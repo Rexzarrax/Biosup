@@ -37,23 +37,23 @@ class IO:
 
     def asrock(self, myData, fileObject):
         for line in fileObject:
-            myData.append(line)
-            print("Adding "+ line + " to asrockArr")
+            myData.append(line.rstrip())
+            print(line.rstrip() + " -> asrockArr")
 
     def asus(self,myData, fileObject):
         for line in fileObject:
-            myData.append(line)
-            print("Adding "+ line + " to asusArr")
+            myData.append(line.rstrip())
+            print(line.rstrip() + " -> asusArr")
 
     def msi(self,myData, fileObject):
         for line in fileObject:
-            myData.append(line)
-            print("Adding "+ line + " to msiArr")
+            myData.append(line.rstrip())
+            print(line.rstrip() + " -> msiArr")
 
     def gigabyte(self,myData, fileObject):
         for line in fileObject:
-            myData.append(line)
-            print("Adding "+ line + " to gigabyteArr")
+            myData.append(line.rstrip())
+            print(line.rstrip() + " -> gigabyteArr")
 
     def getFile(self, filename):
         path = os.path.realpath(
