@@ -63,10 +63,9 @@ class outputfiles:
     def getsku(self, myGetWeb):
         raw_html = myGetWeb.simple_get("https://www.ple.com.au/Motherboards/ASRock")
         html = BeautifulSoup(raw_html, 'html.parser')
-        filter1 = html.find_all("div", {"class": "pg_manufacturermodel"})
+        filter1 = html.findAll("div", class_="pg_manufacturermodel")
+        
         print(filter1)
-
-
         #raw_html = myGetWeb.simple_get("https://www.ple.com.au/Motherboards/ASUS")
 
 
