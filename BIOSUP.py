@@ -56,12 +56,30 @@ class moboData:
         self.gigabyteArr = []
         self.msiArr = []
         
-        
+class outputfiles:
+    def __init__(self):
+        pass
+
+    def getsku(self, myGetWeb):
+        raw_html = myGetWeb.simple_get("https://www.ple.com.au/Motherboards/ASRock")
+        html = BeautifulSoup(raw_html, 'html.parser')
+        print(html)
+
+
+        #raw_html = myGetWeb.simple_get("https://www.ple.com.au/Motherboards/ASUS")
+
+
+        #raw_html = myGetWeb.simple_get("https://www.ple.com.au/Motherboards/Gigabyte")
+
+
+        #raw_html = myGetWeb.simple_get("https://www.ple.com.au/Motherboards/MSI")
+
+    
 
 #get the list of motherboard names from file
 #and saves them to Array
 #creates the file structure to easily find BIOS'
-class IO:
+class inputfiles:
     def asrock(self, myData, fileObject):
         for line in fileObject:
             myData.append(line.rstrip())
@@ -134,25 +152,23 @@ def main():
 
     mysetup = setUp()
     myData = moboData()  
-    myIO = IO()
+    myI = inputfiles()
     myGetWeb = getskuandsave()
+    myO = outputfiles()
 
     mysetup.folderChq("ASROCK")
     mysetup.folderChq("GIGABYTE")
     mysetup.folderChq("ASUS")
     mysetup.folderChq("MSI")
 
-    myIO.StartHere(myData.asrockArr, "/asrockmodel.txt", 1)
-    myIO.StartHere(myData.asusArr, "/asusmodel.txt", 2)
-    myIO.StartHere(myData.gigabyteArr, "/gigabytemodel.txt", 4)
-    myIO.StartHere(myData.msiArr, "/msimodel.txt", 3)
+    myI.StartHere(myData.asrockArr, "/asrockmodel.txt", 1)
+    myI.StartHere(myData.asusArr, "/asusmodel.txt", 2)
+    myI.StartHere(myData.gigabyteArr, "/gigabytemodel.txt", 4)
+    myI.StartHere(myData.msiArr, "/msimodel.txt", 3)
 
     mysetup.printmodels(myData)
 
-    print(myGetWeb.simple_get("https://www.ple.com.au/Motherboards/Gigabyte"))
-    print(myGetWeb.simple_get("https://www.ple.com.au/Motherboards/ASUS"))
-    print(myGetWeb.simple_get("https://www.ple.com.au/Motherboards/Gigabyte"))
-    print(myGetWeb.simple_get("https://www.ple.com.au/Motherboards/MSI"))
+    myO.getsku(myGetWeb)
 
 if __name__ == "__main__":
     main()
