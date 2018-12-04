@@ -61,24 +61,15 @@ class outputfiles:
         pass
 
     def innerHTML(self, element):
-        return (element.encode_contents()).decode("utf-8").replace("SKU:","").strip()
+        return (element.encode_contents()).decode("utf-8").replace("SKU: ","").strip().replace(" ","-")
 
-    def getsku(self, myGetWeb):
-        raw_html = myGetWeb.simple_get("https://www.ple.com.au/Motherboards/ASRock")
+    def getsku(self, myGetWeb, url):
+        raw_html = myGetWeb.simple_get(url)
         html = BeautifulSoup(raw_html, 'html.parser')
         filter1 = html.find_all("div", {"class":"pg_manufacturermodel"})
         
         for div in filter1:
             print(self.innerHTML(div))
-        #raw_html = myGetWeb.simple_get("https://www.ple.com.au/Motherboards/ASUS")
-
-
-        #raw_html = myGetWeb.simple_get("https://www.ple.com.au/Motherboards/Gigabyte")
-
-
-        #raw_html = myGetWeb.simple_get("https://www.ple.com.au/Motherboards/MSI")
-
-    
 
 #get the list of motherboard names from file
 #and saves them to Array
@@ -172,7 +163,10 @@ def main():
 
     mysetup.printmodels(myData)
 
-    myO.getsku(myGetWeb)
+    myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASRock")
+    myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/Gigabyte")
+    myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASUS")
+    myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/MSI")
 
 if __name__ == "__main__":
     main()
