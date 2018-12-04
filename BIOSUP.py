@@ -60,12 +60,16 @@ class outputfiles:
     def __init__(self):
         pass
 
+    def innerHTML(self, element):
+        return (element.encode_contents()).decode("utf-8").replace("SKU:","").strip()
+
     def getsku(self, myGetWeb):
         raw_html = myGetWeb.simple_get("https://www.ple.com.au/Motherboards/ASRock")
         html = BeautifulSoup(raw_html, 'html.parser')
-        filter1 = html.findAll("div", class_="pg_manufacturermodel")
+        filter1 = html.find_all("div", {"class":"pg_manufacturermodel"})
         
-        print(filter1)
+        for div in filter1:
+            print(self.innerHTML(div))
         #raw_html = myGetWeb.simple_get("https://www.ple.com.au/Motherboards/ASUS")
 
 
