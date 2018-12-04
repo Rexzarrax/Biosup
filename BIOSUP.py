@@ -12,7 +12,8 @@ from bs4 import BeautifulSoup
 
 #unzip bios' ready for reading by flash software
 class unzip:
-    
+    def __init__(self):
+        pass
     def deZip(self):
         unzip = zipfile.ZipFile(file2unzip)
         unzip.extractall(folder2extract2)
