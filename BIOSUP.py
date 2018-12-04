@@ -24,6 +24,7 @@ class unzip:
 class getskuandsave:
     def __init__(self):
         pass
+
     def simple_get(self, url):
         try:
             with contextlib.closing(requests.get(url, stream=True)) as resp:
@@ -37,7 +38,7 @@ class getskuandsave:
             return None
 
 
-    def is_good_response(resp):
+    def is_good_response(self, resp):
         content_type = resp.headers['Content-Type'].lower()
         return (resp.status_code == 200 
                 and content_type is not None 
@@ -134,6 +135,7 @@ def main():
     mysetup = setUp()
     myData = moboData()  
     myIO = IO()
+    myGetWeb = getskuandsave()
 
     mysetup.folderChq("ASROCK")
     mysetup.folderChq("GIGABYTE")
@@ -146,6 +148,11 @@ def main():
     myIO.StartHere(myData.msiArr, "/msimodel.txt", 3)
 
     mysetup.printmodels(myData)
+
+    print(myGetWeb.simple_get("https://www.ple.com.au/Motherboards/Gigabyte"))
+    print(myGetWeb.simple_get("https://www.ple.com.au/Motherboards/ASUS"))
+    print(myGetWeb.simple_get("https://www.ple.com.au/Motherboards/Gigabyte"))
+    print(myGetWeb.simple_get("https://www.ple.com.au/Motherboards/MSI"))
 
 if __name__ == "__main__":
     main()
