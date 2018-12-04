@@ -1,6 +1,11 @@
 import zipfile
 import os
 
+import contextlib
+import requests
+from bs4 import BeautifulSoup
+
+
 #extra scopes:
 #use PLE website to source motherboards to get BIOS' for
 #sort into folders for company
@@ -14,10 +19,32 @@ class unzip:
         
         unzip.close()
 
-#downloads the bios from the internet
-class download:
-    #initialiser
-    pass
+#Collects the skus of the various mobo
+class getskuandsave:
+    def __init__(self):
+        pass
+    def simple_get(self, url):
+        try:
+            with contextlib.closing(requests.get(url, stream=True)) as resp:
+                if self.is_good_response(resp):
+                    return resp.content
+                else:
+                    return "Not Valid HTML"
+
+        except requests.exceptions.RequestException as e:
+            self.log_error('Error during requests to {0} : {1}'.format(url, str(e)))
+            return None
+
+
+    def is_good_response(resp):
+        content_type = resp.headers['Content-Type'].lower()
+        return (resp.status_code == 200 
+                and content_type is not None 
+                and content_type.find('html') > -1)
+
+
+    def log_error(e):
+        print(e)
 
 #stores motherboard data2
 class moboData:
@@ -33,8 +60,6 @@ class moboData:
 #and saves them to Array
 #creates the file structure to easily find BIOS'
 class IO:
-    #load file to get models
-
     def asrock(self, myData, fileObject):
         for line in fileObject:
             myData.append(line.rstrip())
@@ -93,28 +118,33 @@ class setUp:
         else:
             print("Dir: " , company ,  " already exists")
 
+    def printmodels(self, myData):
+        print("Asrock: "+str(myData.asrockArr)) 
+        print("Asus: "+str(myData.asusArr))
+        print("MSI: "+str(myData.msiArr))
+        print("Gigabyte: "+str(myData.gigabyteArr))
+
+
 #initial checks and basic file creation
 def main():
     print("----------BIOSUP----------")
     print("Initialising...")
+
     mysetup = setUp()
+    myData = moboData()  
+    myIO = IO()
+
     mysetup.folderChq("ASROCK")
     mysetup.folderChq("GIGABYTE")
     mysetup.folderChq("ASUS")
     mysetup.folderChq("MSI")
 
-    myData = moboData()
-    myIO = IO()
     myIO.StartHere(myData.asrockArr, "/asrockmodel.txt", 1)
     myIO.StartHere(myData.asusArr, "/asusmodel.txt", 2)
     myIO.StartHere(myData.gigabyteArr, "/gigabytemodel.txt", 4)
     myIO.StartHere(myData.msiArr, "/msimodel.txt", 3)
 
-    print("Asrock: "+str(myData.asrockArr)) 
-    print("Asus: "+str(myData.asusArr))
-    print("MSI: "+str(myData.msiArr))
-    print("Gigabyte: "+str(myData.gigabyteArr))
-
+    mysetup.printmodels(myData)
 
 if __name__ == "__main__":
     main()
