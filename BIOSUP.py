@@ -67,6 +67,7 @@ class dlModels:
         raw_html = myGetWeb.simple_get(url)
         html = BeautifulSoup(raw_html, 'html.parser')
         filter1 = html.find_all("div", {"class":"pg_manufacturermodel"})
+        print("Getting: "+url)
         
         for div in filter1:
             array.append(self.innerHTML(div))
@@ -118,6 +119,16 @@ class setUp:
         print("Gigabyte: "+str(myData.gigabyteArr)+"\n")
 
 
+class cleanArr:
+    def arrClean(self, array1):
+        for i in range (len (array1)-1):
+            try:
+                if array1[i] == array1[i+1]:
+                    del array1[i]
+            except:
+                pass
+
+    
 #initial checks and basic file creation
 def main():
     print("----------BIOSUP----------")
@@ -128,22 +139,35 @@ def main():
     myI = inputfiles()
     myGetWeb = getskuandsave()
     myO = dlModels()
-
+    cleanArr1 = cleanArr()
+    #create folders
     mysetup.folderChq("ASROCK")
     mysetup.folderChq("GIGABYTE")
     mysetup.folderChq("ASUS")
     mysetup.folderChq("MSI")
-
+    #import models from local files
     myI.StartHere(myData.asrockArr, "/asrock.txt", 1)
     myI.StartHere(myData.asusArr, "/asus.txt", 2)
     myI.StartHere(myData.gigabyteArr, "/gigabyte.txt", 4)
     myI.StartHere(myData.msiArr, "/msi.txt", 3)
-
+    #Download skus from PLE website
     myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASRock", myData.asrockArr)
     myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/Gigabyte", myData.gigabyteArr)
     myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASUS", myData.asusArr)
     myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/MSI", myData.msiArr)
-
+    #Sort the arrays ready for further processing
+    myData.asrockArr.sort()
+    myData.asusArr.sort()
+    myData.gigabyteArr.sort()
+    myData.msiArr.sort()
+    #delete duplicate entries
+    cleanArr1.arrClean(myData.asrockArr)
+    cleanArr1.arrClean(myData.asusArr)
+    cleanArr1.arrClean(myData.gigabyteArr)
+    cleanArr1.arrClean(myData.msiArr)
+   
+    
+    #print results
     mysetup.printmodels(myData)
 
 if __name__ == "__main__":
