@@ -11,6 +11,14 @@ from bs4 import BeautifulSoup
 #sort into folders for company
 
 #unzip bios' ready for reading by flash software
+#stores motherboard data
+class moboData:
+    def __init__(self):
+        self.asrockArr = []
+        self.asusArr = []
+        self.gigabyteArr = []
+        self.msiArr = []
+
 class unzip:
     def __init__(self):
         pass
@@ -47,16 +55,8 @@ class getskuandsave:
 
     def log_error(e):
         print(e)
-
-#stores motherboard data2
-class moboData:
-    def __init__(self):
-        self.asrockArr = []
-        self.asusArr = []
-        self.gigabyteArr = []
-        self.msiArr = []
         
-class outputfiles:
+class dlModels:
     def __init__(self):
         pass
 
@@ -71,14 +71,16 @@ class outputfiles:
         for div in filter1:
             print(self.innerHTML(div))
 
+
 #get the list of motherboard names from file
 #and saves them to Array
 #creates the file structure to easily find BIOS'
 class inputfiles:
-    def asrock(self, myData, fileObject):
+    #create state machine that returnes the name of the text file
+    def genCompnay(self, myData, fileObject):
         for line in fileObject:
             myData.append(line.rstrip())
-            print(line.rstrip() + " -> asrockArr")
+            print(line.rstrip() + " -> "+str(fileObject.name.split('Biosup/', 1)[-1]).strip(".txt")+"Arr")
 
     def asus(self,myData, fileObject):
         for line in fileObject:
@@ -103,20 +105,9 @@ class inputfiles:
 
     #determine the company to get the company model file
     def StartHere(self, myData, filename, companyint):
-        if companyint == 1:
-            fileObject = self.getFile(filename)
-            self.asrock(myData, fileObject)
-        elif companyint == 2:
-            fileObject = self.getFile(filename)
-            self.asus(myData, fileObject)
-        elif companyint == 3:
-            fileObject = self.getFile(filename)
-            self.msi(myData, fileObject)
-        elif companyint == 4:
-            fileObject = self.getFile(filename)
-            self.gigabyte(myData, fileObject)
-        else:
-            print("Error in case statement")
+        fileObject = self.getFile(filename)
+        self.genCompnay(myData, fileObject)
+
     def __Init__(self):
         pass
 
@@ -149,24 +140,24 @@ def main():
     myData = moboData()  
     myI = inputfiles()
     myGetWeb = getskuandsave()
-    myO = outputfiles()
+    myO = dlModels()
 
     mysetup.folderChq("ASROCK")
     mysetup.folderChq("GIGABYTE")
     mysetup.folderChq("ASUS")
     mysetup.folderChq("MSI")
 
-    myI.StartHere(myData.asrockArr, "/asrockmodel.txt", 1)
-    myI.StartHere(myData.asusArr, "/asusmodel.txt", 2)
-    myI.StartHere(myData.gigabyteArr, "/gigabytemodel.txt", 4)
-    myI.StartHere(myData.msiArr, "/msimodel.txt", 3)
+    myI.StartHere(myData.asrockArr, "/asrock.txt", 1)
+    myI.StartHere(myData.asusArr, "/asus.txt", 2)
+    myI.StartHere(myData.gigabyteArr, "/gigabyte.txt", 4)
+    myI.StartHere(myData.msiArr, "/msi.txt", 3)
 
     mysetup.printmodels(myData)
 
-    myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASRock")
-    myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/Gigabyte")
-    myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASUS")
-    myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/MSI")
+    #myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASRock")
+    #myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/Gigabyte")
+    #myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASUS")
+    #myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/MSI")
 
 if __name__ == "__main__":
     main()
