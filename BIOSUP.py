@@ -63,13 +63,14 @@ class dlModels:
     def innerHTML(self, element):
         return (element.encode_contents()).decode("utf-8").replace("SKU: ","").strip().replace(" ","-")
 
-    def getsku(self, myGetWeb, url):
+    def getsku(self, myGetWeb, url, array):
         raw_html = myGetWeb.simple_get(url)
         html = BeautifulSoup(raw_html, 'html.parser')
         filter1 = html.find_all("div", {"class":"pg_manufacturermodel"})
         
         for div in filter1:
-            print(self.innerHTML(div))
+            array.append(self.innerHTML(div))
+            #print(self.innerHTML(div))
 
 
 #get the list of motherboard names from file
@@ -81,21 +82,6 @@ class inputfiles:
         for line in fileObject:
             myData.append(line.rstrip())
             print(line.rstrip() + " -> "+str(fileObject.name.split('Biosup/', 1)[-1]).strip(".txt")+"Arr")
-
-    def asus(self,myData, fileObject):
-        for line in fileObject:
-            myData.append(line.rstrip())
-            print(line.rstrip() + " -> asusArr")
-
-    def msi(self,myData, fileObject):
-        for line in fileObject:
-            myData.append(line.rstrip())
-            print(line.rstrip() + " -> msiArr")
-
-    def gigabyte(self,myData, fileObject):
-        for line in fileObject:
-            myData.append(line.rstrip())
-            print(line.rstrip() + " -> gigabyteArr")
 
     def getFile(self, filename):
         path = os.path.realpath(
@@ -118,17 +104,18 @@ class inputfiles:
 
 class setUp:
     def folderChq(self, company):
-        if not os.path.exists(company):
-            os.mkdir(company)
+        cpwd = os.path.dirname(os.path.realpath(__file__))+"/"
+        if not os.path.exists(cpwd+company):
+            os.mkdir(cpwd+company)
             print("Dir: " , company ,  " Created ") 
         else:
             print("Dir: " , company ,  " already exists")
 
     def printmodels(self, myData):
-        print("Asrock: "+str(myData.asrockArr)) 
-        print("Asus: "+str(myData.asusArr))
-        print("MSI: "+str(myData.msiArr))
-        print("Gigabyte: "+str(myData.gigabyteArr))
+        print("Asrock: "+str(myData.asrockArr)+"\n") 
+        print("Asus: "+str(myData.asusArr)+"\n")
+        print("MSI: "+str(myData.msiArr)+"\n")
+        print("Gigabyte: "+str(myData.gigabyteArr)+"\n")
 
 
 #initial checks and basic file creation
@@ -152,12 +139,12 @@ def main():
     myI.StartHere(myData.gigabyteArr, "/gigabyte.txt", 4)
     myI.StartHere(myData.msiArr, "/msi.txt", 3)
 
-    mysetup.printmodels(myData)
+    myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASRock", myData.asrockArr)
+    myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/Gigabyte", myData.gigabyteArr)
+    myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASUS", myData.asusArr)
+    myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/MSI", myData.msiArr)
 
-    #myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASRock")
-    #myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/Gigabyte")
-    #myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASUS")
-    #myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/MSI")
+    mysetup.printmodels(myData)
 
 if __name__ == "__main__":
     main()
