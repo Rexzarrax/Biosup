@@ -98,11 +98,13 @@ class inputfiles:
     def __Init__(self):
         pass
 
-    
-#load models from website(wait till website updates)       
-#class webFetch:
+#creates the URL to then download the files to
+class bioufiDL:
+    def urlBuilder(self):
+        pass
 
-
+    def __Init__(self):
+        pass
 class setUp:
     def folderChq(self, company):
         cpwd = os.path.dirname(os.path.realpath(__file__))+"/"
@@ -127,8 +129,6 @@ class cleanArr:
                     del array1[i]
             except:
                 pass
-
-    
 #initial checks and basic file creation
 def main():
     print("----------BIOSUP----------")
@@ -146,10 +146,10 @@ def main():
     mysetup.folderChq("ASUS")
     mysetup.folderChq("MSI")
     #import models from local files
-    myI.StartHere(myData.asrockArr, "/asrock.txt", 1)
-    myI.StartHere(myData.asusArr, "/asus.txt", 2)
-    myI.StartHere(myData.gigabyteArr, "/gigabyte.txt", 4)
-    myI.StartHere(myData.msiArr, "/msi.txt", 3)
+    #myI.StartHere(myData.asrockArr, "/asrock.txt", 1)
+    #myI.StartHere(myData.asusArr, "/asus.txt", 2)
+    #myI.StartHere(myData.gigabyteArr, "/gigabyte.txt", 4)
+    #myI.StartHere(myData.msiArr, "/msi.txt", 3)
     #Download skus from PLE website
     myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASRock", myData.asrockArr)
     myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/Gigabyte", myData.gigabyteArr)
@@ -165,8 +165,6 @@ def main():
     cleanArr1.arrClean(myData.asusArr)
     cleanArr1.arrClean(myData.gigabyteArr)
     cleanArr1.arrClean(myData.msiArr)
-   
-    
     #print results
     mysetup.printmodels(myData)
 
