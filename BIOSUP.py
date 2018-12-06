@@ -100,7 +100,14 @@ class inputfiles:
 
 #creates the URL to then download the files to
 class bioufiDL:
-    def urlBuilder(self):
+    def urlBuilderAsus(self, model):
+        url = "https://www.asus.com/au/Motherboards/"+model+"/HelpDesk_BIOS/"
+        pass
+    def urlBuilderAsrock(self):
+        pass
+    def urlBuilderGigabyte(self):
+        pass
+    def urlBuilderMSI(self):
         pass
 
     def __Init__(self):
@@ -146,10 +153,10 @@ def main():
     mysetup.folderChq("ASUS")
     mysetup.folderChq("MSI")
     #import models from local files
-    #myI.StartHere(myData.asrockArr, "/asrock.txt", 1)
-    #myI.StartHere(myData.asusArr, "/asus.txt", 2)
-    #myI.StartHere(myData.gigabyteArr, "/gigabyte.txt", 4)
-    #myI.StartHere(myData.msiArr, "/msi.txt", 3)
+    #myI.StartHere(myData.asrockArr, "/Sources/asrock.txt", 1)
+    #myI.StartHere(myData.asusArr, "/Sources/asus.txt", 2)
+    #myI.StartHere(myData.gigabyteArr, "/Sources/gigabyte.txt", 4)
+    #myI.StartHere(myData.msiArr, "/Sources/msi.txt", 3)
     #Download skus from PLE website
     myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASRock", myData.asrockArr)
     myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/Gigabyte", myData.gigabyteArr)
