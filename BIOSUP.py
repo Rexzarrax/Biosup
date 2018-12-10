@@ -3,7 +3,17 @@ import os
 
 import contextlib
 import requests
-from bs4 import BeautifulSoup
+try: 
+    from bs4 import BeautifulSoup
+except ImportError:  
+    print("No module named 'BeautifulSoup' found") 
+
+try: 
+    from googlesearch import search 
+except ImportError:  
+    print("No module named 'google' found") 
+
+import re
 
 
 #extra scopes:
@@ -14,6 +24,7 @@ from bs4 import BeautifulSoup
 #stores motherboard data
 class moboData:
     def __init__(self):
+        #COMBINE INTO 2D ARRAY IN FUTURE
         self.asrockArr = []
         self.asusArr = []
         self.gigabyteArr = []
@@ -29,7 +40,7 @@ class unzip:
         unzip.close()
 
 #Collects the skus of the various mobo
-class getskuandsave:
+class gethtml:
     def __init__(self):
         pass
 
@@ -56,7 +67,7 @@ class getskuandsave:
     def log_error(e):
         print(e)
         
-class dlModels:
+class dlModelssource:
     def __init__(self):
         pass
 
@@ -100,18 +111,26 @@ class inputfiles:
 
 #creates the URL to then download the files to
 class bioufiDL:
-    def urlBuilderAsus(self, model):
-        url = "https://www.asus.com/au/Motherboards/"+model+"/HelpDesk_BIOS/"
+    def urlBuilderAsus(self):
         pass
-    def urlBuilderAsrock(self):
+    def urlBuilderAsrock(self, mymodel, urlchq):
+        prodURL = self.searchforlink(mymodel, urlchq)
         pass
     def urlBuilderGigabyte(self):
         pass
     def urlBuilderMSI(self):
         pass
+    
+    def searchforlink(self, mymodel, urlchq):
+        for j in search(mymodel+" bios", tld="co.in", num=10, stop=1, pause=2): 
+            m = re.search("^https:\/\/www\.asrock\.com\/MB\/")
+            print(m.group(0))
+            #if j == urlchq:
+                #return j
 
     def __Init__(self):
         pass
+
 class setUp:
     def folderChq(self, company):
         cpwd = os.path.dirname(os.path.realpath(__file__))+"/"
@@ -126,7 +145,6 @@ class setUp:
         print("Asus: "+str(myData.asusArr)+"\n")
         print("MSI: "+str(myData.msiArr)+"\n")
         print("Gigabyte: "+str(myData.gigabyteArr)+"\n")
-
 
 class cleanArr:
     def arrClean(self, array1):
@@ -144,9 +162,10 @@ def main():
     mysetup = setUp()
     myData = moboData()  
     myI = inputfiles()
-    myGetWeb = getskuandsave()
-    myO = dlModels()
+    myGetWeb = gethtml()
+    myO = dlModelssource()
     cleanArr1 = cleanArr()
+    getBIO = bioufiDL()
     #create folders
     mysetup.folderChq("ASROCK")
     mysetup.folderChq("GIGABYTE")
@@ -159,9 +178,9 @@ def main():
     #myI.StartHere(myData.msiArr, "/Sources/msi.txt", 3)
     #Download skus from PLE website
     myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASRock", myData.asrockArr)
-    myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/Gigabyte", myData.gigabyteArr)
-    myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASUS", myData.asusArr)
-    myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/MSI", myData.msiArr)
+    #myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/Gigabyte", myData.gigabyteArr)
+    #myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASUS", myData.asusArr)
+    #myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/MSI", myData.msiArr)
     #Sort the arrays ready for further processing
     myData.asrockArr.sort()
     myData.asusArr.sort()
@@ -172,8 +191,16 @@ def main():
     cleanArr1.arrClean(myData.asusArr)
     cleanArr1.arrClean(myData.gigabyteArr)
     cleanArr1.arrClean(myData.msiArr)
+
     #print results
     mysetup.printmodels(myData)
+
+
+    for modelStr in myData.asrockArr:   
+        print(modelStr)
+        getBIO.urlBuilderAsrock(modelStr, "https://www.asrock.com/mb/")
+
+    print("Finished...")
 
 if __name__ == "__main__":
     main()
