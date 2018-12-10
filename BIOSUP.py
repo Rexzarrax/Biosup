@@ -124,7 +124,7 @@ class bioufiDL:
     
     def searchforlink(self, mymodel, urlchq):
         for j in search(mymodel, tld="co.in", num=10, stop=1, pause=2): 
-            if re.search("^https:\/\/www\.asrock\.com\/MB\/", j):
+            if re.search(urlchq, j):
                 return j
 
     def __Init__(self):
@@ -197,7 +197,7 @@ def main():
 
     for modelStr in myData.asrockArr:   
         print(modelStr)
-        getBIO.urlBuilderAsrock(modelStr, "https://www.asrock.com/mb/")
+        getBIO.urlBuilderAsrock(modelStr, "^https:\/\/www\.asrock\.com")
 
     print("Finished...")
 
