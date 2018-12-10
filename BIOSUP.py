@@ -115,6 +115,7 @@ class bioufiDL:
         pass
     def urlBuilderAsrock(self, mymodel, urlchq):
         prodURL = self.searchforlink(mymodel, urlchq)
+        print(prodURL)
         pass
     def urlBuilderGigabyte(self):
         pass
@@ -122,11 +123,9 @@ class bioufiDL:
         pass
     
     def searchforlink(self, mymodel, urlchq):
-        for j in search(mymodel+" bios", tld="co.in", num=10, stop=1, pause=2): 
-            m = re.search("^https:\/\/www\.asrock\.com\/MB\/")
-            print(m.group(0))
-            #if j == urlchq:
-                #return j
+        for j in search(mymodel, tld="co.in", num=10, stop=1, pause=2): 
+            if re.search("^https:\/\/www\.asrock\.com\/MB\/", j):
+                return j
 
     def __Init__(self):
         pass
