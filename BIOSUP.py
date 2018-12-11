@@ -1,8 +1,9 @@
-import zipfile
 import os
-
+import re
 import contextlib
 import requests
+import zipfile
+
 try: 
     from bs4 import BeautifulSoup
 except ImportError:  
@@ -12,8 +13,6 @@ try:
     from googlesearch import search 
 except ImportError:  
     print("No module named 'google' found") 
-
-import re
 
 
 #extra scopes:
