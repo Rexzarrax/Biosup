@@ -32,7 +32,7 @@ class moboData:
 class unzip:
     def __init__(self):
         pass
-    def deZip(self):
+    def deZip(self, file2unzip, folder2extract2):
         unzip = zipfile.ZipFile(file2unzip)
         unzip.extractall(folder2extract2)
         
@@ -113,7 +113,8 @@ class bioufiDL:
     def urlBuilderAsus(self):
         pass
     def urlBuilderAsrock(self, mymodel, urlchq):
-        prodURL = self.searchforlink(mymodel, urlchq)
+        #coupld split up to make more generic to reduce repeated code
+        prodURL = str(self.searchforlink(mymodel, urlchq)).strip("index.asp")+"BIOS.html"
         print(prodURL)
         pass
     def urlBuilderGigabyte(self):
