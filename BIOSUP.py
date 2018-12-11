@@ -113,6 +113,7 @@ class bioufiDL:
     def urlBuilderAsus(self):
         pass
     def urlBuilderAsrock(self,myGetWeb, mymodel, urlchq):
+        cpwd = os.path.dirname(os.path.realpath(__file__))+"/"
         #coupld split up to make more generic to reduce repeated code
         prodURL = str(self.searchforlink(mymodel, urlchq)).strip("index.asp")+"BIOS.html"
         print(prodURL)
@@ -122,7 +123,10 @@ class bioufiDL:
             try:
                 r = requests.get(link.get('href'), allow_redirects=True)
                 open(os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASROCK/"+str(mymodel).replace("/","-")+".zip", 'wb').write(r.content)
-                print("Download Successful...")
+                if not os.path.exists(cpwd+str(mymodel).replace("/","-")):
+                    print("Download Successful...")
+                else:
+                    print("Download Failed...")
                 break
             except Exception as e:
                 print("Error: "+str(e)+" |getting:"+ link.get("href"))
