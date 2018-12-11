@@ -112,10 +112,17 @@ class inputfiles:
 class bioufiDL:
     def urlBuilderAsus(self):
         pass
-    def urlBuilderAsrock(self, mymodel, urlchq):
+    def urlBuilderAsrock(self,myGetWeb, mymodel, urlchq):
         #coupld split up to make more generic to reduce repeated code
         prodURL = str(self.searchforlink(mymodel, urlchq)).strip("index.asp")+"BIOS.html"
         print(prodURL)
+        html_page = myGetWeb.simple_get(prodURL)
+        soup_html = BeautifulSoup(html_page, "html5lib")
+        for link in soup_html.findAll('a', attrs={'href': re.compile("^http://")}):
+            r = requests.get(link.get('href'), allow_redirects=True)
+            open(os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASROCK/"+mymodel+".zip", 'wb').write(r.content)
+            break
+        
         pass
     def urlBuilderGigabyte(self):
         pass
@@ -197,7 +204,7 @@ def main():
 
     for modelStr in myData.asrockArr:   
         print(modelStr)
-        getBIO.urlBuilderAsrock(modelStr, "^https:\/\/www\.asrock\.com")
+        getBIO.urlBuilderAsrock(myGetWeb, modelStr ,"^https:\/\/www\.asrock\.com")
 
     print("Finished...")
 
