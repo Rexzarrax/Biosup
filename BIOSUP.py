@@ -119,9 +119,14 @@ class bioufiDL:
         html_page = myGetWeb.simple_get(prodURL)
         soup_html = BeautifulSoup(html_page, "html5lib")
         for link in soup_html.findAll('a', attrs={'href': re.compile("^http://")}):
-            r = requests.get(link.get('href'), allow_redirects=True)
-            open(os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASROCK/"+mymodel+".zip", 'wb').write(r.content)
-            break
+            try:
+                r = requests.get(link.get('href'), allow_redirects=True)
+                open(os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASROCK/"+str(mymodel).replace("/","-")+".zip", 'wb').write(r.content)
+                print("Download Successful...")
+                break
+            except Exception as e:
+                print("Error: "+str(e)+" |getting:"+ link.get("href"))
+                break
         
         pass
     def urlBuilderGigabyte(self):
@@ -203,7 +208,7 @@ def main():
 
 
     for modelStr in myData.asrockArr:   
-        print(modelStr)
+        print("Getting "+modelStr+"'s BIOS...")
         getBIO.urlBuilderAsrock(myGetWeb, modelStr ,"^https:\/\/www\.asrock\.com")
 
     print("Finished...")
