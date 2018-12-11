@@ -110,31 +110,44 @@ class inputfiles:
 
 #creates the URL to then download the files to
 class bioufiDL:
+    #Download bios from Asus
     def urlBuilderAsus(self):
         pass
+    #Download bios from Asrock    
     def urlBuilderAsrock(self,myGetWeb, mymodel, urlchq):
         cpwd = os.path.dirname(os.path.realpath(__file__))+"/"
         #coupld split up to make more generic to reduce repeated code
         prodURL = str(self.searchforlink(mymodel, urlchq)).strip("index.asp")+"BIOS.html"
         print(prodURL)
+        #get html page
         html_page = myGetWeb.simple_get(prodURL)
+        #makeitbeutiful
         soup_html = BeautifulSoup(html_page, "html5lib")
+        #select only the url
         for link in soup_html.findAll('a', attrs={'href': re.compile("^http://")}):
             try:
-                r = requests.get(link.get('href'), allow_redirects=True)
-                open(os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASROCK/"+str(mymodel).replace("/","-")+".zip", 'wb').write(r.content)
                 if not os.path.exists(cpwd+str(mymodel).replace("/","-")):
-                    print("Download Successful...")
+                    r = requests.get(link.get('href'), allow_redirects=True)
+                    cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASROCK/"+str(mymodel).replace("/","-")+".zip"
+                    open(cpath , 'wb').write(r.content)
+                    if not os.path.exists(cpwd+str(mymodel).replace("/","-")):
+                        print("Download Successful...")
+                        break
+                    else:
+                        print("Download Failed...")
+                        break
                 else:
-                    print("Download Failed...")
-                break
+                    print("BIOS already Downloaded")
+
             except Exception as e:
                 print("Error: "+str(e)+" |getting:"+ link.get("href"))
                 break
         
         pass
+    #download BIOS from Gigabyte
     def urlBuilderGigabyte(self):
         pass
+    #download BIOS from MSI
     def urlBuilderMSI(self):
         pass
     
@@ -181,6 +194,7 @@ def main():
     myO = dlModelssource()
     cleanArr1 = cleanArr()
     getBIO = bioufiDL()
+
     #create folders
     mysetup.folderChq("ASROCK")
     mysetup.folderChq("GIGABYTE")
