@@ -111,13 +111,41 @@ class inputfiles:
 #creates the URL to then download the files to
 class bioufiDL:
     #Download bios from Asus
-    def urlBuilderAsus(self):
-        pass
+    def urlBuilderAsus(self,myGetWeb, mymodel, urlchq):
+        cpwd = os.path.dirname(os.path.realpath(__file__))+"/"
+        cpwdfull=cpwd+str(mymodel).replace("/","-")
+        #coupld split up to make more generic to reduce repeated code
+        prodURL = "https://www.asus.com/us/Motherboards/"+str(mymodel).replace("(","-").replace(")","")+"/HelpDesk_BIOS/"
+        print(prodURL)
+        #get html page
+        html_page = myGetWeb.simple_get(prodURL)
+        #makeitbeutiful
+        soup_html = BeautifulSoup(html_page, "html5lib")
+        #select only the url
+        for link in soup_html.find_all("div", class_="download-inf-r"):
+            print(link)
+            try:
+                if not os.path.exists(cpwdfull):
+                    r = requests.get(link.get('href'), allow_redirects=True)
+                    cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASUS/"+str(mymodel).replace("/","-")+".zip"
+                    open(cpath , 'wb').write(r.content)
+                    if not os.path.exists(cpwdfull):
+                        print("Download Successful...")
+                        break
+                    else:
+                        print("Download Failed...")
+                        break
+                else:
+                    print("BIOS already Downloaded")
+            except Exception as e:
+                print("Error: "+str(e)+" |getting:"+ link.get("href"))
+                break
     #Download bios from Asrock    
     def urlBuilderAsrock(self,myGetWeb, mymodel, urlchq):
         cpwd = os.path.dirname(os.path.realpath(__file__))+"/"
+        cpwdfull=cpwd+str(mymodel).replace("/","-")
         #coupld split up to make more generic to reduce repeated code
-        prodURL = str(self.searchforlink(mymodel, urlchq)).strip("index.asp")+"BIOS.html"
+        prodURL = str(self.searchforlink(mymodel, urlchq)).replace("index.asp","BIOS.html")
         print(prodURL)
         #get html page
         html_page = myGetWeb.simple_get(prodURL)
@@ -126,11 +154,11 @@ class bioufiDL:
         #select only the url
         for link in soup_html.findAll('a', attrs={'href': re.compile("^http://")}):
             try:
-                if not os.path.exists(cpwd+str(mymodel).replace("/","-")):
+                if not os.path.exists(cpwdfull):
                     r = requests.get(link.get('href'), allow_redirects=True)
                     cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASROCK/"+str(mymodel).replace("/","-")+".zip"
                     open(cpath , 'wb').write(r.content)
-                    if not os.path.exists(cpwd+str(mymodel).replace("/","-")):
+                    if not os.path.exists(cpwdfull):
                         print("Download Successful...")
                         break
                     else:
@@ -206,9 +234,9 @@ def main():
     #myI.StartHere(myData.gigabyteArr, "/Sources/gigabyte.txt", 4)
     #myI.StartHere(myData.msiArr, "/Sources/msi.txt", 3)
     #Download skus from PLE website
-    myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASRock", myData.asrockArr)
+    #myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASRock", myData.asrockArr)
     #myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/Gigabyte", myData.gigabyteArr)
-    #myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASUS", myData.asusArr)
+    myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASUS", myData.asusArr)
     #myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/MSI", myData.msiArr)
     #Sort the arrays ready for further processing
     myData.asrockArr.sort()
@@ -225,9 +253,12 @@ def main():
     mysetup.printmodels(myData)
 
 
-    for modelStr in myData.asrockArr:   
+    #for modelStr in myData.asrockArr:   
+    #    print("Getting "+modelStr+"'s BIOS...")
+    #    getBIO.urlBuilderAsrock(myGetWeb, modelStr ,"^https:\/\/www\.asrock\.com")
+    for modelStr in myData.asusArr:   
         print("Getting "+modelStr+"'s BIOS...")
-        getBIO.urlBuilderAsrock(myGetWeb, modelStr ,"^https:\/\/www\.asrock\.com")
+        getBIO.urlBuilderAsus(myGetWeb, modelStr ,"^https:\/\/www\.asus\.com")
 
     print("Finished...")
 
