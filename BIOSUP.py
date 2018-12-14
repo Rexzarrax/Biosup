@@ -18,6 +18,7 @@ except ImportError:
 #extra scopes:
 #use PLE website to source motherboards to get BIOS' for
 #sort into folders for company
+#use pcpartpicker for sources
 
 #unzip bios' ready for reading by flash software
 #stores motherboard data
@@ -112,61 +113,32 @@ class inputfiles:
 class bioufiDL:
     #Download bios from Asus
     def urlBuilderAsus(self,myGetWeb, mymodel, urlchq):
-        cpwd = os.path.dirname(os.path.realpath(__file__))+"/"
-        cpwdfull=cpwd+str(mymodel).replace("/","-")
-        #coupld split up to make more generic to reduce repeated code
-        prodURL = "https://www.asus.com/us/Motherboards/"+str(mymodel).replace("(","-").replace(")","")+"/HelpDesk_BIOS/"
-        print(prodURL)
+        formatModel= str(mymodel).replace("(","").replace(")","")
+        print(formatModel)
+        cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASUS/"+formatModel+".zip"
         #get html page
-        html_page = myGetWeb.simple_get(prodURL)
-        #makeitbeutiful
-        soup_html = BeautifulSoup(html_page, "html5lib")
-        #select only the url
-        for link in soup_html.find_all("div", class_="download-inf-r"):
-            print(link)
-            try:
-                if not os.path.exists(cpwdfull):
-                    r = requests.get(link.get('href'), allow_redirects=True)
-                    cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASUS/"+str(mymodel).replace("/","-")+".zip"
-                    open(cpath , 'wb').write(r.content)
-                    if not os.path.exists(cpwdfull):
-                        print("Successfully Downloaded...")
-                        break
-                    else:
-                        print("Failed...")
-                        break
-                else:
-                    print("already Downloaded")
-            except Exception as e:
-                print("Error: "+str(e)+" |getting:"+ link.get("href"))
-                break
+        if not os.path.exists(cpath):
+            prodURL = "https://www.asus.com/us/Motherboards/"+formatModel+"/HelpDesk_BIOS/"
+            print("Src URL: "+prodURL)
+            html_page = myGetWeb.simple_get(prodURL)
+
+            
+            #select only the url
+            self.dlBIOS(html_page, cpath)            
+            
+        else:
+            print("already Downloaded\n")
     #Download bios from Asrock    
     def urlBuilderAsrock(self,myGetWeb, mymodel, urlchq):
         cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASROCK/"+str(mymodel).replace("/","-")+".zip"
         #get html page
         if not os.path.exists(cpath):
             prodURL = str(self.searchforlink(mymodel, urlchq)).replace("index.asp","BIOS.html")
-            #print("File: "+ cpath)
             print("Src URL: "+prodURL)
             html_page = myGetWeb.simple_get(prodURL)
-            #makeitbeutiful
-            soup_html = BeautifulSoup(html_page, "html5lib")
             #select only the url
-            for link in soup_html.findAll('a', attrs={'href': re.compile("^http://")}):
-                try:             
-                    r = requests.get(link.get('href'), allow_redirects=True)
-                    
-                    print("DL and Save to "+cpath)
-                    open(cpath , 'wb').write(r.content)
-                    if os.path.exists(cpath):
-                        print("Successfully Downloaded...")
-                        break
-                    else:
-                        print("Failed...")
-                        break
-                except Exception as e:
-                    print("Error: "+str(e)+" |getting:"+ link.get("href"))
-                    break
+            self.dlBIOS(html_page, cpath)            
+            
         else:
             print("already Downloaded\n")
 
@@ -176,6 +148,24 @@ class bioufiDL:
     #download BIOS from MSI
     def urlBuilderMSI(self):
         pass
+
+    def dlBIOS(self, html_page, cpath):
+        soup_html = BeautifulSoup(html_page, "html5lib")
+        for link in soup_html.findAll('a', attrs={'href': re.compile("^http://")}):
+                try:             
+                    r = requests.get(link.get('href'), allow_redirects=True)
+                    
+                    print("DL and Save to "+cpath)
+                    open(cpath , 'wb').write(r.content)
+                    if os.path.exists(cpath):
+                        print("Successfully Downloaded...\n")
+                        break
+                    else:
+                        print("Failed...\n")
+                        break
+                except Exception as e:
+                    print("Error: "+str(e)+" |getting:"+ link.get("href"))
+                    break
     
     def searchforlink(self, mymodel, urlchq):
         for j in search(mymodel, tld="co.in", num=10, stop=1, pause=2): 
@@ -235,7 +225,7 @@ def main():
     print("Sourcing models...")
     myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASRock", myData.asrockArr)
     #myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/Gigabyte", myData.gigabyteArr)
-    #myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASUS", myData.asusArr)
+    myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASUS", myData.asusArr)
     #myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/MSI", myData.msiArr)
     #Sort the arrays ready for further processing
     myData.asrockArr.sort()
@@ -253,11 +243,11 @@ def main():
 
 
     for modelStr in myData.asrockArr:   
-        print("Getting "+modelStr+"'s BIOS...")
+        print(modelStr+"'s BIOS...")
         getBIO.urlBuilderAsrock(myGetWeb, modelStr ,"^https:\/\/www\.asrock\.com")
-    #for modelStr in myData.asusArr:   
-     #   print("Getting "+modelStr+"'s BIOS...")
-      #  getBIO.urlBuilderAsus(myGetWeb, modelStr ,"^https:\/\/www\.asus\.com")
+    for modelStr in myData.asusArr:   
+        print("Getting "+modelStr+"'s BIOS...")
+        getBIO.urlBuilderAsus(myGetWeb, modelStr ,"^https:\/\/www\.asus\.com")
 
     print("Finished...")
 
