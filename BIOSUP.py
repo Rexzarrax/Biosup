@@ -121,10 +121,12 @@ class bioufiDL:
             prodURL = "https://www.asus.com/us/Motherboards/"+formatModel+"/HelpDesk_BIOS/"
             print("Src URL: "+prodURL)
             html_page = myGetWeb.simple_get(prodURL)
-
-            
-            #select only the url
-            self.dlBIOS(html_page, cpath)            
+            soup_html = BeautifulSoup(html_page, "html5lib")
+            #for link in soup_html.findAll('a', attrs={'href': re.compile("^http://")}):
+            for link in soup_html.find_all('div', class_="download-inf-r"):
+                print(link)
+                if self.dlBIOS(link, cpath):
+                    break                 
             
         else:
             print("already Downloaded\n")
@@ -137,35 +139,72 @@ class bioufiDL:
             print("Src URL: "+prodURL)
             html_page = myGetWeb.simple_get(prodURL)
             #select only the url
-            self.dlBIOS(html_page, cpath)            
-            
+            soup_html = BeautifulSoup(html_page, "html5lib")
+            for link in soup_html.findAll('a', attrs={'href': re.compile("^http://")}):
+                print("Found the URL:", link['href'])
+                if self.dlBIOS(link, cpath):
+                    break        
         else:
             print("already Downloaded\n")
 
     #download BIOS from Gigabyte
-    def urlBuilderGigabyte(self):
+    def urlBuilderGigabyte(self,myGetWeb, mymodel, urlchq):
+        cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/GIGABYTE/"+str(mymodel).replace("/","-")+".zip"
+        #get html page
+        if not os.path.exists(cpath):
+            prodURL = str(self.searchforlink(mymodel, urlchq)+"#support-dl-bios")
+            print("Src URL: "+prodURL)
+            html_page = myGetWeb.simple_get(prodURL)
+            #select only the url  
+            soup_html = BeautifulSoup(html_page, "html5lib")
+            for link in soup_html.find_all('a', attrs={'href': re.compile("^http://")}):
+                print("Found the URL:", link['href'])
+                if self.dlBIOS(link, cpath):
+                    break  
+                else:
+                    pass
+                      
+        else:
+            print("already Downloaded\n")
         pass
     #download BIOS from MSI
-    def urlBuilderMSI(self):
+    def urlBuilderMSI(self,myGetWeb, mymodel, urlchq):
+        cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/MSI/"+str(mymodel).replace("/","-")+".zip"
+        #get html page
+        if not os.path.exists(cpath):
+            prodURL = str(self.searchforlink(mymodel+"bios", urlchq)+"#down-bios")
+            print("Src URL: "+prodURL)
+            html_page = myGetWeb.simple_get(prodURL)
+            #select only the url  
+            soup_html = BeautifulSoup(html_page, "html5lib")
+            for link in soup_html.find_all('a', attrs={'href': re.compile("^http://")}):
+                print("Found the URL:", link['href'])
+                if self.dlBIOS(link, cpath):
+                    break  
+                else:
+                    pass
+                      
+        else:
+            print("already Downloaded\n")
         pass
 
-    def dlBIOS(self, html_page, cpath):
-        soup_html = BeautifulSoup(html_page, "html5lib")
-        for link in soup_html.findAll('a', attrs={'href': re.compile("^http://")}):
-                try:             
-                    r = requests.get(link.get('href'), allow_redirects=True)
-                    
-                    print("DL and Save to "+cpath)
-                    open(cpath , 'wb').write(r.content)
-                    if os.path.exists(cpath):
-                        print("Successfully Downloaded...\n")
-                        break
-                    else:
-                        print("Failed...\n")
-                        break
-                except Exception as e:
-                    print("Error: "+str(e)+" |getting:"+ link.get("href"))
-                    break
+    def dlBIOS(self, link, cpath):
+        try:             
+            r = requests.get(link.get('href'), allow_redirects=True)
+            
+            print("DL and Save to "+cpath)
+            open(cpath , 'wb').write(r.content)
+            if os.path.exists(cpath):
+                print("Successfully Downloaded...\n")
+                return True
+                
+            else:
+                print("Failed...\n")
+                return False
+                
+        except Exception as e:
+            print("Error: "+str(e))
+            
     
     def searchforlink(self, mymodel, urlchq):
         for j in search(mymodel, tld="co.in", num=10, stop=1, pause=2): 
@@ -224,8 +263,8 @@ def main():
     #Download skus from PLE website
     print("Sourcing models...")
     myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASRock", myData.asrockArr)
-    #myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/Gigabyte", myData.gigabyteArr)
-    myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASUS", myData.asusArr)
+    myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/Gigabyte", myData.gigabyteArr)
+    #myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASUS", myData.asusArr)
     #myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/MSI", myData.msiArr)
     #Sort the arrays ready for further processing
     myData.asrockArr.sort()
@@ -245,9 +284,12 @@ def main():
     for modelStr in myData.asrockArr:   
         print(modelStr+"'s BIOS...")
         getBIO.urlBuilderAsrock(myGetWeb, modelStr ,"^https:\/\/www\.asrock\.com")
-    for modelStr in myData.asusArr:   
-        print("Getting "+modelStr+"'s BIOS...")
-        getBIO.urlBuilderAsus(myGetWeb, modelStr ,"^https:\/\/www\.asus\.com")
+    for modelStr in myData.gigabyteArr:   
+        print(modelStr+"'s BIOS...")
+        getBIO.urlBuilderGigabyte(myGetWeb, modelStr ,"^https:\/\/www\.gigabyte\.com")
+    #for modelStr in myData.asusArr:   
+    #    print("Getting "+modelStr+"'s BIOS...")
+    #    getBIO.urlBuilderAsus(myGetWeb, modelStr ,"^https:\/\/www\.asus\.com")
 
     print("Finished...")
 
