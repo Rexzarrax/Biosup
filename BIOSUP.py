@@ -177,7 +177,7 @@ class bioufiDL:
             html_page = myGetWeb.simple_get(prodURL)
             #select only the url  
             soup_html = BeautifulSoup(html_page, "html5lib")
-            for link in soup_html.find_all('a', attrs={'href': re.compile("^http://")}):
+            for link in soup_html.find_all('a', class_={'href': re.compile("^http://")}):
                 print("Found the URL:", link['href'])
                 if self.dlBIOS(link, cpath):
                     break  
@@ -263,9 +263,9 @@ def main():
     #Download skus from PLE website
     print("Sourcing models...")
     myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASRock", myData.asrockArr)
-    myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/Gigabyte", myData.gigabyteArr)
+    #myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/Gigabyte", myData.gigabyteArr)
     #myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASUS", myData.asusArr)
-    #myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/MSI", myData.msiArr)
+    myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/MSI", myData.msiArr)
     #Sort the arrays ready for further processing
     myData.asrockArr.sort()
     myData.asusArr.sort()
@@ -284,9 +284,12 @@ def main():
     for modelStr in myData.asrockArr:   
         print(modelStr+"'s BIOS...")
         getBIO.urlBuilderAsrock(myGetWeb, modelStr ,"^https:\/\/www\.asrock\.com")
-    for modelStr in myData.gigabyteArr:   
+    for modelStr in myData.msiArr:   
         print(modelStr+"'s BIOS...")
-        getBIO.urlBuilderGigabyte(myGetWeb, modelStr ,"^https:\/\/www\.gigabyte\.com")
+        getBIO.urlBuilderAsrock(myGetWeb, modelStr ,"^https:\/\/www\.msi\.com")
+    #for modelStr in myData.gigabyteArr:   
+    #    print(modelStr+"'s BIOS...")
+    #    getBIO.urlBuilderGigabyte(myGetWeb, modelStr ,"^https:\/\/www\.gigabyte\.com")
     #for modelStr in myData.asusArr:   
     #    print("Getting "+modelStr+"'s BIOS...")
     #    getBIO.urlBuilderAsus(myGetWeb, modelStr ,"^https:\/\/www\.asus\.com")
