@@ -1,8 +1,11 @@
 import os
+import sys
 import re
 import contextlib
 import requests
 import zipfile
+
+from PCPartPicker_API import pcpartpicker as pcpp
 
 try: 
     from bs4 import BeautifulSoup
@@ -14,13 +17,16 @@ try:
 except ImportError:  
     print("No module named 'google' found") 
 
+#from PyQt4.QtGui import QApplication
+#from PyQt4.QtCore import QUrl
+#from PyQt4.QtWebKit import QWebPage
+
 
 #extra scopes:
-#use PLE website to source motherboards to get BIOS' for
-#sort into folders for company
-#use pcpartpicker for sources
+#->use pcpartpicker for sources
 
 #unzip bios' ready for reading by flash software
+
 #stores motherboard data
 class moboData:
     def __init__(self):
@@ -67,18 +73,18 @@ class gethtml:
     def log_error(e):
         print(e)
         
-class dlModelssource:
+class dlSrcPLE:
     def __init__(self):
         pass
 
     def innerHTML(self, element):
         return (element.encode_contents()).decode("utf-8").replace("SKU: ","").strip().replace(" ","-")
 
-    def getsku(self, myGetWeb, url, array):
-        raw_html = myGetWeb.simple_get(url)
+    def getsku(self, myGetWeb, vendor, array):
+        raw_html = myGetWeb.simple_get("https://www.ple.com.au/Motherboards/"+vendor)
         html = BeautifulSoup(raw_html, 'html.parser')
         filter1 = html.find_all("div", {"class":"pg_manufacturermodel"})
-        print("Getting: "+url)
+        print("Getting: "+"https://www.ple.com.au/Motherboards/"+vendor)
         
         for div in filter1:
             array.append(self.innerHTML(div))
@@ -120,13 +126,7 @@ class bioufiDL:
         if not os.path.exists(cpath):
             prodURL = "https://www.asus.com/us/Motherboards/"+formatModel+"/HelpDesk_BIOS/"
             print("Src URL: "+prodURL)
-            html_page = myGetWeb.simple_get(prodURL)
-            soup_html = BeautifulSoup(html_page, "html5lib")
-            #for link in soup_html.findAll('a', attrs={'href': re.compile("^http://")}):
-            for link in soup_html.find_all('div', class_="download-inf-r"):
-                print(link)
-                if self.dlBIOS(link, cpath):
-                    break                 
+                           
             
         else:
             print("already Downloaded\n")
@@ -140,7 +140,7 @@ class bioufiDL:
             html_page = myGetWeb.simple_get(prodURL)
             #select only the url
             soup_html = BeautifulSoup(html_page, "html5lib")
-            for link in soup_html.findAll('a', attrs={'href': re.compile("^http://")}):
+            for link in soup_html.find_all('a', attrs={'href': re.compile("^http://")}):
                 print("Found the URL:", link['href'])
                 if self.dlBIOS(link, cpath):
                     break        
@@ -157,13 +157,14 @@ class bioufiDL:
             html_page = myGetWeb.simple_get(prodURL)
             #select only the url  
             soup_html = BeautifulSoup(html_page, "html5lib")
-            for link in soup_html.find_all('a', attrs={'href': re.compile("^http://")}):
-                print("Found the URL:", link['href'])
-                if self.dlBIOS(link, cpath):
-                    break  
-                else:
-                    pass
-                      
+            for myDiv in soup_html.find_all('div', attrs={'class':'div-table'}):
+                print(myDiv.text)
+                for link in myDiv.find_all('a', attrs={'href': re.compile("^http://")}):
+                    print("Found the URL:", link['href'])
+                    if self.dlBIOS(link, cpath):
+                        break  
+                    else:
+                        pass                     
         else:
             print("already Downloaded\n")
         pass
@@ -177,12 +178,13 @@ class bioufiDL:
             html_page = myGetWeb.simple_get(prodURL)
             #select only the url  
             soup_html = BeautifulSoup(html_page, "html5lib")
-            for link in soup_html.find_all('a', class_={'href': re.compile("^http://")}):
-                print("Found the URL:", link['href'])
-                if self.dlBIOS(link, cpath):
-                    break  
-                else:
-                    pass
+            for myDiv in soup_html.find_all('div', attrs={'class':'row spec'}):
+                for link in myDiv.find_all('a', class_={'href': re.compile("^http://download.msi.com")}):
+                    print("Found the URL:", link['href'])
+                    if self.dlBIOS(link, cpath):
+                        break  
+                    else:
+                        pass
                       
         else:
             print("already Downloaded\n")
@@ -195,11 +197,11 @@ class bioufiDL:
             print("DL and Save to "+cpath)
             open(cpath , 'wb').write(r.content)
             if os.path.exists(cpath):
-                print("Successfully Downloaded...\n")
+                print("BIOS Successfully Downloaded...\n")
                 return True
                 
             else:
-                print("Failed...\n")
+                print("Download Failed...\n")
                 return False
                 
         except Exception as e:
@@ -229,6 +231,19 @@ class setUp:
         print("MSI: "+str(myData.msiArr)+"\n")
         print("Gigabyte: "+str(myData.gigabyteArr)+"\n")
 
+    def CreatArr(self):
+        mobo_count = pcpp.productLists.totalPages("motherboard")
+        print("Total Mobo pages:", mobo_count)
+
+        # Pull info from page 1 of CPUs
+        for page in range(0, 1):
+            skuName = pcpp.productLists.getProductList("motherboard", page)
+            # Print the names and prices of all the CPUs on the page
+            for mobo in skuName:
+                vendor = str(mobo["name"]).split(" ")
+                print(vendor[0])
+
+
 class cleanArr:
     def arrClean(self, array1):
         for i in range (len (array1)-1):
@@ -246,7 +261,7 @@ def main():
     myData = moboData()  
     myI = inputfiles()
     myGetWeb = gethtml()
-    myO = dlModelssource()
+    myO = dlSrcPLE()
     cleanArr1 = cleanArr()
     getBIO = bioufiDL()
 
@@ -262,10 +277,10 @@ def main():
     #myI.StartHere(myData.msiArr, "/Sources/msi.txt", 3)
     #Download skus from PLE website
     print("Sourcing models...")
-    myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASRock", myData.asrockArr)
-    #myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/Gigabyte", myData.gigabyteArr)
-    #myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/ASUS", myData.asusArr)
-    myO.getsku(myGetWeb, "https://www.ple.com.au/Motherboards/MSI", myData.msiArr)
+    myO.getsku(myGetWeb, "ASRock", myData.asrockArr)
+    #myO.getsku(myGetWeb, "Gigabyte", myData.gigabyteArr)
+    #myO.getsku(myGetWeb, "ASUS", myData.asusArr)
+    myO.getsku(myGetWeb, "MSI", myData.msiArr)
     #Sort the arrays ready for further processing
     myData.asrockArr.sort()
     myData.asusArr.sort()
@@ -287,12 +302,12 @@ def main():
     for modelStr in myData.msiArr:   
         print(modelStr+"'s BIOS...")
         getBIO.urlBuilderAsrock(myGetWeb, modelStr ,"^https:\/\/www\.msi\.com")
-    #for modelStr in myData.gigabyteArr:   
-    #    print(modelStr+"'s BIOS...")
-    #    getBIO.urlBuilderGigabyte(myGetWeb, modelStr ,"^https:\/\/www\.gigabyte\.com")
-    #for modelStr in myData.asusArr:   
-    #    print("Getting "+modelStr+"'s BIOS...")
-    #    getBIO.urlBuilderAsus(myGetWeb, modelStr ,"^https:\/\/www\.asus\.com")
+    for modelStr in myData.gigabyteArr:   
+        print(modelStr+"'s BIOS...")
+        getBIO.urlBuilderGigabyte(myGetWeb, modelStr ,"^https:\/\/www\.gigabyte\.com")
+    for modelStr in myData.asusArr:   
+        print("Getting "+modelStr+"'s BIOS...")
+        getBIO.urlBuilderAsus(myGetWeb, modelStr ,"^https:\/\/www\.asus\.com")
 
     print("Finished...")
 
