@@ -23,18 +23,27 @@ except ImportError:
 
 
 #extra scopes:
-#->use pcpartpicker for sources
+#->select src, either PLE or PCPP
+#-> generate local lists to reduce dl time in future
+#-> cli menu system
 
-#unzip bios' ready for reading by flash software
+#planned scopes:
+#->unzip bios' ready for reading by flash software
+#-> config file
 
 #stores motherboard data
 class moboData:
-    def __init__(self):
+    def __init__(self, mysetup, myGetWeb, vendor):
         #COMBINE INTO 2D ARRAY IN FUTURE
         self.asrockArr = []
         self.asusArr = []
         self.gigabyteArr = []
         self.msiArr = []
+
+        self.allVenArr = [self.asrockArr, self.asusArr, self.gigabyteArr, self.msiArr]
+
+        for ven in range(len(self.allVenArr)):
+            mysetup.dlSrcPLE(myGetWeb, vendor[ven], self.allVenArr[ven])
 
 class unzip:
     def __init__(self):
@@ -72,24 +81,6 @@ class gethtml:
 
     def log_error(e):
         print(e)
-        
-class dlSrcPLE:
-    def __init__(self):
-        pass
-
-    def innerHTML(self, element):
-        return (element.encode_contents()).decode("utf-8").replace("SKU: ","").strip().replace(" ","-")
-
-    def getsku(self, myGetWeb, vendor, array):
-        raw_html = myGetWeb.simple_get("https://www.ple.com.au/Motherboards/"+vendor)
-        html = BeautifulSoup(raw_html, 'html.parser')
-        filter1 = html.find_all("div", {"class":"pg_manufacturermodel"})
-        print("Getting: "+"https://www.ple.com.au/Motherboards/"+vendor)
-        
-        for div in filter1:
-            array.append(self.innerHTML(div))
-            #print(self.innerHTML(div))
-
 
 #get the list of motherboard names from file
 #and saves them to Array
@@ -217,13 +208,15 @@ class bioufiDL:
         pass
 
 class setUp:
+    def __init__(self):
+        pass
     def folderChq(self, company):
         cpwd = os.path.dirname(os.path.realpath(__file__))+"/"
         if not os.path.exists(cpwd+company):
             os.mkdir(cpwd+company)
-            print("Dir: \n" , cpwd ,  " \nCreated \n") 
+            print("Dir: \n" , cpwd+company ,  " \nCreated \n") 
         else:
-            print("Dir: \n" , cpwd ,  " \nalready exists\n")
+            print("Dir: \n" , cpwd+company ,  " \nalready exists\n")
 
     def printmodels(self, myData):
         print("Asrock: "+str(myData.asrockArr)+"\n") 
@@ -231,18 +224,31 @@ class setUp:
         print("MSI: "+str(myData.msiArr)+"\n")
         print("Gigabyte: "+str(myData.gigabyteArr)+"\n")
 
-    def CreatArr(self):
+    def dlSrcPCPP(self):
         mobo_count = pcpp.productLists.totalPages("motherboard")
         print("Total Mobo pages:", mobo_count)
 
         # Pull info from page 1 of CPUs
-        for page in range(0, 1):
+        for page in range(0, mobo_count):
             skuName = pcpp.productLists.getProductList("motherboard", page)
             # Print the names and prices of all the CPUs on the page
             for mobo in skuName:
-                vendor = str(mobo["name"]).split(" ")
-                print(vendor[0])
+                fullsku = str(mobo["name"]).split(" ")
+                vendor = fullsku[0]
+                model = fullsku[1]  
+    def innerHTML(self, element):
+        return (element.encode_contents()).decode("utf-8").replace("SKU: ","").strip().replace(" ","-")
 
+    def dlSrcPLE(self, myGetWeb, vendor, array):
+        site = "https://www.ple.com.au/Motherboards/"+vendor
+        raw_html = myGetWeb.simple_get(site)
+        html = BeautifulSoup(raw_html, 'html.parser')
+        filter1 = html.find_all("div", {"class":"pg_manufacturermodel"})
+        print("Getting: "+site)
+        
+        for div in filter1:
+            array.append(self.innerHTML(div))
+            #print(self.innerHTML(div))       
 
 class cleanArr:
     def arrClean(self, array1):
@@ -257,19 +263,19 @@ def main():
     print("----------BIOSUP----------")
     print("Initialising...")
 
+    vendor = ["ASROCK","ASUS", "GIGABYTE", "MSI"]
+
     mysetup = setUp()
-    myData = moboData()  
-    myI = inputfiles()
     myGetWeb = gethtml()
-    myO = dlSrcPLE()
+    myData = moboData(mysetup, myGetWeb, vendor)  
+    myI = inputfiles()
     cleanArr1 = cleanArr()
     getBIO = bioufiDL()
 
     #create folders
-    mysetup.folderChq("ASROCK")
-    mysetup.folderChq("GIGABYTE")
-    mysetup.folderChq("ASUS")
-    mysetup.folderChq("MSI")
+    for ven1 in range(len(vendor)):
+        mysetup.folderChq(vendor[ven1])
+    
     #import models from local files
     #myI.StartHere(myData.asrockArr, "/Sources/asrock.txt", 1)
     #myI.StartHere(myData.asusArr, "/Sources/asus.txt", 2)
@@ -277,20 +283,11 @@ def main():
     #myI.StartHere(myData.msiArr, "/Sources/msi.txt", 3)
     #Download skus from PLE website
     print("Sourcing models...")
-    myO.getsku(myGetWeb, "ASRock", myData.asrockArr)
-    #myO.getsku(myGetWeb, "Gigabyte", myData.gigabyteArr)
-    #myO.getsku(myGetWeb, "ASUS", myData.asusArr)
-    myO.getsku(myGetWeb, "MSI", myData.msiArr)
-    #Sort the arrays ready for further processing
-    myData.asrockArr.sort()
-    myData.asusArr.sort()
-    myData.gigabyteArr.sort()
-    myData.msiArr.sort()
-    #delete duplicate entries
-    cleanArr1.arrClean(myData.asrockArr)
-    cleanArr1.arrClean(myData.asusArr)
-    cleanArr1.arrClean(myData.gigabyteArr)
-    cleanArr1.arrClean(myData.msiArr)
+    #Sort the arrays ready for further processing+delete duplicate entries
+    for ven2 in range(len(vendor)):
+        myData.allVenArr[ven2].sort()
+        cleanArr1.arrClean(myData.allVenArr[ven2])
+
 
     #print results
     mysetup.printmodels(myData)
