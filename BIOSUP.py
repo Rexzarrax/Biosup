@@ -26,6 +26,7 @@ except ImportError:
 #->select src, either PLE or PCPP
 #-> generate local lists to reduce dl time in future
 #-> cli menu system
+#-> options for specific sources/vendors
 
 #planned scopes:
 #->unzip bios' ready for reading by flash software
@@ -158,7 +159,7 @@ class bioufiDL:
                         pass                     
         else:
             print("already Downloaded\n")
-        pass
+
     #download BIOS from MSI
     def urlBuilderMSI(self,myGetWeb, mymodel, urlchq):
         cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/MSI/"+str(mymodel).replace("/","-")+".zip"
@@ -178,8 +179,7 @@ class bioufiDL:
                         pass
                       
         else:
-            print("already Downloaded\n")
-        pass
+            print("already Downloaded\n")0
 
     def dlBIOS(self, link, cpath):
         try:             
@@ -270,12 +270,6 @@ def main():
     for ven1 in range(len(vendor)):
         mysetup.folderChq(vendor[ven1])
     
-    #import models from local files
-    #myI.StartHere(myData.asrockArr, "/Sources/asrock.txt", 1)
-    #myI.StartHere(myData.asusArr, "/Sources/asus.txt", 2)
-    #myI.StartHere(myData.gigabyteArr, "/Sources/gigabyte.txt", 4)
-    #myI.StartHere(myData.msiArr, "/Sources/msi.txt", 3)
-    #Download skus from PLE website
     print("Sourcing models...")
     #Sort the arrays ready for further processing+delete duplicate entries
     for ven2 in range(len(vendor)):
