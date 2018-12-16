@@ -218,12 +218,6 @@ class setUp:
         else:
             print("Dir: \n" , cpwd+company ,  " \nalready exists\n")
 
-    def printmodels(self, myData):
-        print("Asrock: "+str(myData.asrockArr)+"\n") 
-        print("Asus: "+str(myData.asusArr)+"\n")
-        print("MSI: "+str(myData.msiArr)+"\n")
-        print("Gigabyte: "+str(myData.gigabyteArr)+"\n")
-
     def dlSrcPCPP(self):
         mobo_count = pcpp.productLists.totalPages("motherboard")
         print("Total Mobo pages:", mobo_count)
@@ -287,18 +281,14 @@ def main():
     for ven2 in range(len(vendor)):
         myData.allVenArr[ven2].sort()
         cleanArr1.arrClean(myData.allVenArr[ven2])
-
-
-    #print results
-    mysetup.printmodels(myData)
-
+        print("\n"+str(myData.allVenArr[ven2])+"\n")
 
     for modelStr in myData.asrockArr:   
         print(modelStr+"'s BIOS...")
         getBIO.urlBuilderAsrock(myGetWeb, modelStr ,"^https:\/\/www\.asrock\.com")
     for modelStr in myData.msiArr:   
         print(modelStr+"'s BIOS...")
-        getBIO.urlBuilderAsrock(myGetWeb, modelStr ,"^https:\/\/www\.msi\.com")
+        getBIO.urlBuilderMSI(myGetWeb, modelStr ,"^https:\/\/www\.msi\.com")
     for modelStr in myData.gigabyteArr:   
         print(modelStr+"'s BIOS...")
         getBIO.urlBuilderGigabyte(myGetWeb, modelStr ,"^https:\/\/www\.gigabyte\.com")
