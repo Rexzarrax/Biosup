@@ -157,7 +157,7 @@ class bioufiDL:
         #cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/MSI/"+str(mymodel).replace("/","-")+".zip"
         #get html page
         if not os.path.exists(cpath):
-            prodURL = str(self.searchforlink(mymodel+"bios", urlchq)+"#down-bios")
+            prodURL = str(self.searchforlink(mymodel, urlchq)+"#down-bios")
             print("Src URL: "+prodURL)
             html_page = myGetWeb.simple_get(prodURL)
             #select only the url  
@@ -180,7 +180,7 @@ class bioufiDL:
             print("DL and Save to "+cpath)
             open(cpath , 'wb').write(r.content)
             if os.path.exists(cpath):
-                print("BIOS Successfully Downloaded...\n")
+                print("BIOS Successfully Downloaded...")
                 return True
                 
             else:
