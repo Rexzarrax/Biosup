@@ -21,17 +21,6 @@ except ImportError:
 #from PyQt4.QtCore import QUrl
 #from PyQt4.QtWebKit import QWebPage
 
-
-#extra scopes:
-#->select src, either PLE or PCPP
-#-> generate local lists to reduce dl time in future
-#-> cli menu system
-#-> options for specific sources/vendors
-
-#planned scopes:
-#->unzip bios' ready for reading by flash software
-#-> config file
-
 #stores motherboard data
 class moboData:
     def __init__(self, mysetup, myGetWeb, vendor):
@@ -50,10 +39,13 @@ class unzip:
     def __init__(self):
         pass
     def deZip(self, file2unzip, folder2extract2):
-        unzip = zipfile.ZipFile(file2unzip)
-        unzip.extractall(folder2extract2)
-        
-        unzip.close()
+        try:
+            unzip = zipfile.ZipFile(file2unzip)
+            unzip.extractall(folder2extract2)     
+            unzip.close()
+        except requests.exceptions.RequestException as e:
+            self.log_error('Error during unzipping to '+str(e))
+
 
 #Collects the skus of the various mobo
 class gethtml:
@@ -123,11 +115,11 @@ class bioufiDL:
         else:
             print("already Downloaded\n")
     #Download bios from Asrock    
-    def urlBuilderAsrock(self,myGetWeb, mymodel, urlchq):
-        cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASROCK/"+str(mymodel).replace("/","-")+".zip"
+    def urlBuilderAsrock(self,myGetWeb, mymodel, urlchq, cpath):
+        #cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASROCK/"+str(mymodel).replace("/","-")+".zip"
         #get html page
         if not os.path.exists(cpath):
-            prodURL = str(self.searchforlink(mymodel, urlchq)).replace("index.asp","BIOS.html")
+            prodURL = str(self.searchforlink(mymodel, urlchq)).replace("index.asp","")+"BIOS.html"
             print("Src URL: "+prodURL)
             html_page = myGetWeb.simple_get(prodURL)
             #select only the url
@@ -140,8 +132,8 @@ class bioufiDL:
             print("already Downloaded\n")
 
     #download BIOS from Gigabyte
-    def urlBuilderGigabyte(self,myGetWeb, mymodel, urlchq):
-        cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/GIGABYTE/"+str(mymodel).replace("/","-")+".zip"
+    def urlBuilderGigabyte(self,myGetWeb, mymodel, urlchq, cpath):
+        #cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/GIGABYTE/"+str(mymodel).replace("/","-")+".zip"
         #get html page
         if not os.path.exists(cpath):
             prodURL = str(self.searchforlink(mymodel, urlchq)+"#support-dl-bios")
@@ -161,8 +153,8 @@ class bioufiDL:
             print("already Downloaded\n")
 
     #download BIOS from MSI
-    def urlBuilderMSI(self,myGetWeb, mymodel, urlchq):
-        cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/MSI/"+str(mymodel).replace("/","-")+".zip"
+    def urlBuilderMSI(self,myGetWeb, mymodel, urlchq, cpath):
+        #cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/MSI/"+str(mymodel).replace("/","-")+".zip"
         #get html page
         if not os.path.exists(cpath):
             prodURL = str(self.searchforlink(mymodel+"bios", urlchq)+"#down-bios")
@@ -179,7 +171,7 @@ class bioufiDL:
                         pass
                       
         else:
-            print("already Downloaded\n")0
+            print("already Downloaded\n")
 
     def dlBIOS(self, link, cpath):
         try:             
@@ -200,7 +192,8 @@ class bioufiDL:
             
     
     def searchforlink(self, mymodel, urlchq):
-        for j in search(mymodel, tld="co.in", num=10, stop=1, pause=2): 
+        for j in search(mymodel+" BIOS", tld="co.in", num=10, stop=1, pause=2): 
+            #print(mymodel+": "+j)
             if re.search(urlchq, j):
                 return j
 
@@ -265,6 +258,7 @@ def main():
     myI = inputfiles()
     cleanArr1 = cleanArr()
     getBIO = bioufiDL()
+    dezip = unzip()
 
     #create folders
     for ven1 in range(len(vendor)):
@@ -277,18 +271,25 @@ def main():
         cleanArr1.arrClean(myData.allVenArr[ven2])
         print("\n"+str(myData.allVenArr[ven2])+"\n")
 
-    for modelStr in myData.asrockArr:   
+    for modelStr in myData.asrockArr: 
+        cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASROCK/"+str(modelStr).replace("/","-")+".zip"  
         print(modelStr+"'s BIOS...")
-        getBIO.urlBuilderAsrock(myGetWeb, modelStr ,"^https:\/\/www\.asrock\.com")
+        getBIO.urlBuilderAsrock(myGetWeb, modelStr,"^https:\/\/www\.asrock\.com", cpath)
+        print("Unzipping: "+cpath)
+        dezip.deZip(cpath, cpath.strip(".zip"))
+        print("All actions Attempted, moving to next BIOS...\n")
     for modelStr in myData.msiArr:   
+        cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/MSI/"+str(modelStr).replace("/","-")+".zip"
         print(modelStr+"'s BIOS...")
-        getBIO.urlBuilderMSI(myGetWeb, modelStr ,"^https:\/\/www\.msi\.com")
-    for modelStr in myData.gigabyteArr:   
+        getBIO.urlBuilderMSI(myGetWeb, modelStr ,"^https:\/\/www\.msi\.com", cpath)
+    for modelStr in myData.gigabyteArr:
+        cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/GIGABYTE/"+str(modelStr).replace("/","-")+".zip"  
         print(modelStr+"'s BIOS...")
-        getBIO.urlBuilderGigabyte(myGetWeb, modelStr ,"^https:\/\/www\.gigabyte\.com")
+        getBIO.urlBuilderGigabyte(myGetWeb, modelStr ,"^https:\/\/www\.gigabyte\.com", cpath)
     for modelStr in myData.asusArr:   
         print("Getting "+modelStr+"'s BIOS...")
         getBIO.urlBuilderAsus(myGetWeb, modelStr ,"^https:\/\/www\.asus\.com")
+
 
     print("Finished...")
 
@@ -296,3 +297,12 @@ if __name__ == "__main__":
     main()
 
 
+#extra scopes:
+#->select src, either PLE or PCPP
+#-> generate local lists to reduce dl time in future
+#-> cli menu system
+#-> options for specific sources/vendors
+
+#planned scopes:
+#->unzip bios' ready for reading by flash software
+#-> config file
