@@ -4,6 +4,8 @@ import re
 import contextlib
 import requests
 import zipfile
+from selenium import webdriver
+import time
 
 from PCPartPicker_API import pcpartpicker as pcpp
 
@@ -33,7 +35,12 @@ class moboData:
         self.allVenArr = [self.asrockArr, self.asusArr, self.gigabyteArr, self.msiArr]
 
         for ven in range(len(self.allVenArr)):
-            mysetup.dlSrcPLE(myGetWeb, vendor[ven], self.allVenArr[ven])
+            try:
+                #mysetup.dlSrcPCPP(vendor[ven], mysetup)
+                mysetup.dlSrcPLE(myGetWeb, vendor[ven], self.allVenArr[ven])
+            except:
+                pass
+            
 
 class unzip:
     def __init__(self):
@@ -157,11 +164,16 @@ class bioufiDL:
         #cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/MSI/"+str(mymodel).replace("/","-")+".zip"
         #get html page
         if not os.path.exists(cpath):
-            prodURL = str(self.searchforlink(mymodel+"bios", urlchq)+"#down-bios")
+            prodURL = str(self.searchforlink(mymodel, urlchq)+"#down-bios")
             print("Src URL: "+prodURL)
-            html_page = myGetWeb.simple_get(prodURL)
+            #html_page = myGetWeb.simple_get(prodURL)
+            driver = webdriver.Firefox()
+            driver.get(prodURL)
+            time.sleep(6)
+            htmlSource = driver.page_source
             #select only the url  
-            soup_html = BeautifulSoup(html_page, "html5lib")
+            soup_html = BeautifulSoup(htmlSource, "html5lib")
+            print(soup_html)
             for myDiv in soup_html.find_all('div', attrs={'class':'row spec'}):
                 for link in myDiv.find_all('a', class_={'href': re.compile("^http://download.msi.com")}):
                     print("Found the URL:", link['href'])
@@ -169,7 +181,7 @@ class bioufiDL:
                         break  
                     else:
                         pass
-                      
+            driver.close()        
         else:
             print("already Downloaded\n")
 
@@ -180,7 +192,7 @@ class bioufiDL:
             print("DL and Save to "+cpath)
             open(cpath , 'wb').write(r.content)
             if os.path.exists(cpath):
-                print("BIOS Successfully Downloaded...\n")
+                print("BIOS Successfully Downloaded...")
                 return True
                 
             else:
@@ -211,7 +223,7 @@ class setUp:
         else:
             print("Dir: \n" , cpwd+company ,  " \nalready exists\n")
 
-    def dlSrcPCPP(self):
+    def dlSrcPCPP(self, vendor, mysetup):
         mobo_count = pcpp.productLists.totalPages("motherboard")
         print("Total Mobo pages:", mobo_count)
 
@@ -221,8 +233,21 @@ class setUp:
             # Print the names and prices of all the CPUs on the page
             for mobo in skuName:
                 fullsku = str(mobo["name"]).split(" ")
-                vendor = fullsku[0]
-                model = fullsku[1]  
+                vendorpcpp = (fullsku[0]).upper()
+                model = fullsku[1]
+                for ven in vendor:
+                    #print(vendorpcpp+":"+ven)
+                    if ven==vendorpcpp:
+                        pass
+                    else:
+                        #print(str(vendor)+"\n")
+                        vendor.append(vendorpcpp)
+                        break
+            vendor.sort()
+            print(vendor)
+            mysetup.arrClean(vendor)
+            print(vendor)
+
     def innerHTML(self, element):
         return (element.encode_contents()).decode("utf-8").replace("SKU: ","").strip().replace(" ","-")
 
@@ -235,30 +260,31 @@ class setUp:
         
         for div in filter1:
             array.append(self.innerHTML(div))
-            #print(self.innerHTML(div))       
-
-class cleanArr:
+            #print(self.innerHTML(div))    
     def arrClean(self, array1):
         for i in range (len (array1)-1):
             try:
                 if array1[i] == array1[i+1]:
                     del array1[i]
             except:
-                pass
+                pass   
+    
 #initial checks and basic file creation
 def main():
     print("----------BIOSUP----------")
     print("Initialising...")
 
     vendor = ["ASROCK","ASUS", "GIGABYTE", "MSI"]
+    #vendor = ["ASROCK"]
 
     mysetup = setUp()
     myGetWeb = gethtml()
     myData = moboData(mysetup, myGetWeb, vendor)  
     myI = inputfiles()
-    cleanArr1 = cleanArr()
     getBIO = bioufiDL()
     dezip = unzip()
+
+    print(vendor)
 
     #create folders
     for ven1 in range(len(vendor)):
@@ -268,7 +294,7 @@ def main():
     #Sort the arrays ready for further processing+delete duplicate entries
     for ven2 in range(len(vendor)):
         myData.allVenArr[ven2].sort()
-        cleanArr1.arrClean(myData.allVenArr[ven2])
+        mysetup.arrClean(myData.allVenArr[ven2])
         print("\n"+str(myData.allVenArr[ven2])+"\n")
 
     for modelStr in myData.asrockArr: 
