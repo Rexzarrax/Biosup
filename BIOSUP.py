@@ -274,8 +274,8 @@ def main():
     print("----------BIOSUP----------")
     print("Initialising...")
 
-    #vendor = ["ASROCK","ASUS", "GIGABYTE", "MSI"]
-    vendor = ["ASROCK"]
+    vendor = ["ASROCK","ASUS", "GIGABYTE", "MSI"]
+    #vendor = ["ASROCK"]
 
     mysetup = setUp()
     myGetWeb = gethtml()
