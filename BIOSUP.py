@@ -4,8 +4,6 @@ import re
 import contextlib
 import requests
 import zipfile
-from selenium import webdriver
-import time
 
 from PCPartPicker_API import pcpartpicker as pcpp
 
@@ -26,7 +24,7 @@ except ImportError:
 #stores motherboard data
 class moboData:
     def __init__(self, mysetup, myGetWeb, vendor):
-        #COMBINE INTO 2D ARRAY IN FUTURE
+        #need to make variable, based on length of vendor array in main
         self.asrockArr = []
         self.asusArr = []
         self.gigabyteArr = []
@@ -166,13 +164,9 @@ class bioufiDL:
         if not os.path.exists(cpath):
             prodURL = str(self.searchforlink(mymodel, urlchq)+"#down-bios")
             print("Src URL: "+prodURL)
-            #html_page = myGetWeb.simple_get(prodURL)
-            driver = webdriver.Firefox()
-            driver.get(prodURL)
-            time.sleep(6)
-            htmlSource = driver.page_source
+            html_page = myGetWeb.simple_get(prodURL)
             #select only the url  
-            soup_html = BeautifulSoup(htmlSource, "html5lib")
+            soup_html = BeautifulSoup(html_page, "html5lib")
             print(soup_html)
             for myDiv in soup_html.find_all('div', attrs={'class':'row spec'}):
                 for link in myDiv.find_all('a', class_={'href': re.compile("^http://download.msi.com")}):
@@ -180,8 +174,7 @@ class bioufiDL:
                     if self.dlBIOS(link, cpath):
                         break  
                     else:
-                        pass
-            driver.close()        
+                        pass      
         else:
             print("already Downloaded\n")
 
@@ -224,8 +217,9 @@ class setUp:
             print("Dir: \n" , cpwd+company ,  " \nalready exists\n")
 
     def dlSrcPCPP(self, vendor, mysetup):
+        #need to work out a system to filter unwanted skus, also save this list due to taking AGES to fix
         mobo_count = pcpp.productLists.totalPages("motherboard")
-        print("Total Mobo pages:", mobo_count)
+        print("Total Mb pages:", mobo_count)
 
         # Pull info from page 1 of CPUs
         for page in range(0, mobo_count):
@@ -235,18 +229,7 @@ class setUp:
                 fullsku = str(mobo["name"]).split(" ")
                 vendorpcpp = (fullsku[0]).upper()
                 model = fullsku[1]
-                for ven in vendor:
-                    #print(vendorpcpp+":"+ven)
-                    if ven==vendorpcpp:
-                        pass
-                    else:
-                        #print(str(vendor)+"\n")
-                        vendor.append(vendorpcpp)
-                        break
-            vendor.sort()
-            print(vendor)
-            mysetup.arrClean(vendor)
-            print(vendor)
+                
 
     def innerHTML(self, element):
         return (element.encode_contents()).decode("utf-8").replace("SKU: ","").strip().replace(" ","-")
