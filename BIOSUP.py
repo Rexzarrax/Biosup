@@ -48,6 +48,7 @@ class unzip:
             unzip = zipfile.ZipFile(file2unzip)
             unzip.extractall(folder2extract2)     
             unzip.close()
+            #os.remove(file2unzip)
         except requests.exceptions.RequestException as e:
             self.log_error('Error during unzipping to '+str(e))
 
@@ -66,7 +67,7 @@ class gethtml:
                     return "Not Valid HTML"
 
         except requests.exceptions.RequestException as e:
-            self.log_error('Error during requests to {0} : {1}'.format(url, str(e)))
+            print("Err: "+str(url) + str(e))
             return None
 
 
@@ -129,12 +130,12 @@ class bioufiDL:
             html_page = myGetWeb.simple_get(prodURL)
             #select only the url
             soup_html = BeautifulSoup(html_page, "html5lib")
-            for link in soup_html.find_all('a', attrs={'href': re.compile("^http://")}):
+            for link in soup_html.find_all('a', attrs={'href': re.compile("^http://asrock.pc.cdn.bitgravity.com/BIOS/")}):
                 print("Found the URL:", link['href'])
                 if self.dlBIOS(link, cpath):
                     break        
         else:
-            print("already Downloaded\n")
+            print("already Downloaded")
 
     #download BIOS from Gigabyte
     def urlBuilderGigabyte(self,myGetWeb, mymodel, urlchq, cpath):
@@ -181,7 +182,6 @@ class bioufiDL:
     def dlBIOS(self, link, cpath):
         try:             
             r = requests.get(link.get('href'), allow_redirects=True)
-            
             print("DL and Save to "+cpath)
             open(cpath , 'wb').write(r.content)
             if os.path.exists(cpath):
@@ -197,9 +197,10 @@ class bioufiDL:
             
     
     def searchforlink(self, mymodel, urlchq):
-        for j in search(mymodel+" BIOS", tld="co.in", num=10, stop=1, pause=2): 
+        for j in search(mymodel, tld="co.in", num=10, stop=1, pause=2): 
+        #for j in search(mymodel+" BIOS", tld="co.in", num=10, stop=1, pause=2): 
             #print(mymodel+": "+j)
-            if re.search(urlchq, j):
+            if re.search(urlchq, j, re.IGNORECASE):
                 return j
 
     def __Init__(self):
@@ -251,14 +252,24 @@ class setUp:
                     del array1[i]
             except:
                 pass   
+    def cleanup(self, modelarray, vendor):
+            for i in range (len(modelarray)-1):
+                cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/"+vendor+"/"+str(modelarray[i]).replace("/","-")+".zip"
+                try:
+                    print("Deleting "+cpath)
+                    os.remove(cpath)
+                except: 
+                    print("Err in Deleting "+cpath)
     
 #initial checks and basic file creation
 def main():
     print("----------BIOSUP----------")
     print("Initialising...")
 
-    vendor = ["ASROCK","ASUS", "GIGABYTE", "MSI"]
-    #vendor = ["ASROCK"]
+    clean = True
+
+    #vendor = ["ASROCK","ASUS", "GIGABYTE", "MSI"]
+    vendor = ["ASROCK"]
 
     mysetup = setUp()
     myGetWeb = gethtml()
@@ -283,7 +294,7 @@ def main():
     for modelStr in myData.asrockArr: 
         cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASROCK/"+str(modelStr).replace("/","-")+".zip"  
         print(modelStr+"'s BIOS...")
-        getBIO.urlBuilderAsrock(myGetWeb, modelStr,"^https:\/\/www\.asrock\.com", cpath)
+        getBIO.urlBuilderAsrock(myGetWeb, modelStr,"^https:\/\/www\.asrock\.com\/mb", cpath)
         print("Unzipping: "+cpath)
         dezip.deZip(cpath, cpath.strip(".zip"))
         print("All actions Attempted, moving to next BIOS...\n")
@@ -298,6 +309,12 @@ def main():
     for modelStr in myData.asusArr:   
         print("Getting "+modelStr+"'s BIOS...")
         getBIO.urlBuilderAsus(myGetWeb, modelStr ,"^https:\/\/www\.asus\.com")
+
+    if clean:
+        print("Running Cleanup...")
+        for v in range(len(vendor)):
+            mysetup(myData.allVenArr[v], vendor[v])
+            
 
 
     print("Finished...")
