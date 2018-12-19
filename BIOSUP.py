@@ -197,7 +197,7 @@ class bioufiDL:
             
     
     def searchforlink(self, mymodel, urlchq):
-        for j in search(mymodel, tld="co.in", num=10, stop=1, pause=2): 
+        for j in search(mymodel+" bios", tld="co.in", num=10, stop=1, pause=2): 
         #for j in search(mymodel+" BIOS", tld="co.in", num=10, stop=1, pause=2): 
             #print(mymodel+": "+j)
             if re.search(urlchq, j, re.IGNORECASE):
@@ -313,7 +313,7 @@ def main():
     if clean:
         print("Running Cleanup...")
         for v in range(len(vendor)):
-            mysetup(myData.allVenArr[v], vendor[v])
+            mysetup.cleanup(myData.allVenArr[v], vendor[v])
             
 
 
