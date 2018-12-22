@@ -5,6 +5,8 @@ import contextlib
 import requests
 import zipfile
 
+from clint.textui import progress
+
 from PCPartPicker_API import pcpartpicker as pcpp
 
 try: 
@@ -183,7 +185,12 @@ class bioufiDL:
         try:             
             r = requests.get(link.get('href'), allow_redirects=True)
             print("DL and Save to "+cpath)
-            open(cpath , 'wb').write(r.content)
+            with open(cpath, 'wb') as f:
+                total_length = int(r.headers.get('content-length'))
+                for chunk in progress.bar(r.iter_content(chunk_size=1024), expected_size=(total_length/1024) + 1): 
+                    if chunk:
+                        f.write(chunk)
+                        f.flush()
             if os.path.exists(cpath):
                 print("BIOS Successfully Downloaded...")
                 return True
