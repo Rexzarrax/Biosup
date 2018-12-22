@@ -107,15 +107,17 @@ class inputfiles:
     def __Init__(self):
         pass
 
-#creates the URL to then download the files to
+#class holds methods for downloading the BIOS from a vendor
 class bioufiDL:
     #Download bios from Asus
     def urlBuilderAsus(self,myGetWeb, mymodel, urlchq):
         formatModel= str(mymodel).replace("(","").replace(")","")
         print(formatModel)
+        print("Getting Src...")
         cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASUS/"+formatModel+".zip"
         #get html page
         if not os.path.exists(cpath):
+            print("Getting URL...")
             prodURL = "https://www.asus.com/us/Motherboards/"+formatModel+"/HelpDesk_BIOS/"
             print("Src URL: "+prodURL)
                            
@@ -126,9 +128,11 @@ class bioufiDL:
     def urlBuilderAsrock(self,myGetWeb, mymodel, urlchq, cpath):
         #cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASROCK/"+str(mymodel).replace("/","-")+".zip"
         #get html page
+        print("Getting Src...")
         if not os.path.exists(cpath):
             prodURL = str(self.searchforlink(mymodel, urlchq)).replace("index.asp","")+"BIOS.html"
             print("Src URL: "+prodURL)
+            print("Getting URL...")
             html_page = myGetWeb.simple_get(prodURL)
             #select only the url
             soup_html = BeautifulSoup(html_page, "html5lib")
@@ -141,11 +145,11 @@ class bioufiDL:
 
     #download BIOS from Gigabyte
     def urlBuilderGigabyte(self,myGetWeb, mymodel, urlchq, cpath):
-        #cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/GIGABYTE/"+str(mymodel).replace("/","-")+".zip"
-        #get html page
+        print("Getting Src...")
         if not os.path.exists(cpath):
             prodURL = str(self.searchforlink(mymodel, urlchq)+"#support-dl-bios")
             print("Src URL: "+prodURL)
+            print("Getting URL...")
             html_page = myGetWeb.simple_get(prodURL)
             #select only the url  
             soup_html = BeautifulSoup(html_page, "html5lib")
@@ -162,11 +166,11 @@ class bioufiDL:
 
     #download BIOS from MSI
     def urlBuilderMSI(self,myGetWeb, mymodel, urlchq, cpath):
-        #cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/MSI/"+str(mymodel).replace("/","-")+".zip"
-        #get html page
+        print("Getting Src...")
         if not os.path.exists(cpath):
             prodURL = str(self.searchforlink(mymodel, urlchq)+"#down-bios")
             print("Src URL: "+prodURL)
+            print("Getting URL...")
             html_page = myGetWeb.simple_get(prodURL)
             #select only the url  
             soup_html = BeautifulSoup(html_page, "html5lib")
@@ -180,7 +184,9 @@ class bioufiDL:
                         pass      
         else:
             print("already Downloaded\n")
-
+#Downloads and saves the zipped bios file to the cpath location
+#cpath: the path to the file
+#link: the url of the BIOS
     def dlBIOS(self, link, cpath):
         try:             
             r = requests.get(link.get('href'), allow_redirects=True)
@@ -260,7 +266,7 @@ class setUp:
             except:
                 pass   
     def cleanup(self, modelarray, vendor):
-            for i in range (len(modelarray)-1):
+            for i in range (len(modelarray)):
                 cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/"+vendor+"/"+str(modelarray[i]).replace("/","-")+".zip"
                 try:
                     print("Deleting "+cpath)
@@ -273,6 +279,7 @@ def main():
     print("----------BIOSUP----------")
     print("Initialising...")
 
+    #config
     clean = True
 
     #vendor = ["ASROCK","ASUS", "GIGABYTE", "MSI"]
@@ -337,5 +344,4 @@ if __name__ == "__main__":
 #-> options for specific sources/vendors
 
 #planned scopes:
-#->unzip bios' ready for reading by flash software
 #-> config file
