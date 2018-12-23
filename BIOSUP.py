@@ -107,26 +107,6 @@ class inputfiles:
 
 #class holds methods for downloading the BIOS from a vendor
 class bioufiDL:
-    #Download bios from Asus
-    def urlBuilderAsus(self,myGetWeb, mymodel, urlchq):
-        formatModel= str(mymodel).replace("(","").replace(")","")
-        print(formatModel)
-        print("Getting Src...")
-        cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASUS/"+formatModel+".zip"
-        #get html page
-        if not os.path.exists(cpath):
-            print("Getting URL...")
-            prodURL = "https://www.asus.com/us/Motherboards/"+formatModel+"/HelpDesk_BIOS/"
-            soup_html = self.getwebwithjs(prodURL)
-            #print(soup_html)
-            for link in soup_html.find_all('a', attrs={'href': re.compile("^https://dlcdnets.asus.com/pub/ASUS/mb/")}):
-                print("Found the URL:", link['href'])
-                if self.dlBIOS(link, cpath):
-                    break  
-                else:
-                    pass      
-        else:
-            print("already Downloaded\n")
     #Download bios from Asrock    
     def urlBuilderAsrock(self,myGetWeb, mymodel, urlchq, cpath):
         #cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASROCK/"+str(mymodel).replace("/","-")+".zip"
@@ -145,6 +125,24 @@ class bioufiDL:
                     break        
         else:
             print("already Downloaded")
+    #Download bios from Asus
+    def urlBuilderAsus(self,myGetWeb, mymodel, urlchq, cpath):
+        print("Getting Src...")
+        #get html page
+        if not os.path.exists(cpath):
+            prodURL = str(self.searchforlink(mymodel, urlchq))
+            print("Src URL: "+prodURL)
+            print("Getting URL...")
+            soup_html = self.getwebwithjs(prodURL)
+            #print(soup_html)
+            for link in soup_html.find_all('a', attrs={'href': re.compile("^https://dlcdnets.asus.com/pub")}):
+                print("Found the URL:", link['href'])
+                if self.dlBIOS(link, cpath):
+                    break  
+                else:
+                    pass      
+        else:
+            print("already Downloaded\n")
 
     #download BIOS from Gigabyte
     def urlBuilderGigabyte(self,myGetWeb, mymodel, urlchq, cpath):
@@ -155,7 +153,7 @@ class bioufiDL:
             print("Getting URL...")
             soup_html = self.getwebwithjs(prodURL)
             #print(soup_html)
-            for link in soup_html.find_all('a', attrs={'href': re.compile("^download.gigabyte.asia/FileList/BIOS")}):
+            for link in soup_html.find_all('a', attrs={'href': re.compile("^http://download.gigabyte.asia/FileList/BIOS")}):
                 print("Found the URL:", link['href'])
                 if self.dlBIOS(link, cpath):
                     break  
@@ -174,7 +172,7 @@ class bioufiDL:
             #select only the url  
             soup_html = self.getwebwithjs(prodURL)
             #print(soup_html)
-            for link in soup_html.find_all('a', attrs={'href': re.compile("^http://download.msi.com")}):
+            for link in soup_html.find_all('a', attrs={'href': re.compile("^http://download.msi.com/bos")}):
                 print("Found the URL:", link['href'])
                 if self.dlBIOS(link, cpath):
                     break  
@@ -208,10 +206,10 @@ class bioufiDL:
 
     def getwebwithjs(self, link):
         options = webdriver.firefox.options.Options()
-        options.add_argument('headless')
+        options.add_argument('-headless')
         driver = webdriver.Firefox(options=options)
         driver.get(link)
-        temp = BeautifulSoup(driver.page_source) #page_source fetches page after rendering is complete
+        temp = BeautifulSoup(driver.page_source, "html5lib") #page_source fetches page after rendering is complete
         driver.quit()
         return temp
     
@@ -311,6 +309,18 @@ def main():
         mysetup.arrClean(myData.allVenArr[ven2])
         print("\n"+str(myData.allVenArr[ven2])+"\n")
     #Get models
+    for modelStr in myData.asusArr:   
+        cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASUS/"+str(modelStr).replace("/","-")+".zip"  
+        print(modelStr+"'s BIOS...")
+        getBIO.urlBuilderAsus(myGetWeb, modelStr ,"^https:\/\/www\.asus\.com", cpath)
+        dezip.deZip(cpath, cpath.strip(".zip"))
+        print("All actions Attempted, moving to next BIOS...\n")
+    for modelStr in myData.gigabyteArr:
+        cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/GIGABYTE/"+str(modelStr).replace("/","-")+".zip"  
+        print(modelStr+"'s BIOS...")
+        getBIO.urlBuilderGigabyte(myGetWeb, modelStr ,"^https:\/\/www\.gigabyte\.com", cpath)
+        dezip.deZip(cpath, cpath.strip(".zip"))
+        print("All actions Attempted, moving to next BIOS...\n")
     for modelStr in myData.msiArr:   
         cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/MSI/"+str(modelStr).replace("/","-")+".zip"
         print(modelStr+"'s BIOS...")
@@ -324,15 +334,7 @@ def main():
         print("Unzipping: "+cpath)
         dezip.deZip(cpath, cpath.strip(".zip"))
         print("All actions Attempted, moving to next BIOS...\n")
-    for modelStr in myData.gigabyteArr:
-        cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/GIGABYTE/"+str(modelStr).replace("/","-")+".zip"  
-        print(modelStr+"'s BIOS...")
-        getBIO.urlBuilderGigabyte(myGetWeb, modelStr ,"^https:\/\/www\.gigabyte\.com", cpath)
-        print("All actions Attempted, moving to next BIOS...\n")
-    for modelStr in myData.asusArr:   
-        print("Getting "+modelStr+"'s BIOS...")
-        getBIO.urlBuilderAsus(myGetWeb, modelStr ,"^https:\/\/www\.asus\.com")
-        print("All actions Attempted, moving to next BIOS...\n")
+
 
     if clean:
         print("Running Cleanup...")
