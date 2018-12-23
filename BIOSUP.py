@@ -205,10 +205,20 @@ class bioufiDL:
             print("Error: "+str(e))
 
     def getwebwithjs(self, link):
-        options = webdriver.firefox.options.Options()
-        options.add_argument('-headless')
-        driver = webdriver.Firefox(options=options)
-        driver.get(link)
+        Firefox = True
+
+        if Firefox:
+            #FireFox headless
+            options = webdriver.firefox.options.Options()
+            options.add_argument('-headless')
+            driver = webdriver.Firefox(options=options)
+            driver.get(link)
+        else:
+            #Chrome Headless
+            options = webdriver.ChromeOptions()
+            options.add_argument('headless')
+            browser = webdriver.Chrome(chrome_options=options)
+        
         temp = BeautifulSoup(driver.page_source, "html5lib") #page_source fetches page after rendering is complete
         driver.quit()
         return temp
