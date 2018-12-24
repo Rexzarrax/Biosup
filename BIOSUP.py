@@ -44,13 +44,13 @@ class unzip:
     def __init__(self):
         pass
     def deZip(self, file2unzip, folder2extract2):
-        try:
+        if os.path.exists(file2unzip):
             unzip = zipfile.ZipFile(file2unzip)
             unzip.extractall(folder2extract2)     
             unzip.close()
             #os.remove(file2unzip)
-        except requests.exceptions.RequestException as e:
-            self.log_error('Error during unzipping to '+str(e))
+        else:
+            print("File does not exist...")
 
 
 #Collects the skus of the various mobo
@@ -132,15 +132,18 @@ class bioufiDL:
         if not os.path.exists(cpath):
             prodURL = str(self.searchforlink(mymodel, urlchq))
             print("Src URL: "+prodURL)
-            print("Getting URL...")
-            soup_html = self.getwebwithjs(prodURL)
-            #print(soup_html)
-            for link in soup_html.find_all('a', attrs={'href': re.compile("^https://dlcdnets.asus.com/pub")}):
-                print("Found the URL:", link['href'])
-                if self.dlBIOS(link, cpath):
-                    break  
-                else:
-                    pass      
+            if prodURL != "None":
+                print("Getting URL...")
+                soup_html = self.getwebwithjs(prodURL)
+                #print(soup_html)
+                for link in soup_html.find_all('a', attrs={'href': re.compile("^https://dlcdnets.asus.com/pub")}):
+                    print("Found the URL:", link['href'])
+                    if self.dlBIOS(link, cpath):
+                        break  
+                    else:
+                        pass
+            else:
+                print("Error in getting Src URL")      
         else:
             print("already Downloaded\n")
 
@@ -149,6 +152,8 @@ class bioufiDL:
         print("Getting Src...")
         if not os.path.exists(cpath):
             prodURL = str(self.searchforlink(mymodel, urlchq)+"#support-dl-bios")
+            if not prodURL.endswith('HelpDesk_BIOS/'):
+                prodURL += 'HelpDesk_BIOS/'
             print("Src URL: "+prodURL)
             print("Getting URL...")
             soup_html = self.getwebwithjs(prodURL)
@@ -211,6 +216,7 @@ class bioufiDL:
             #FireFox headless
             options = webdriver.firefox.options.Options()
             options.add_argument('-headless')
+            #driver = webdriver.Firefox(executable_path=,options=options)
             driver = webdriver.Firefox(options=options)
             driver.get(link)
         else:
@@ -322,7 +328,7 @@ def main():
     for modelStr in myData.asusArr:   
         cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASUS/"+str(modelStr).replace("/","-")+".zip"  
         print(modelStr+"'s BIOS...")
-        getBIO.urlBuilderAsus(myGetWeb, modelStr ,"^https:\/\/www\.asus\.com", cpath)
+        getBIO.urlBuilderAsus(myGetWeb, modelStr ,"^https:\/\/www\.asus\.com\/us\/Motherboards", cpath)
         dezip.deZip(cpath, cpath.strip(".zip"))
         print("All actions Attempted, moving to next BIOS...\n")
     for modelStr in myData.gigabyteArr:
