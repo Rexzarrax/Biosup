@@ -130,9 +130,12 @@ class bioufiDL:
         print("Getting Src...")
         #get html page
         if not os.path.exists(cpath):
+            print(mymodel+" : "+ urlchq)
             prodURL = str(self.searchforlink(mymodel, urlchq))
+            if not prodURL.endswith('HelpDesk_BIOS/'):
+                prodURL += 'HelpDesk_BIOS/'
             print("Src URL: "+prodURL)
-            if prodURL != "None":
+            if not prodURL == "None":
                 print("Getting URL...")
                 soup_html = self.getwebwithjs(prodURL)
                 #print(soup_html)
@@ -152,8 +155,6 @@ class bioufiDL:
         print("Getting Src...")
         if not os.path.exists(cpath):
             prodURL = str(self.searchforlink(mymodel, urlchq)+"#support-dl-bios")
-            if not prodURL.endswith('HelpDesk_BIOS/'):
-                prodURL += 'HelpDesk_BIOS/'
             print("Src URL: "+prodURL)
             print("Getting URL...")
             soup_html = self.getwebwithjs(prodURL)
@@ -276,7 +277,8 @@ class setUp:
         print("Getting: "+site)
         
         for div in filter1:
-            array.append(self.innerHTML(div))
+            model = str(self.innerHTML(div)).replace(" ","-")
+            array.append(model)
             #print(self.innerHTML(div))    
     def arrClean(self, array1):
         for i in range (len (array1)-1):
