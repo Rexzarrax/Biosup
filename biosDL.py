@@ -68,19 +68,8 @@ class bioufiDL:
             #print(mymodel+" : "+ urlchq)
             prodURL = str(self.searchforlink(mymodel, urlchq))
             if not prodURL.endswith('HelpDesk_BIOS/') and prodURL != "None":
-                if not prodURL.endswith('HelpDesk_Download/'):
-                    if not prodURL.endswith('/specifications/'):
-                         prodURL += "HelpDesk_BIOS/"
-                    else:
-                        prodURL.replace('/specifications/', '/HelpDesk_BIOS/')
-                else:
-                    prodURL.replace('HelpDesk_Download/', '/HelpDesk_BIOS/')
-            else:
-                print("Going to Backup")
-                if mymodel.startswith('CROSSHAIR'):
-                    prodURL = 'https://www.asus.com/us/Motherboards/ROG-'+mymodel+'/HelpDesk_BIOS/'
-                else: 
-                    prodURL = 'https://www.asus.com/us/Motherboards/'+mymodel+'/HelpDesk_BIOS/'
+                prodURL += 'HelpDesk_BIOS/'
+                        
             print("Src URL: "+prodURL)
             if not prodURL == "None":
                 print("Getting URL...")

@@ -60,7 +60,7 @@ def main():
     for modelStr in myData.asusArr:   
         cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASUS/"+str(modelStr).replace("/","-")+".zip"  
         print(modelStr+"'s BIOS...")
-        getBIO.urlBuilderAsus(myGetWeb, modelStr ,"^https:\/\/www\.asus\.com\/us\/Motherboards", cpath)
+        getBIO.urlBuilderAsus(myGetWeb, modelStr ,"^https:\/\/www\.asus\.com\/", cpath)
         dezip.deZip(cpath, cpath.strip(".zip"))
         print("All actions Attempted, moving to next BIOS...\n")
     for modelStr in myData.gigabyteArr:
