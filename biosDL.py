@@ -1,6 +1,7 @@
 import os
 import re
 import requests
+import time
 from selenium import webdriver
 
 try: 
@@ -67,7 +68,19 @@ class bioufiDL:
             #print(mymodel+" : "+ urlchq)
             prodURL = str(self.searchforlink(mymodel, urlchq))
             if not prodURL.endswith('HelpDesk_BIOS/') and prodURL != "None":
-                prodURL += 'HelpDesk_BIOS/'
+                if not prodURL.endswith('HelpDesk_Download/'):
+                    if not prodURL.endswith('/specifications/'):
+                         prodURL += "HelpDesk_BIOS/"
+                    else:
+                        prodURL.replace('/specifications/', '/HelpDesk_BIOS/')
+                else:
+                    prodURL.replace('HelpDesk_Download/', '/HelpDesk_BIOS/')
+            else:
+                print("Going to Backup")
+                if mymodel.startswith('CROSSHAIR'):
+                    prodURL = 'https://www.asus.com/us/Motherboards/ROG-'+mymodel+'/HelpDesk_BIOS/'
+                else: 
+                    prodURL = 'https://www.asus.com/us/Motherboards/'+mymodel+'/HelpDesk_BIOS/'
             print("Src URL: "+prodURL)
             if not prodURL == "None":
                 print("Getting URL...")
@@ -125,24 +138,27 @@ class bioufiDL:
 #link: the url of the BIOS
     def dlBIOS(self, link, cpath):
         try:             
-            r = requests.get(link.get('href'), allow_redirects=True)
             print("DL and Save to "+cpath)
             with open(cpath, 'wb') as f:
+                r = requests.get(link.get('href'), allow_redirects=True)
                 total_length = int(r.headers.get('content-length'))
                 for chunk in progress.bar(r.iter_content(chunk_size=1024), expected_size=(total_length/1024) + 1): 
                     if chunk:
                         f.write(chunk)
                         f.flush()
-            if os.path.exists(cpath):
-                print("BIOS Successfully Downloaded...")
-                return True
-                
-            else:
-                print("Download Failed...\n")
-                return False
                 
         except Exception as e:
             print("Error: "+str(e))
+    
+        if os.path.exists(cpath):
+            print("BIOS Successfully Downloaded...")
+            return True               
+        else:
+            print("Download Failed...\n")
+            text_file = open("ErrUnzip.txt", "a")
+            text_file.write("Errored Link: %s\n" % link)
+
+            return False
 
     def getwebwithjs(self, link):
         Firefox = True
@@ -153,7 +169,11 @@ class bioufiDL:
             options.add_argument('-headless')
             #driver = webdriver.Firefox(executable_path=,options=options)
             driver = webdriver.Firefox(options=options)
-            driver.get(link)
+            if not link == "None":
+                driver.get(link)
+                time.sleep(3)
+            else:
+                print("Error in Web Driver, Link= "+link)
         else:
             #Chrome Headless
             options = webdriver.ChromeOptions()
@@ -165,6 +185,7 @@ class bioufiDL:
         return temp
     
     def searchforlink(self, mymodel, urlchq):
+        print("Searching for "+mymodel)
         for j in search(mymodel+" bios", tld="co.in", num=10, stop=1, pause=2): 
         #for j in search(mymodel+" BIOS", tld="co.in", num=10, stop=1, pause=2): 
             #print(mymodel+": "+j)
