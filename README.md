@@ -5,3 +5,6 @@ google==2.0.1
 
 Current supported vendors:
 Asrock
+Asus
+Gigabyte
+MSI
