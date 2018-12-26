@@ -2,6 +2,7 @@ import os
 import re
 import requests
 import time
+import html5lib
 from selenium import webdriver
 
 try: 
@@ -150,7 +151,7 @@ class bioufiDL:
             return False
 
     def getwebwithjs(self, link):
-        Firefox = True
+        Firefox = False
 
         if Firefox:
             #FireFox headless
@@ -158,17 +159,19 @@ class bioufiDL:
             options.add_argument('-headless')
             #driver = webdriver.Firefox(executable_path=,options=options)
             driver = webdriver.Firefox(options=options)
-            if not link == "None":
-                driver.get(link)
-                time.sleep(3)
-            else:
-                print("Error in Web Driver, Link= "+link)
         else:
             #Chrome Headless
             options = webdriver.ChromeOptions()
             options.add_argument('headless')
-            browser = webdriver.Chrome(chrome_options=options)
+            cpath = os.getcwd()+'\\chromedriver.exe'
+            print("Opening: "+ cpath)
+            driver = webdriver.Chrome(executable_path=cpath,chrome_options=options)
         
+        if not link == "None":
+                driver.get(link)
+                time.sleep(3)
+        else:
+            print("Error in Web Driver, Link= "+link)
         temp = BeautifulSoup(driver.page_source, "html5lib") #page_source fetches page after rendering is complete
         driver.quit()
         return temp

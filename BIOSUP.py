@@ -32,7 +32,7 @@ def main():
     print("Initialising...")
 
     #config
-    clean = False
+    clean = True
 
     vendor = ["ASROCK","ASUS", "GIGABYTE", "MSI"]
     #vendor = ["MSI"]
