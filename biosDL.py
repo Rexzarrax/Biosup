@@ -163,15 +163,23 @@ class bioufiDL:
             #Chrome Headless
             options = webdriver.ChromeOptions()
             options.add_argument('headless')
+<<<<<<< Updated upstream
             cpath = os.getcwd()+'\\chromedriver.exe'
             print("Opening: "+ cpath)
             driver = webdriver.Chrome(executable_path=cpath,chrome_options=options)
+=======
+            driver = webdriver.Chrome(chrome_options=options)
+>>>>>>> Stashed changes
         
         if not link == "None":
                 driver.get(link)
                 time.sleep(3)
         else:
             print("Error in Web Driver, Link= "+link)
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
         temp = BeautifulSoup(driver.page_source, "html5lib") #page_source fetches page after rendering is complete
         driver.quit()
         return temp
