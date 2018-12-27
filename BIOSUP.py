@@ -33,9 +33,12 @@ def main():
 
     #config
     clean = True
+    browser = False
 
     vendor = ["ASROCK","ASUS", "GIGABYTE", "MSI"]
     #vendor = ["MSI"]
+    modelCount = 0
+    modelTotal = 0
 
     mysetup = setUp()
     myGetWeb = gethtml()
@@ -84,6 +87,13 @@ def main():
         print("All actions Attempted, moving to next BIOS...\n")
 
 
+    for ven3 in vendor:
+        for model1 in ven3:
+            if os.path.exists(os.path.join(os.getcwd(), os.path.dirname(__file__))+"/"+ven3+"/"+str(modelStr).replace("/","-")+".zip"):
+                modelCount += 1
+            else:
+                print("Failed to get: "+ model1)
+
     if clean:
         print("Running Cleanup...")
         for v in range(len(vendor)):
@@ -92,6 +102,7 @@ def main():
 
 
     print("Finished...")
+    input("Press Enter to continue...")
 
 if __name__ == "__main__":
     main()

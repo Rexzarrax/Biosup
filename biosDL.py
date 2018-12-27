@@ -44,8 +44,6 @@ class bioufiDL:
             print("already Downloaded\n")
     #Download bios from Asrock    
     def urlBuilderAsrock(self,myGetWeb, mymodel, urlchq, cpath):
-        #cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASROCK/"+str(mymodel).replace("/","-")+".zip"
-        #get html page
         print("Getting Src...")
         if not os.path.exists(cpath):
             prodURL = str(self.searchforlink(mymodel, urlchq)).replace("index.asp","")+"BIOS.html"
@@ -64,9 +62,7 @@ class bioufiDL:
     #Download bios from Asus
     def urlBuilderAsus(self,myGetWeb, mymodel, urlchq, cpath):
         print("Getting Src...")
-        #get html page
         if not os.path.exists(cpath):
-            #print(mymodel+" : "+ urlchq)
             prodURL = str(self.searchforlink(mymodel, urlchq))
             if not prodURL.endswith('HelpDesk_BIOS/') and prodURL != "None":
                 prodURL += 'HelpDesk_BIOS/'
@@ -75,7 +71,6 @@ class bioufiDL:
             if not prodURL == "None":
                 print("Getting URL...")
                 soup_html = self.getwebwithjs(prodURL)
-                #print(soup_html)
                 for link in soup_html.find_all('a', attrs={'href': re.compile("^https://dlcdnets.asus.com/pub")}):
                     print("Found the URL:", link['href'])
                     if self.dlBIOS(link, cpath):
@@ -87,7 +82,7 @@ class bioufiDL:
         else:
             print("already Downloaded\n")
 
-    #download BIOS from Gigabyte
+    #Get link from Gigabyte
     def urlBuilderGigabyte(self,myGetWeb, mymodel, urlchq, cpath):
         print("Getting Src...")
         if not os.path.exists(cpath):
@@ -105,7 +100,7 @@ class bioufiDL:
         else:
             print("already Downloaded\n")
 
-    #download BIOS from MSI
+    #get link from MSI
     def urlBuilderMSI(self,myGetWeb, mymodel, urlchq, cpath):
         print("Getting Src...")
         if not os.path.exists(cpath):
@@ -123,9 +118,7 @@ class bioufiDL:
                     pass      
         else:
             print("already Downloaded\n")
-#Downloads and saves the zipped bios file to the cpath location
-#cpath: the path to the file
-#link: the url of the BIOS
+
     def dlBIOS(self, link, cpath):
         try:             
             print("DL and Save to "+cpath)
@@ -150,10 +143,9 @@ class bioufiDL:
 
             return False
 
-    def getwebwithjs(self, link):
-        Firefox = False
+    def getwebwithjs(self, link, browser):
 
-        if Firefox:
+        if browser:
             #FireFox headless
             options = webdriver.firefox.options.Options()
             options.add_argument('-headless')
@@ -162,24 +154,14 @@ class bioufiDL:
         else:
             #Chrome Headless
             options = webdriver.ChromeOptions()
-            options.add_argument('headless')
-<<<<<<< Updated upstream
-            cpath = os.getcwd()+'\\chromedriver.exe'
-            print("Opening: "+ cpath)
-            driver = webdriver.Chrome(executable_path=cpath,chrome_options=options)
-=======
+            options.add_argument('headless', '--log-level=3')
             driver = webdriver.Chrome(chrome_options=options)
->>>>>>> Stashed changes
         
         if not link == "None":
                 driver.get(link)
                 time.sleep(3)
         else:
             print("Error in Web Driver, Link= "+link)
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
         temp = BeautifulSoup(driver.page_source, "html5lib") #page_source fetches page after rendering is complete
         driver.quit()
         return temp
