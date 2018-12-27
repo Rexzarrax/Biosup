@@ -1,6 +1,7 @@
 import sys
 import requests
 import os
+import time
 
 from Unzip import unzip
 from getHTML import gethtml
@@ -36,9 +37,10 @@ def main():
     browser = False
 
     vendor = ["ASROCK","ASUS", "GIGABYTE", "MSI"]
-    #vendor = ["MSI"]
     modelCount = 0
     modelTotal = 0
+
+    timeStart = time.time()
 
     mysetup = setUp()
     myGetWeb = gethtml()
@@ -93,13 +95,16 @@ def main():
                 modelCount += 1
             else:
                 print("Failed to get: "+ model1)
+        print(modelCount+"/"+len(ven3))
 
     if clean:
         print("Running Cleanup...")
         for v in range(len(vendor)):
             mysetup.cleanup(myData.allVenArr[v], vendor[v])
             
-
+    timeEnd = time.time()
+    timeDelta = timeStart - timeEnd
+    print("Total Time: "+timeDelta)
 
     print("Finished...")
     input("Press Enter to continue...")

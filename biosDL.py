@@ -63,9 +63,15 @@ class bioufiDL:
     def urlBuilderAsus(self,myGetWeb, mymodel, urlchq, cpath):
         print("Getting Src...")
         if not os.path.exists(cpath):
-            prodURL = str(self.searchforlink(mymodel, urlchq))
-            if not prodURL.endswith('HelpDesk_BIOS/') and prodURL != "None":
+            prodURL = str(self.searchforlink(mymodel+" bios", urlchq))
+            #print(prodURL)
+            if not prodURL.endswith('HelpDesk_BIOS/'):        
+                prodURL.replace('_Download/', '_BIOS/')
+            if prodURL != "None" and not prodURL.endswith('_Download/') and not prodURL.endswith('_BIOS/'):
                 prodURL += 'HelpDesk_BIOS/'
+            else:
+                print("Err in getting link...")
+
                         
             print("Src URL: "+prodURL)
             if not prodURL == "None":
@@ -86,7 +92,13 @@ class bioufiDL:
     def urlBuilderGigabyte(self,myGetWeb, mymodel, urlchq, cpath):
         print("Getting Src...")
         if not os.path.exists(cpath):
-            prodURL = str(self.searchforlink(mymodel, urlchq)+"#support-dl-bios")
+            prodURL = str(self.searchforlink(mymodel+" bios", urlchq))
+            print(prodURL)
+            if not str(prodURL) == "None":
+                prodURL += "#support-dl-bios"
+            else:
+                prodURL = "Err in Search"
+
             print("Src URL: "+prodURL)
             print("Getting URL...")
             soup_html = self.getwebwithjs(prodURL)
@@ -139,12 +151,12 @@ class bioufiDL:
         else:
             print("Download Failed...\n")
             text_file = open("ErrUnzip.txt", "a")
-            text_file.write("Errored Link: %s\n" % link)
+            text_file.write("Error Link: %s\n" % link)
 
             return False
 
-    def getwebwithjs(self, link, browser):
-
+    def getwebwithjs(self, link):
+        browser = False
         if browser:
             #FireFox headless
             options = webdriver.firefox.options.Options()
@@ -154,7 +166,8 @@ class bioufiDL:
         else:
             #Chrome Headless
             options = webdriver.ChromeOptions()
-            options.add_argument('headless', '--log-level=3')
+            options.add_argument('headless')
+            options.add_argument('--log-level=3')
             driver = webdriver.Chrome(chrome_options=options)
         
         if not link == "None":
@@ -169,8 +182,6 @@ class bioufiDL:
     def searchforlink(self, mymodel, urlchq):
         print("Searching for "+mymodel)
         for j in search(mymodel+" bios", tld="co.in", num=10, stop=1, pause=2): 
-        #for j in search(mymodel+" BIOS", tld="co.in", num=10, stop=1, pause=2): 
-            #print(mymodel+": "+j)
             if re.search(urlchq, j, re.IGNORECASE):
                 return j
 
