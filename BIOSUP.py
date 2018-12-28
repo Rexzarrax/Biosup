@@ -8,6 +8,7 @@ from getHTML import gethtml
 from biosDL import bioufiDL
 from setup import setUp
 from inputFiles import inputfiles
+from statistics import statistics
 
 #stores motherboard data
 class moboData:
@@ -33,7 +34,7 @@ def main():
     print("Initialising...")
 
     #config
-    clean = True
+    clean = False
     browser = False
 
     vendor = ["ASROCK","ASUS", "GIGABYTE", "MSI"]
@@ -71,7 +72,7 @@ def main():
     for modelStr in myData.gigabyteArr:
         cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/GIGABYTE/"+str(modelStr).replace("/","-")+".zip"  
         print(modelStr+"'s BIOS...")
-        getBIO.urlBuilderGigabyte(myGetWeb, modelStr ,"^https:\/\/www\.gigabyte\.com\/Motherboard\/", cpath)
+        getBIO.urlBuilderGigabyte(myGetWeb, modelStr ,"^https:\/\/www\.gigabyte\.com\/(us\/)?Motherboard\/", cpath)
         dezip.deZip(cpath, cpath.strip(".zip"))
         print("All actions Attempted, moving to next BIOS...\n")
     for modelStr in myData.msiArr:   
@@ -88,24 +89,12 @@ def main():
         dezip.deZip(cpath, cpath.strip(".zip"))
         print("All actions Attempted, moving to next BIOS...\n")
 
-
-    for ven3 in vendor:
-        for model1 in ven3:
-            if os.path.exists(os.path.join(os.getcwd(), os.path.dirname(__file__))+"/"+ven3+"/"+str(modelStr).replace("/","-")+".zip"):
-                modelCount += 1
-            else:
-                print("Failed to get: "+ model1)
-        print(modelCount+"/"+len(ven3))
+    statistics(myData, vendor, timeStart)
 
     if clean:
         print("Running Cleanup...")
         for v in range(len(vendor)):
             mysetup.cleanup(myData.allVenArr[v], vendor[v])
-            
-    timeEnd = time.time()
-    timeDelta = timeStart - timeEnd
-    print("Total Time: "+timeDelta)
-
     print("Finished...")
     input("Press Enter to continue...")
 

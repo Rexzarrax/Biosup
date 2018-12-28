@@ -63,7 +63,7 @@ class bioufiDL:
     def urlBuilderAsus(self,myGetWeb, mymodel, urlchq, cpath):
         print("Getting Src...")
         if not os.path.exists(cpath):
-            prodURL = str(self.searchforlink(mymodel+" bios", urlchq))
+            prodURL = str(self.searchforlink(mymodel, urlchq))
             #print(prodURL)
             if not prodURL.endswith('HelpDesk_BIOS/'):        
                 prodURL.replace('_Download/', '_BIOS/')

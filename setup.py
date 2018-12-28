@@ -1,4 +1,6 @@
 import os
+import json
+import requests
 from PCPartPicker_API import pcpartpicker as pcpp
 try: 
     from bs4 import BeautifulSoup
@@ -35,6 +37,16 @@ class setUp:
     def innerHTML(self, element):
         return (element.encode_contents()).decode("utf-8").replace("SKU: ","").strip().replace(" ","-")
 
+    def dl_Src_PLE_API(self, vendor, array):
+        url = "https://www.ple.com.au/api/getItemGrid"
+        payload = {'Header': '','Content-Type':application/json, 'Body':{"InventoryCategoryId":302}}
+        r = requests.post(url, data=payload)
+        data = json.loads(r)
+        ['data']
+        [obj for obj in data if data['ManufacturerName']==vendor]
+        
+
+
     def dlSrcPLE(self, myGetWeb, vendor, array):
         site = "https://www.ple.com.au/Motherboards/"+vendor
         raw_html = myGetWeb.simple_get(site)
@@ -45,7 +57,7 @@ class setUp:
         for div in filter1:
             model = str(self.innerHTML(div)).replace(" ","-")
             array.append(model)
-            #print(self.innerHTML(div))    
+ 
     def arrClean(self, array1):
         for i in range (len (array1)-1):
             try:
