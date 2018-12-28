@@ -40,8 +40,8 @@ def main():
     vendor = ["ASROCK","ASUS", "GIGABYTE", "MSI"]
     modelCount = 0
     modelTotal = 0
-
     timeStart = time.time()
+    breaker = "-------------------start---------------------"
 
     mysetup = setUp()
     myGetWeb = gethtml()
@@ -63,25 +63,32 @@ def main():
         mysetup.arrClean(myData.allVenArr[ven2])
         print("\n"+str(myData.allVenArr[ven2])+"\n")
     #Get models
-    for modelStr in myData.asusArr:   
+    for modelStr in myData.asusArr:
+        print(breaker)   
         cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASUS/"+str(modelStr).replace("/","-")+".zip"  
         print(modelStr+"'s BIOS...")
         getBIO.urlBuilderAsus(myGetWeb, modelStr ,"^https:\/\/www\.asus\.com\/", cpath)
+        print("Unzipping: "+cpath)
         dezip.deZip(cpath, cpath.strip(".zip"))
         print("All actions Attempted, moving to next BIOS...\n")
     for modelStr in myData.gigabyteArr:
+        print(breaker)
         cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/GIGABYTE/"+str(modelStr).replace("/","-")+".zip"  
         print(modelStr+"'s BIOS...")
         getBIO.urlBuilderGigabyte(myGetWeb, modelStr ,"^https:\/\/www\.gigabyte\.com\/(us\/)?Motherboard\/", cpath)
+        print("Unzipping: "+cpath)
         dezip.deZip(cpath, cpath.strip(".zip"))
         print("All actions Attempted, moving to next BIOS...\n")
-    for modelStr in myData.msiArr:   
+    for modelStr in myData.msiArr:
+        print(breaker)   
         cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/MSI/"+str(modelStr).replace("/","-")+".zip"
         print(modelStr+"'s BIOS...")
         getBIO.urlBuilderMSI(myGetWeb, modelStr ,"^https:\/\/www\.msi\.com\/Motherboard\/support\/", cpath)
+        print("Unzipping: "+cpath)
         dezip.deZip(cpath, cpath.strip(".zip"))
         print("All actions Attempted, moving to next BIOS...\n")
-    for modelStr in myData.asrockArr: 
+    for modelStr in myData.asrockArr:
+        print(breaker) 
         cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASROCK/"+str(modelStr).replace("/","-")+".zip"  
         print(modelStr+"'s BIOS...")
         getBIO.urlBuilderAsrock(myGetWeb, modelStr,"^https:\/\/www\.asrock\.com\/mb", cpath)

@@ -69,7 +69,7 @@ class bioufiDL:
                 prodURL.replace('_Download/', '_BIOS/')
             if prodURL != "None" and not prodURL.endswith('_Download/') and not prodURL.endswith('_BIOS/'):
                 prodURL += 'HelpDesk_BIOS/'
-            else:
+            elif prodURL == "None":
                 print("Err in getting link...")
 
                         
