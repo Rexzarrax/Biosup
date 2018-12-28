@@ -42,6 +42,7 @@ class setUp:
         payload = {'Header': '','Content-Type':application/json, 'Body':{"InventoryCategoryId":302}}
         r = requests.post(url, data=payload)
         data = json.loads(r)
+        print(data)
         ['data']
         [obj for obj in data if data['ManufacturerName']==vendor]
         
@@ -56,7 +57,7 @@ class setUp:
         
         for div in filter1:
             model = str(self.innerHTML(div)).replace(" ","-")
-            array.append(model)
+            array.append(model.replace)
  
     def arrClean(self, array1):
         for i in range (len (array1)-1):
