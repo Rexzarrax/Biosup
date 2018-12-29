@@ -29,10 +29,12 @@ class setUp:
                 print("Found:"+ str(fullsku))
                 vendorpcpp = (fullsku[0]).upper()
                 model = "-"
-                for strs in fullsku:
-                    model += "-"+strs 
                 if vendorpcpp == vendor:
-                    array.append(model.replace("--",""))
+                    for strs in fullsku:
+                        model += "-"+strs 
+                    model = model.replace("--","").upper()
+                    print("Adding: "+str(model))
+                    array.append(model)
 
     def dl_Src_PLE_API(self, vendor, array):
         url = "https://www.ple.com.au/api/getItemGrid"
@@ -62,18 +64,18 @@ class setUp:
             print("Error in Request, code: "+r.status_code)
 
 
-    #def dlSrcPLE(self, myGetWeb, vendor, array):
-    #    site = "https://www.ple.com.au/Motherboards/"+vendor
-    #    print("Getting: "+site)
-    #    raw_html = myGetWeb.simple_get(site)
-    #    html = BeautifulSoup(raw_html, 'html.parser')
-    #    filter1 = html.find_all("div", {"class":"pg_manufacturermodel"})
-    #    
-    #    
-    #    for div in filter1:
-    #        print(div)
-    #        model = str(self.innerHTML(div)).replace(" ","-")
-    #        array.append(model.replace)
+    def dl_Src_PLE(self, myGetWeb, vendor, array):
+        site = "https://www.ple.com.au/Motherboards/"+vendor
+        print("Getting: "+site)
+        raw_html = myGetWeb.simple_get(site)
+        html = BeautifulSoup(raw_html, 'html.parser')
+        filter1 = html.find_all("div", {"class":"pg_manufacturermodel"})
+        
+        
+        for div in filter1:
+            print(div)
+            model = str(self.innerHTML(div)).replace(" ","-")
+            array.append(model)
  
     def innerHTML(self, element):
         return (element.encode_contents()).decode("utf-8").replace("SKU: ","").strip().replace(" ","-")

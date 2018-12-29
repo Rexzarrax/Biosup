@@ -24,7 +24,8 @@ class moboData:
         if PLESrc == True:
             print("Src = PLE")
             for ven in range(len(self.allVenArr)):
-                mysetup.dl_Src_PLE_API(vendor[ven], self.allVenArr[ven])
+                #mysetup.dl_Src_PLE_API(vendor[ven], self.allVenArr[ven])
+                mysetup.dl_Src_PLE(myGetWeb, vendor[ven], self.allVenArr[ven])
         else:
             print("Src = PCPP")
             for ven in range(len(self.allVenArr)):
@@ -36,9 +37,9 @@ def main():
     print("Initialising...")
 
     #config
-    clean = False
-    FireFox = True
-    PLESrc = True
+    clean = False #delete zip file once done
+    FireFox = False #need to find way to reduce amount of passthrough
+    PLESrc = False #Get model from PLE
 
     vendor = ["ASROCK","ASUS", "GIGABYTE", "MSI"]
     modelCount = 0
