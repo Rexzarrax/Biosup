@@ -36,23 +36,30 @@ class setUp:
 
     def dl_Src_PLE_API(self, vendor, array):
         url = "https://www.ple.com.au/api/getItemGrid"
-        payload = {'Header': '','Content-Type':application/json, 'Body':{"InventoryCategoryId":302}}
-        r = requests.post(url, data=payload)
-        data = json.loads(r)
-        print(data)
-        ['data']
-        [obj for obj in data if data['ManufacturerName']==vendor]
-        for objectmodel in data:
-            if vendor == "ASUS":
-                pass
-            elif vendor == "GIGABYTE":
-                pass
-            elif vendor == "MSI":
-                pass
-            elif vendor == "ASROCK":
-                pass
-            else:
-                print("Error in PLE API")
+        headers = ''
+        payload = {'Content-type':'application/json','Body':{"InventoryCategoryId":'302'}}
+        r = requests.post(url, data=payload, headers=headers)
+
+        print("Resp Code: "+str(r.status_code))
+        #data = json.loads(r)['data']
+        data = r.json()
+        print(str(data))
+        if r.status_code == 200:
+            [obj for obj in data if data['ManufacturerName']==vendor]
+            for objectmodel in data:
+                print(str(objectmodel))
+                if vendor == "ASUS":
+                    array.append(objectmodel)
+                elif vendor == "GIGABYTE":
+                    array.append(objectmodel)
+                elif vendor == "MSI":
+                    array.append(objectmodel)
+                elif vendor == "ASROCK":
+                    array.append(objectmodel)
+                else:
+                    print("Error in PLE API")
+        else:
+            print("Error in Request, code: "+r.status_code)
 
 
     #def dlSrcPLE(self, myGetWeb, vendor, array):

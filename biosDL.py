@@ -19,7 +19,7 @@ except ImportError:
 #class holds methods for downloading the BIOS from a vendor
 class bioufiDL:
     #Framework for future code compression
-    def UniUrlBuilder(self, myGetWeb, mymodel, urlchq, cpath, dlFilter, extraURL):
+    def UniUrlBuilder(self, myGetWeb, mymodel, urlchq, cpath, dlFilter, extraURL, FireFox):
         print("Getting Src...")
         #get html page
         if not os.path.exists(cpath):
@@ -34,7 +34,7 @@ class bioufiDL:
                 #print(soup_html)
                 for link in soup_html.find_all('a', attrs={'href': re.compile(dlFilter)}):
                     print("Found the URL:", link['href'])
-                    if self.dlBIOS(link, cpath):
+                    if self.dlBIOS(link, cpath, FireFox):
                         break  
                     else:
                         pass
@@ -43,7 +43,7 @@ class bioufiDL:
         else:
             print("already Downloaded\n")
     #Download bios from Asrock    
-    def urlBuilderAsrock(self,myGetWeb, mymodel, urlchq, cpath):
+    def urlBuilderAsrock(self,myGetWeb, mymodel, urlchq, cpath, FireFox):
         print("Getting Src...")
         if not os.path.exists(cpath):
             prodURL = str(self.searchforlink(mymodel, urlchq)).replace("index.asp","")+"BIOS.html"
@@ -60,7 +60,7 @@ class bioufiDL:
             print("already Downloaded")
     
     #Download bios from Asus
-    def urlBuilderAsus(self,myGetWeb, mymodel, urlchq, cpath):
+    def urlBuilderAsus(self,myGetWeb, mymodel, urlchq, cpath, FireFox):
         print("Getting Src...")
         if not os.path.exists(cpath):
             prodURL = str(self.searchforlink(mymodel, urlchq))
@@ -76,7 +76,7 @@ class bioufiDL:
             print("Src URL: "+prodURL)
             if not prodURL == "None":
                 print("Getting URL...")
-                soup_html = self.getwebwithjs(prodURL)
+                soup_html = self.getwebwithjs(prodURL, FireFox)
                 for link in soup_html.find_all('a', attrs={'href': re.compile("^https://dlcdnets.asus.com/pub")}):
                     print("Found the URL:", link['href'])
                     if self.dlBIOS(link, cpath):
@@ -89,7 +89,7 @@ class bioufiDL:
             print("already Downloaded\n")
 
     #Get link from Gigabyte
-    def urlBuilderGigabyte(self,myGetWeb, mymodel, urlchq, cpath):
+    def urlBuilderGigabyte(self,myGetWeb, mymodel, urlchq, cpath, FireFox):
         print("Getting Src...")
         if not os.path.exists(cpath):
             prodURL = str(self.searchforlink(mymodel+" bios", urlchq))
@@ -101,7 +101,7 @@ class bioufiDL:
 
             print("Src URL: "+prodURL)
             print("Getting URL...")
-            soup_html = self.getwebwithjs(prodURL)
+            soup_html = self.getwebwithjs(prodURL, FireFox)
             #print(soup_html)
             for link in soup_html.find_all('a', attrs={'href': re.compile("^http://download.gigabyte.asia/FileList/BIOS")}):
                 print("Found the URL:", link['href'])
@@ -113,14 +113,14 @@ class bioufiDL:
             print("already Downloaded\n")
 
     #get link from MSI
-    def urlBuilderMSI(self,myGetWeb, mymodel, urlchq, cpath):
+    def urlBuilderMSI(self,myGetWeb, mymodel, urlchq, cpath, FireFox):
         print("Getting Src...")
         if not os.path.exists(cpath):
             prodURL = str(self.searchforlink(mymodel, urlchq))
             print("Src URL: "+prodURL)
             print("Getting URL...")
             #select only the url  
-            soup_html = self.getwebwithjs(prodURL)
+            soup_html = self.getwebwithjs(prodURL, FireFox)
             #print(soup_html)
             for link in soup_html.find_all('a', attrs={'href': re.compile("^http://download.msi.com/bos")}):
                 print("Found the URL:", link['href'])
@@ -155,8 +155,7 @@ class bioufiDL:
 
             return False
 
-    def getwebwithjs(self, link):
-        FireFox = False
+    def getwebwithjs(self, link, FireFox):
         if FireFox:
             #FireFox headless
             options = webdriver.firefox.options.Options()
