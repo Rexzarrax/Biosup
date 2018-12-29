@@ -19,23 +19,20 @@ class setUp:
         else:
             print("Dir: \n" , cpwd+company ,  " \nalready exists\n")
 
-    def dlSrcPCPP(self, vendor, mysetup):
-        #need to work out a system to filter unwanted skus, also save this list due to taking AGES to fix
+    def dl_Src_PCPP(self, vendor, array):
         mobo_count = pcpp.productLists.totalPages("motherboard")
-        print("Total Mb pages:", mobo_count)
-
-        # Pull info from page 1 of CPUs
         for page in range(0, mobo_count):
             skuName = pcpp.productLists.getProductList("motherboard", page)
-            # Print the names and prices of all the CPUs on the page
+            print("Collected page "+ str(page))
             for mobo in skuName:
                 fullsku = str(mobo["name"]).split(" ")
+                print("Found:"+ str(fullsku))
                 vendorpcpp = (fullsku[0]).upper()
-                model = fullsku[1]
-                
-
-    def innerHTML(self, element):
-        return (element.encode_contents()).decode("utf-8").replace("SKU: ","").strip().replace(" ","-")
+                model = "-"
+                for strs in fullsku:
+                    model += "-"+strs 
+                if vendorpcpp == vendor:
+                    array.append(model.replace("--",""))
 
     def dl_Src_PLE_API(self, vendor, array):
         url = "https://www.ple.com.au/api/getItemGrid"
@@ -45,20 +42,35 @@ class setUp:
         print(data)
         ['data']
         [obj for obj in data if data['ManufacturerName']==vendor]
-        
+        for objectmodel in data:
+            if vendor == "ASUS":
+                pass
+            elif vendor == "GIGABYTE":
+                pass
+            elif vendor == "MSI":
+                pass
+            elif vendor == "ASROCK":
+                pass
+            else:
+                print("Error in PLE API")
 
 
-    def dlSrcPLE(self, myGetWeb, vendor, array):
-        site = "https://www.ple.com.au/Motherboards/"+vendor
-        raw_html = myGetWeb.simple_get(site)
-        html = BeautifulSoup(raw_html, 'html.parser')
-        filter1 = html.find_all("div", {"class":"pg_manufacturermodel"})
-        print("Getting: "+site)
-        
-        for div in filter1:
-            model = str(self.innerHTML(div)).replace(" ","-")
-            array.append(model.replace)
+    #def dlSrcPLE(self, myGetWeb, vendor, array):
+    #    site = "https://www.ple.com.au/Motherboards/"+vendor
+    #    print("Getting: "+site)
+    #    raw_html = myGetWeb.simple_get(site)
+    #    html = BeautifulSoup(raw_html, 'html.parser')
+    #    filter1 = html.find_all("div", {"class":"pg_manufacturermodel"})
+    #    
+    #    
+    #    for div in filter1:
+    #        print(div)
+    #        model = str(self.innerHTML(div)).replace(" ","-")
+    #        array.append(model.replace)
  
+    def innerHTML(self, element):
+        return (element.encode_contents()).decode("utf-8").replace("SKU: ","").strip().replace(" ","-")
+
     def arrClean(self, array1):
         for i in range (len (array1)-1):
             try:

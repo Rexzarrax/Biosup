@@ -12,22 +12,24 @@ from statistics import statistics
 
 #stores motherboard data
 class moboData:
-    def __init__(self, mysetup, myGetWeb, vendor):
+    def __init__(self, mysetup, myGetWeb, vendor, PLESrc):
         #need to make variable, based on length of vendor array in main
         self.asrockArr = []
         self.asusArr = []
         self.gigabyteArr = []
         self.msiArr = []
+        self.miscArr = []
 
         self.allVenArr = [self.asrockArr, self.asusArr, self.gigabyteArr, self.msiArr]
-
-        for ven in range(len(self.allVenArr)):
-            try:
-                #mysetup.dlSrcPCPP(vendor[ven], mysetup)
-                mysetup.dlSrcPLE(myGetWeb, vendor[ven], self.allVenArr[ven])
-            except:
-                pass
-    
+        if PLESrc == True:
+            print("Src = PLE")
+            for ven in range(len(self.allVenArr)):
+                mysetup.dl_Src_PLE_API(vendor[ven], self.allVenArr[ven])
+        else:
+            print("Src = PCPP")
+            for ven in range(len(self.allVenArr)):
+                mysetup.dl_Src_PCPP(vendor[ven], self.allVenArr[ven])
+           
 #initial checks and basic file creation
 def main():
     print("----------BIOSUP----------")
@@ -35,7 +37,8 @@ def main():
 
     #config
     clean = False
-    browser = False
+    FireFox = False
+    PLESrc = False
 
     vendor = ["ASROCK","ASUS", "GIGABYTE", "MSI"]
     modelCount = 0
@@ -45,7 +48,7 @@ def main():
 
     mysetup = setUp()
     myGetWeb = gethtml()
-    myData = moboData(mysetup, myGetWeb, vendor)  
+    myData = moboData(mysetup, myGetWeb, vendor, PLESrc)  
     myI = inputfiles()
     getBIO = bioufiDL()
     dezip = unzip()

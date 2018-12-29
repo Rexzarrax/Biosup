@@ -156,8 +156,8 @@ class bioufiDL:
             return False
 
     def getwebwithjs(self, link):
-        browser = False
-        if browser:
+        FireFox = False
+        if FireFox:
             #FireFox headless
             options = webdriver.firefox.options.Options()
             options.add_argument('-headless')
