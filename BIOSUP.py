@@ -47,7 +47,7 @@ def main():
     config_object.read("config.ini")
 
     #config
-    clean = bool(config_object["SETTINGS"]["clean"]) #delete zip file once done
+    clean = bool(config_object["SETTINGS"]["clean"]) #delete zip files once done
     FireFox = bool(config_object["SETTINGS"]["FireFox"]) #need to find way to reduce amount of passthrough
     PLESrc = bool(config_object["SETTINGS"]["PLESrc"]) #Get model from PLE
 
