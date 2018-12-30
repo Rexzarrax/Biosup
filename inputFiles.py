@@ -1,4 +1,4 @@
-
+import os
 #get the list of motherboard names from file
 #and saves them to Array
 #creates the file structure to easily find BIOS'

@@ -9,6 +9,7 @@ from biosDL import bioufiDL
 from setup import setUp
 from inputFiles import inputfiles
 from statistics import statistics
+from configparser import ConfigParser
 
 #stores motherboard data
 class moboData:
@@ -36,16 +37,24 @@ def main():
     print("----------BIOSUP----------")
     print("Initialising...")
 
-    #config
-    clean = False #delete zip file once done
-    FireFox = False #need to find way to reduce amount of passthrough
-    PLESrc = False #Get model from PLE
-
     vendor = ["ASROCK","ASUS", "GIGABYTE", "MSI"]
     modelCount = 0
     modelTotal = 0
     timeStart = time.time()
     breaker = "-------------------START---------------------"
+
+    config_object = ConfigParser()
+    config_object.read("config.ini")
+
+    #config
+    clean = bool(config_object["SETTINGS"]["clean"]) #delete zip file once done
+    FireFox = bool(config_object["SETTINGS"]["FireFox"]) #need to find way to reduce amount of passthrough
+    PLESrc = bool(config_object["SETTINGS"]["PLESrc"]) #Get model from PLE
+
+    print("Loading config: ")
+    print("Clean up: "+str(clean))
+    print("FireFox installed: "+str(FireFox))
+    print("Use PLE Website for models: "+str(PLESrc))
 
     mysetup = setUp()
     myGetWeb = gethtml()

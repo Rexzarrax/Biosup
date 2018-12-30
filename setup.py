@@ -38,15 +38,14 @@ class setUp:
 
     def dl_Src_PLE_API(self, vendor, array):
         url = "https://www.ple.com.au/api/getItemGrid"
-        headers = ''
-        payload = {'Content-type':'application/json','Body':{"InventoryCategoryId":'302'}}
-        r = requests.post(url, data=payload, headers=headers)
-
-        print("Resp Code: "+str(r.status_code))
-        #data = json.loads(r)['data']
-        data = r.json()
-        print(str(data))
+        headers = {}
+        data = {'Content-type':'application/json','Body':{"InventoryCategoryId":302}}
+        r = requests.post(url, data=json.dumps(data), headers=headers)
+        
         if r.status_code == 200:
+            data = json.loads(r)['data']
+            #data = r.json()
+            print(str(data))
             [obj for obj in data if data['ManufacturerName']==vendor]
             for objectmodel in data:
                 print(str(objectmodel))
@@ -61,8 +60,7 @@ class setUp:
                 else:
                     print("Error in PLE API")
         else:
-            print("Error in Request, code: "+r.status_code)
-
+            print("Error in Requesting "+vendor+" Bios, code: "+str(r.status_code))
 
     def dl_Src_PLE(self, myGetWeb, vendor, array):
         site = "https://www.ple.com.au/Motherboards/"+vendor
