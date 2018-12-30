@@ -116,7 +116,7 @@ class bioufiDL:
     def urlBuilderMSI(self,myGetWeb, mymodel, urlchq, cpath, driver):
         print("Getting Src...")
         if not os.path.exists(cpath):
-            prodURL = str(self.searchforlink(mymodel, urlchq))
+            prodURL = str(self.searchforlink(mymodel.replace("Z390-I", "Z390I"), urlchq))
             if not str(prodURL) == "None":
                 prodURL += "#down-bios"
                 soup_html = driver.getwebwithjs(prodURL)
