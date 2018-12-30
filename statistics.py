@@ -21,4 +21,4 @@ def statistics(myData, vendor, timeStart):
             
     timeEnd = time.time()
     timeDelta = timeEnd - timeStart
-    print("Total Time: "+str(int(timeDelta))+"s")
+    print("Total Time: "+str(int(timeDelta)/60)+"min")

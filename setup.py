@@ -73,6 +73,7 @@ class setUp:
         else:
             print("Error in Requesting "+vendor+" Bios, code: "+str(r.status_code))
 
+    #Will be Deprecated in 2019
     def dl_Src_PLE(self, myGetWeb, vendor, array):
         site = "https://www.ple.com.au/Motherboards/"+vendor
         print("Getting: "+site)
@@ -82,8 +83,9 @@ class setUp:
         
         
         for div in filter1:
-            print(div)
+            #print(div)
             model = str(self.innerHTML(div)).replace(" ","-")
+            print(model)
             array.append(model)
  
     def innerHTML(self, element):

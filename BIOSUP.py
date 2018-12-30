@@ -117,6 +117,7 @@ def main():
         for v in range(len(vendor)):
             mysetup.cleanup(myData.allVenArr[v], vendor[v])
     browser.driver.quit()
+    print("Statistics are above the deleted files")
     print("Finished...")
     input("Press Enter to continue...")
 
