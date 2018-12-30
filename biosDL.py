@@ -95,19 +95,20 @@ class bioufiDL:
             print(prodURL)
             if not str(prodURL) == "None":
                 prodURL += "#support-dl-bios"
+                soup_html = driver.getwebwithjs(prodURL)
+                print("Src URL: "+prodURL)
+                print("Getting URL...")
+                #print(soup_html)
+                for link in soup_html.find_all('a', attrs={'href': re.compile("^http://download.gigabyte.asia/FileList/BIOS")}):
+                    print("Found the URL:", link['href'])
+                    if self.dlBIOS(link, cpath):
+                        break  
+                    else:
+                        pass                          
             else:
                 prodURL = "Err in Search"
 
-            print("Src URL: "+prodURL)
-            print("Getting URL...")
-            soup_html = driver.getwebwithjs(prodURL)
-            #print(soup_html)
-            for link in soup_html.find_all('a', attrs={'href': re.compile("^http://download.gigabyte.asia/FileList/BIOS")}):
-                print("Found the URL:", link['href'])
-                if self.dlBIOS(link, cpath):
-                    break  
-                else:
-                    pass                          
+
         else:
             print("already Downloaded\n")
 
@@ -115,18 +116,22 @@ class bioufiDL:
     def urlBuilderMSI(self,myGetWeb, mymodel, urlchq, cpath, driver):
         print("Getting Src...")
         if not os.path.exists(cpath):
-            prodURL = str(self.searchforlink(mymodel, urlchq)+"#down-bios")
-            print("Src URL: "+prodURL)
-            print("Getting URL...")
-            #select only the url  
-            soup_html = driver.getwebwithjs(prodURL)
-            #print(soup_html)
-            for link in soup_html.find_all('a', attrs={'href': re.compile("^http://download.msi.com/bos")}):
-                print("Found the URL:", link['href'])
-                if self.dlBIOS(link, cpath):
-                    break  
-                else:
-                    pass      
+            prodURL = str(self.searchforlink(mymodel, urlchq))
+            if not str(prodURL) == "None":
+                prodURL += "#down-bios"
+                soup_html = driver.getwebwithjs(prodURL)
+                print("Src URL: "+prodURL)
+                print("Getting URL...")
+                #select only the url  
+                #print(soup_html)
+                for link in soup_html.find_all('a', attrs={'href': re.compile("^http://download.msi.com/bos")}):
+                    print("Found the URL:", link['href'])
+                    if self.dlBIOS(link, cpath):
+                        break  
+                    else:
+                        pass      
+            else:
+                prodURL = "Err in Search"
         else:
             print("already Downloaded\n")
 
