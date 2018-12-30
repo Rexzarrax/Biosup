@@ -28,13 +28,32 @@ class setUp:
                 fullsku = str(mobo["name"]).split(" ")
                 print("Found:"+ str(fullsku))
                 vendorpcpp = (fullsku[0]).upper()
-                model = "-"
-                if vendorpcpp == vendor:
-                    for strs in fullsku:
-                        model += "-"+strs 
-                    model = model.replace("--","").upper()
-                    print("Adding: "+str(model))
-                    array.append(model)
+                #if vendorpcpp == vendor:
+                modelsku = self.dl_Src_PCPP_cleanStr(fullsku)
+                self.generic_State(modelsku, vendorpcpp, array)
+
+    def generic_State(self,modelsku, vendor, array):
+        if vendor == "ASUS":
+            array[1].append(modelsku)
+            print("Sorted "+modelsku+" to "+vendor)
+        elif vendor == "GIGABYTE":
+            array[2].append(modelsku)
+            print("Sorted "+modelsku+" to "+vendor)
+        elif vendor == "MSI":
+            array[3].append(modelsku)
+            print("Sorted "+modelsku+" to "+vendor)
+        elif vendor == "ASROCK":
+            array[0].append(modelsku)
+            print("Sorted "+modelsku+" to "+vendor)
+        else:
+            print("Could not Sort: "+modelsku)
+
+    def dl_Src_PCPP_cleanStr(self,fullsku):
+        model = '-'
+        for strs in fullsku:
+            model += "-"+strs 
+            model = model.replace("--","").upper()
+        return model
 
     def dl_Src_PLE_API(self, vendor, array):
         url = "https://www.ple.com.au/api/getItemGrid"
@@ -49,16 +68,8 @@ class setUp:
             [obj for obj in data if data['ManufacturerName']==vendor]
             for objectmodel in data:
                 print(str(objectmodel))
-                if vendor == "ASUS":
-                    array.append(objectmodel)
-                elif vendor == "GIGABYTE":
-                    array.append(objectmodel)
-                elif vendor == "MSI":
-                    array.append(objectmodel)
-                elif vendor == "ASROCK":
-                    array.append(objectmodel)
-                else:
-                    print("Error in PLE API")
+                self.generic_State(objectmodel, vendor, array)
+                
         else:
             print("Error in Requesting "+vendor+" Bios, code: "+str(r.status_code))
 

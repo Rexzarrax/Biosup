@@ -29,8 +29,8 @@ class moboData:
                 mysetup.dl_Src_PLE(myGetWeb, vendor[ven], self.allVenArr[ven])
         else:
             print("Src = PCPP")
-            for ven in range(len(self.allVenArr)):
-                mysetup.dl_Src_PCPP(vendor[ven], self.allVenArr[ven])
+            #for ven in range(len(self.allVenArr)):
+            mysetup.dl_Src_PCPP(vendor, self.allVenArr)
            
 #initial checks and basic file creation
 def main():
@@ -59,7 +59,6 @@ def main():
     mysetup = setUp()
     myGetWeb = gethtml()
     myData = moboData(mysetup, myGetWeb, vendor, PLESrc)  
-    myI = inputfiles()
     getBIO = bioufiDL()
     dezip = unzip()
 
