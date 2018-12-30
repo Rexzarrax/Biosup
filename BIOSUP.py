@@ -10,6 +10,7 @@ from setup import setUp
 from inputFiles import inputfiles
 from statistics import statistics
 from configparser import ConfigParser
+from getwebwithjs import webwithjs
 
 #stores motherboard data
 class moboData:
@@ -61,6 +62,7 @@ def main():
     myData = moboData(mysetup, myGetWeb, vendor, PLESrc)  
     getBIO = bioufiDL()
     dezip = unzip()
+    browser = webwithjs(FireFox)
 
     print(vendor)
 
@@ -79,7 +81,7 @@ def main():
         print(breaker)   
         cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASUS/"+str(modelStr).replace("/","-")+".zip"  
         print(modelStr+"'s BIOS...")
-        getBIO.urlBuilderAsus(myGetWeb, modelStr ,"^https:\/\/www\.asus\.com\/", cpath, FireFox)
+        getBIO.urlBuilderAsus(myGetWeb, modelStr ,"^https:\/\/www\.asus\.com\/", cpath, browser)
         print("Unzipping: "+cpath)
         dezip.deZip(cpath, cpath.strip(".zip"))
         print("All actions Attempted, moving to next BIOS...\n")
@@ -87,7 +89,7 @@ def main():
         print(breaker)
         cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/GIGABYTE/"+str(modelStr).replace("/","-")+".zip"  
         print(modelStr+"'s BIOS...")
-        getBIO.urlBuilderGigabyte(myGetWeb, modelStr ,"^https:\/\/www\.gigabyte\.com\/(us\/)?Motherboard\/", cpath, FireFox)
+        getBIO.urlBuilderGigabyte(myGetWeb, modelStr ,"^https:\/\/www\.gigabyte\.com\/(us\/)?Motherboard\/", cpath, browser)
         print("Unzipping: "+cpath)
         dezip.deZip(cpath, cpath.strip(".zip"))
         print("All actions Attempted, moving to next BIOS...\n")
@@ -95,7 +97,7 @@ def main():
         print(breaker)   
         cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/MSI/"+str(modelStr).replace("/","-")+".zip"
         print(modelStr+"'s BIOS...")
-        getBIO.urlBuilderMSI(myGetWeb, modelStr ,"^https:\/\/www\.msi\.com\/Motherboard\/support\/", cpath, FireFox)
+        getBIO.urlBuilderMSI(myGetWeb, modelStr ,"^https:\/\/www\.msi\.com\/Motherboard\/support\/", cpath, browser)
         print("Unzipping: "+cpath)
         dezip.deZip(cpath, cpath.strip(".zip"))
         print("All actions Attempted, moving to next BIOS...\n")
@@ -103,7 +105,7 @@ def main():
         print(breaker) 
         cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASROCK/"+str(modelStr).replace("/","-")+".zip"  
         print(modelStr+"'s BIOS...")
-        getBIO.urlBuilderAsrock(myGetWeb, modelStr,"^https:\/\/www\.asrock\.com\/mb", cpath, FireFox)
+        getBIO.urlBuilderAsrock(myGetWeb, modelStr,"^https:\/\/www\.asrock\.com\/mb", cpath, browser)
         print("Unzipping: "+cpath)
         dezip.deZip(cpath, cpath.strip(".zip"))
         print("All actions Attempted, moving to next BIOS...\n")
@@ -114,6 +116,7 @@ def main():
         print("Running Cleanup...")
         for v in range(len(vendor)):
             mysetup.cleanup(myData.allVenArr[v], vendor[v])
+    browser.driver.quit()
     print("Finished...")
     input("Press Enter to continue...")
 
