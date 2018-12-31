@@ -20,7 +20,6 @@ class moboData:
         self.asusArr = []
         self.gigabyteArr = []
         self.msiArr = []
-        self.miscArr = []
 
         self.allVenArr = [self.asrockArr, self.asusArr, self.gigabyteArr, self.msiArr]
         if PLESrc == True:

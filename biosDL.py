@@ -25,9 +25,12 @@ class bioufiDL:
             #prodURL = str(self.searchforlink(mymodel, urlchq)).replace("index.asp","")+"BIOS.html"
             prodURL = str(self.searchforlink(mymodel, urlchq))
             if not prodURL.endswith('index.asp'):
-                prodURL.replace("index.asp","BIOS.html")
+                if prodURL == "None":
+                    pass
+                else: 
+                    prodURL += "#BIOS"
             else:
-                prodURL += "#BIOS"
+                prodURL.replace("index.asp","BIOS.html")
             if not prodURL == "None":
                 print("Motherboard URL: "+prodURL)
                 print("Finding Download URL...")

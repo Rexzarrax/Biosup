@@ -21,6 +21,7 @@ class setUp:
 
     def dl_Src_PCPP(self, vendor, array):
         mobo_count = pcpp.productLists.totalPages("motherboard")
+        print("Pages found: "+mobo_count)
         for page in range(0, mobo_count):
             skuName = pcpp.productLists.getProductList("motherboard", page)
             print("Collected page "+ str(page))
