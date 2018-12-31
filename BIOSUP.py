@@ -79,7 +79,7 @@ def main():
         mysetup.arrClean(myData.allVenArr[ven2])
         print("\n"+str(myData.allVenArr[ven2])+"\n")
     
-    for modelArr in range (len (myData.allVenArr)-1):
+    for modelArr in range (len (myData.allVenArr)):
         for modelStr in myData.allVenArr[modelArr]:
             print(breaker)   
             cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/"+vendor[modelArr]+"/"+str(modelStr).replace("/","-")+".zip"
@@ -96,6 +96,7 @@ def main():
             dezip.deZip(cpath, cpath.strip(".zip"))
             print("All actions Attempted, moving to next BIOS...\n")
 
+    print("All download and unzipping attempted...")
     statistics(myData, vendor, timeStart)
 
     if clean:
@@ -103,9 +104,9 @@ def main():
         for v in range(len(vendor)):
             mysetup.cleanup(myData.allVenArr[v], vendor[v])
     browser.driver.quit()
-    print("Statistics are above the deleted files")
-    print("Finished...")
-    input("Press Enter to continue...")
+    #print("Statistics are above the deleted files")
+    print("Script Finished...")
+    input("Press Enter to continue/exit...")
 
 if __name__ == "__main__":
     main()

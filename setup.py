@@ -28,7 +28,6 @@ class setUp:
                 fullsku = str(mobo["name"]).split(" ")
                 print("Found:"+ str(fullsku))
                 vendorpcpp = (fullsku[0]).upper()
-                #if vendorpcpp == vendor:
                 modelsku = self.dl_Src_PCPP_cleanStr(fullsku)
                 self.generic_State(modelsku, vendorpcpp, array)
 
@@ -102,7 +101,7 @@ class setUp:
             for i in range (len(modelarray)):
                 cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/"+vendor+"/"+str(modelarray[i]).replace("/","-")+".zip"
                 try:
-                    print("Deleting "+cpath)
+                    #print("Deleting "+cpath)
                     os.remove(cpath)
                 except: 
                     print("Err in Deleting "+cpath)
