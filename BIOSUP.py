@@ -63,6 +63,7 @@ def main():
     myData = moboData(mysetup, myGetWeb, vendor, PLESrc)  
     getBIO = bioufiDL()
     dezip = unzip()
+    print("Opening browser...")
     browser = webwithjs(FireFox, openBrowser)
 
     print(vendor)
@@ -78,39 +79,22 @@ def main():
         mysetup.arrClean(myData.allVenArr[ven2])
         print("\n"+str(myData.allVenArr[ven2])+"\n")
     
-    #Get models
-    for modelStr in myData.asrockArr:
-        print(breaker) 
-        cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASROCK/"+str(modelStr).replace("/","-")+".zip"  
-        print(modelStr+"'s BIOS...")
-        getBIO.urlBuilderAsrock(myGetWeb, modelStr,"^https:\/\/www\.asrock\.com\/mb", cpath, browser)
-        print("Unzipping: "+cpath)
-        dezip.deZip(cpath, cpath.strip(".zip"))
-        print("All actions Attempted, moving to next BIOS...\n")
-    for modelStr in myData.asusArr:
-        print(breaker)   
-        cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASUS/"+str(modelStr).replace("/","-")+".zip"  
-        print(modelStr+"'s BIOS...")
-        getBIO.urlBuilderAsus(myGetWeb, modelStr ,"^https:\/\/www\.asus\.com\/", cpath, browser)
-        print("Unzipping: "+cpath)
-        dezip.deZip(cpath, cpath.strip(".zip"))
-        print("All actions Attempted, moving to next BIOS...\n")
-    for modelStr in myData.gigabyteArr:
-        print(breaker)
-        cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/GIGABYTE/"+str(modelStr).replace("/","-")+".zip"  
-        print(modelStr+"'s BIOS...")
-        getBIO.urlBuilderGigabyte(myGetWeb, modelStr ,"^https:\/\/www\.gigabyte\.com\/(us\/)?Motherboard\/", cpath, browser)
-        print("Unzipping: "+cpath)
-        dezip.deZip(cpath, cpath.strip(".zip"))
-        print("All actions Attempted, moving to next BIOS...\n")
-    for modelStr in myData.msiArr:
-        print(breaker)   
-        cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/MSI/"+str(modelStr).replace("/","-")+".zip"
-        print(modelStr+"'s BIOS...")
-        getBIO.urlBuilderMSI(myGetWeb, modelStr ,"^https:\/\/www\.msi\.com\/Motherboard\/support\/", cpath, browser)
-        print("Unzipping: "+cpath)
-        dezip.deZip(cpath, cpath.strip(".zip"))
-        print("All actions Attempted, moving to next BIOS...\n")
+    for modelArr in range (len (myData.allVenArr)-1):
+        for modelStr in myData.allVenArr[modelArr]:
+            print(breaker)   
+            cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/"+vendor[modelArr]+"/"+str(modelStr).replace("/","-")+".zip"
+            print(modelStr+"'s BIOS...")  
+            if vendor[modelArr] == "ASUS":
+                getBIO.urlBuilderAsus(myGetWeb, modelStr ,"^https:\/\/www\.asus\.com\/", cpath, browser)
+            elif vendor[modelArr] == "ASROCK":
+                getBIO.urlBuilderAsrock(myGetWeb, modelStr,"^https:\/\/www\.asrock\.com\/mb", cpath, browser)
+            elif vendor[modelArr] == "MSI":
+                getBIO.urlBuilderMSI(myGetWeb, modelStr ,"^https:\/\/www\.msi\.com\/Motherboard\/support\/", cpath, browser)
+            elif vendor[modelArr] == "GIGABYTE":
+                getBIO.urlBuilderGigabyte(myGetWeb, modelStr ,"^https:\/\/www\.gigabyte\.com\/(us\/)?Motherboard\/", cpath, browser)
+            print("Unzipping: "+cpath)
+            dezip.deZip(cpath, cpath.strip(".zip"))
+            print("All actions Attempted, moving to next BIOS...\n")
 
     statistics(myData, vendor, timeStart)
 
