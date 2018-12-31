@@ -14,15 +14,17 @@ class webwithjs:
             temp = BeautifulSoup(self.driver.page_source, "html5lib") #page_source fetches page after rendering is complete
             #self.driver.quit()
             return temp
-    def __init__(self, FireFox):
+    def __init__(self, FireFox, openBrowser):
         if FireFox:
             #FireFox headless
             options = webdriver.firefox.options.Options()
-            options.add_argument('-headless')
+            if not openBrowser:
+                options.add_argument('-headless')
             self.driver = webdriver.Firefox(options=options)
         else:
             #Chrome Headless
             options = webdriver.ChromeOptions()
-            options.add_argument('headless')
+            if not openBrowser:
+                options.add_argument('headless')
             options.add_argument('--log-level=3')
             self.driver = webdriver.Chrome(chrome_options=options)

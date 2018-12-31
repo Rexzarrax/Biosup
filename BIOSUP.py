@@ -50,6 +50,7 @@ def main():
     #config
     clean = bool(config_object["SETTINGS"]["clean"]) #delete zip files once done
     FireFox = bool(config_object["SETTINGS"]["FireFox"]) #need to find way to reduce amount of passthrough
+    openBrowser = bool(config_object["SETTINGS"]["openBrowser"])#to see where the browser is going to
     PLESrc = bool(config_object["SETTINGS"]["PLESrc"]) #Get model from PLE
 
     print("Loading config: ")
@@ -62,7 +63,7 @@ def main():
     myData = moboData(mysetup, myGetWeb, vendor, PLESrc)  
     getBIO = bioufiDL()
     dezip = unzip()
-    browser = webwithjs(FireFox)
+    browser = webwithjs(FireFox, openBrowser)
 
     print(vendor)
 
@@ -76,7 +77,16 @@ def main():
         myData.allVenArr[ven2].sort()
         mysetup.arrClean(myData.allVenArr[ven2])
         print("\n"+str(myData.allVenArr[ven2])+"\n")
+    
     #Get models
+    for modelStr in myData.asrockArr:
+        print(breaker) 
+        cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASROCK/"+str(modelStr).replace("/","-")+".zip"  
+        print(modelStr+"'s BIOS...")
+        getBIO.urlBuilderAsrock(myGetWeb, modelStr,"^https:\/\/www\.asrock\.com\/mb", cpath, browser)
+        print("Unzipping: "+cpath)
+        dezip.deZip(cpath, cpath.strip(".zip"))
+        print("All actions Attempted, moving to next BIOS...\n")
     for modelStr in myData.asusArr:
         print(breaker)   
         cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASUS/"+str(modelStr).replace("/","-")+".zip"  
@@ -98,14 +108,6 @@ def main():
         cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/MSI/"+str(modelStr).replace("/","-")+".zip"
         print(modelStr+"'s BIOS...")
         getBIO.urlBuilderMSI(myGetWeb, modelStr ,"^https:\/\/www\.msi\.com\/Motherboard\/support\/", cpath, browser)
-        print("Unzipping: "+cpath)
-        dezip.deZip(cpath, cpath.strip(".zip"))
-        print("All actions Attempted, moving to next BIOS...\n")
-    for modelStr in myData.asrockArr:
-        print(breaker) 
-        cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/ASROCK/"+str(modelStr).replace("/","-")+".zip"  
-        print(modelStr+"'s BIOS...")
-        getBIO.urlBuilderAsrock(myGetWeb, modelStr,"^https:\/\/www\.asrock\.com\/mb", cpath, browser)
         print("Unzipping: "+cpath)
         dezip.deZip(cpath, cpath.strip(".zip"))
         print("All actions Attempted, moving to next BIOS...\n")

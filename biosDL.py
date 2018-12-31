@@ -18,44 +18,29 @@ except ImportError:
 
 #class holds methods for downloading the BIOS from a vendor
 class bioufiDL:
-    #Framework for future code compression
-    def UniUrlBuilder(self, myGetWeb, mymodel, urlchq, cpath, dlFilter, extraURL):
+    #Download bios from Asrock    
+    def urlBuilderAsrock(self,myGetWeb, mymodel, urlchq, cpath, driver):
         print("Getting Src...")
-        #get html page
         if not os.path.exists(cpath):
-            #print(mymodel+" : "+ urlchq)
+            #prodURL = str(self.searchforlink(mymodel, urlchq)).replace("index.asp","")+"BIOS.html"
             prodURL = str(self.searchforlink(mymodel, urlchq))
-            if not prodURL.endswith(extraURL) and prodURL != "None":
-                prodURL += extraURL
+            if not prodURL.endswith('index.asp'):
+                prodURL.replace("index.asp","BIOS.html")
+            else:
+                prodURL += "#BIOS"
+
             print("Src URL: "+prodURL)
             if not prodURL == "None":
                 print("Getting URL...")
-                soup_html = self.getwebwithjs(prodURL)
-                #print(soup_html)
-                for link in soup_html.find_all('a', attrs={'href': re.compile(dlFilter)}):
+                soup_html = driver.getwebwithjs(prodURL)
+                for link in soup_html.find_all('a', attrs={'href': re.compile("^http://asrock.pc.cdn.bitgravity.com/BIOS/")}):
                     print("Found the URL:", link['href'])
                     if self.dlBIOS(link, cpath):
                         break  
                     else:
                         pass
             else:
-                print("Error in getting Src URL")      
-        else:
-            print("already Downloaded\n")
-    #Download bios from Asrock    
-    def urlBuilderAsrock(self,myGetWeb, mymodel, urlchq, cpath, driver):
-        print("Getting Src...")
-        if not os.path.exists(cpath):
-            prodURL = str(self.searchforlink(mymodel, urlchq)).replace("index.asp","")+"BIOS.html"
-            print("Src URL: "+prodURL)
-            print("Getting URL...")
-            html_page = myGetWeb.simple_get(prodURL)
-            #select only the url
-            soup_html = BeautifulSoup(html_page, "html5lib")
-            for link in soup_html.find_all('a', attrs={'href': re.compile("^http://asrock.pc.cdn.bitgravity.com/BIOS/")}):
-                print("Found the URL:", link['href'])
-                if self.dlBIOS(link, cpath):
-                    break        
+                print("Error in getting Src URL")
         else:
             print("already Downloaded")
     
