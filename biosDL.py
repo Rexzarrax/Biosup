@@ -24,6 +24,8 @@ class bioufiDL:
         if not os.path.exists(cpath):
             #prodURL = str(self.searchforlink(mymodel, urlchq)).replace("index.asp","")+"BIOS.html"
             prodURL = str(self.searchforlink(mymodel, urlchq))
+            if mymodel == 'B360M-ITX-AC':
+                prodURL = "None"
             #prodURL.replace("index.asp","BIOS.html")
             if not prodURL == "None":
                 prodURL += "#BIOS"

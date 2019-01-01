@@ -16,7 +16,7 @@ class datastatistics:
             if os.path.exists(cpathchq):
                 intModelCount += 1
             else:
-                self.Failed.append("Failed to get: "+vendor+"|"+model1)
+                self.Failed.append(vendor+"|"+model1)
         self.successStr.append(vendor+": Successful Download's: "+str(intModelCount)+"/"+str(len(myData.allVenArr[ven])))
             
         self.timeEnd = time.time()
@@ -27,9 +27,9 @@ class datastatistics:
         for SucStr in self.successStr:
             print(SucStr)
         if not len(self.Failed) == 0:
-            print("Failed Downloads:")
+            print("\nFailed Downloads:")
             for strings in self.Failed:
                 print(strings)
         else:
-            print("Failed Downloads:None")
+            print("Failed Downloads: None")
         print("\nTotal Time: "+str(self.timeDelta)+"min")

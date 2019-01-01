@@ -52,9 +52,10 @@ def main():
         FireFox = bool(config_object["SETTINGS"]["FireFox"]) #need to find way to reduce amount of passthrough
         openBrowser = bool(config_object["SETTINGS"]["openBrowser"])#to see where the browser is going to
         PLESrc = bool(config_object["SETTINGS"]["PLESrc"]) #Get model from PLE 
+        sleepTimer = int(config_object["SETTINGS"]["sleeptimer"])
     except:
         print("Missing/invalid configuration file")
-        
+
 
 
     print("Loading config: ")
@@ -62,6 +63,7 @@ def main():
     print("FireFox installed: "+str(FireFox))
     print("Open browser window: "+str(openBrowser))
     print("Use PLE Website for models: "+str(PLESrc))
+    print("Sleep Timer: "+ str(sleepTimer))
 
     mysetup = setUp()
     myGetWeb = gethtml()
@@ -69,7 +71,7 @@ def main():
     getBIO = bioufiDL()
     dezip = unzip()
     print("Opening browser...")
-    browser = webwithjs(FireFox, openBrowser)
+    browser = webwithjs(FireFox, openBrowser, sleepTimer)
 
     print(vendor)     
     

@@ -8,13 +8,14 @@ class webwithjs:
     def getwebwithjs(self, link):           
             if not link == "None":
                 self.driver.get(link)
-                time.sleep(3)
+                time.sleep(self.sleepTimer)
             else:
                 print("Error in Web Driver, Link= "+link)
             temp = BeautifulSoup(self.driver.page_source, "html5lib") #page_source fetches page after rendering is complete
             #self.driver.quit()
             return temp
-    def __init__(self, FireFox, openBrowser):
+    def __init__(self, FireFox, openBrowser, ST):
+        self.sleepTimer = ST
         if FireFox:
             #FireFox headless
             options = webdriver.firefox.options.Options()
