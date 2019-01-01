@@ -24,14 +24,9 @@ class bioufiDL:
         if not os.path.exists(cpath):
             #prodURL = str(self.searchforlink(mymodel, urlchq)).replace("index.asp","")+"BIOS.html"
             prodURL = str(self.searchforlink(mymodel, urlchq))
-            if not prodURL.endswith('index.asp'):
-                if prodURL == "None":
-                    pass
-                else: 
-                    prodURL += "#BIOS"
-            else:
-                prodURL.replace("index.asp","BIOS.html")
+            #prodURL.replace("index.asp","BIOS.html")
             if not prodURL == "None":
+                prodURL += "#BIOS"
                 print("Motherboard URL: "+prodURL)
                 print("Finding Download URL...")
                 soup_html = driver.getwebwithjs(prodURL)

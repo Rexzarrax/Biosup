@@ -1,23 +1,35 @@
 import os
 import time
 
-def statistics(myData, vendor, timeStart):
-    print("Generating Statistics...")
-    i = 0
-    for ven3 in myData.allVenArr:
-        modelCount = 0
-        vendorstr = "----------"+vendor[i]
-        print(vendorstr)
-        for model1 in ven3:
-            cpathchq = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/"+vendor[i]+"/"+str(model1).replace("/","-")+".zip"
+class datastatistics:
+    def __init__(self):
+        self.timeEnd = 0
+        self.timeDelta = 0
+        self.Failed = []
+        self.timeStart = time.time()
+        self.successStr = []
+
+    def statistics(self, myData, vendor, ven):
+        intModelCount = 0
+        for model1 in myData.allVenArr[ven]:
+            cpathchq = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/"+vendor+"/"+str(model1)+".zip"
             if os.path.exists(cpathchq):
-                modelCount += 1
+                intModelCount += 1
             else:
-                print("Failed to get: "+ model1)
-        print("Successful Download's: "+str(modelCount)+"/"+str(len(ven3)))
-        print(vendorstr+"\n")
-        i+=1
+                self.Failed.append("Failed to get: "+vendor+"|"+model1)
+        self.successStr.append(vendor+": Successful Download's: "+str(intModelCount)+"/"+str(len(myData.allVenArr[ven])))
             
-    timeEnd = time.time()
-    timeDelta = timeEnd - timeStart
-    print("Total Time: "+str(int(timeDelta/60))+"min")
+        self.timeEnd = time.time()
+        self.timeDelta = int((self.timeEnd - self.timeStart)/60)
+    
+    def printstat(self, vendor):
+        print("Statistics...")
+        for SucStr in self.successStr:
+            print(SucStr)
+        if not len(self.Failed) == 0:
+            print("Failed Downloads:")
+            for strings in self.Failed:
+                print(strings)
+        else:
+            print("Failed Downloads:None")
+        print("\nTotal Time: "+str(self.timeDelta)+"min")

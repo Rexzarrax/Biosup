@@ -8,7 +8,7 @@ from getHTML import gethtml
 from biosDL import bioufiDL
 from setup import setUp
 from inputFiles import inputfiles
-from statistics import statistics
+from statistics import datastatistics
 from configparser import ConfigParser
 from getwebwithjs import webwithjs
 
@@ -24,7 +24,7 @@ class moboData:
         self.allVenArr = [self.asrockArr, self.asusArr, self.gigabyteArr, self.msiArr]
         if PLESrc == True:
             print("Src = PLE")
-            for ven in range(len(self.allVenArr)):
+            for ven in range(len(vendor)):
                 #mysetup.dl_Src_PLE_API(vendor[ven], self.allVenArr[ven])
                 mysetup.dl_Src_PLE(myGetWeb, vendor[ven], self.allVenArr[ven])
         else:
@@ -36,25 +36,31 @@ class moboData:
 def main():
     print("----------BIOSUP----------")
     print("Initialising...")
+    statisticsData = datastatistics()
 
     vendor = ["ASROCK","ASUS", "GIGABYTE", "MSI"]
+    #vendor = ["ASROCK"]
     modelCount = 0
     modelTotal = 0
-    timeStart = time.time()
     breaker = "-------------------START---------------------"
+    try:
+        config_object = ConfigParser()
+        config_object.read("config.ini")
 
-    config_object = ConfigParser()
-    config_object.read("config.ini")
+        #config
+        clean = bool(config_object["SETTINGS"]["clean"]) #delete zip files once done
+        FireFox = bool(config_object["SETTINGS"]["FireFox"]) #need to find way to reduce amount of passthrough
+        openBrowser = bool(config_object["SETTINGS"]["openBrowser"])#to see where the browser is going to
+        PLESrc = bool(config_object["SETTINGS"]["PLESrc"]) #Get model from PLE 
+    except:
+        print("Missing/invalid configuration file")
+        
 
-    #config
-    clean = bool(config_object["SETTINGS"]["clean"]) #delete zip files once done
-    FireFox = bool(config_object["SETTINGS"]["FireFox"]) #need to find way to reduce amount of passthrough
-    openBrowser = bool(config_object["SETTINGS"]["openBrowser"])#to see where the browser is going to
-    PLESrc = bool(config_object["SETTINGS"]["PLESrc"]) #Get model from PLE
 
     print("Loading config: ")
     print("Clean up: "+str(clean))
     print("FireFox installed: "+str(FireFox))
+    print("Open browser window: "+str(openBrowser))
     print("Use PLE Website for models: "+str(PLESrc))
 
     mysetup = setUp()
@@ -65,20 +71,17 @@ def main():
     print("Opening browser...")
     browser = webwithjs(FireFox, openBrowser)
 
-    print(vendor)
-
-    #create folders
-    for ven1 in range(len(vendor)):
-        mysetup.folderChq(vendor[ven1])
+    print(vendor)     
     
     print("Sourcing models...")
     #Sort the arrays ready for further processing+delete duplicate entries
     for ven2 in range(len(vendor)):
+        mysetup.folderChq(vendor[ven2])
         myData.allVenArr[ven2].sort()
         mysetup.arrClean(myData.allVenArr[ven2])
         print("\n"+str(myData.allVenArr[ven2])+"\n")
     
-    for modelArr in range (len (myData.allVenArr)):
+    for modelArr in range (len (vendor)):
         for modelStr in myData.allVenArr[modelArr]:
             print(breaker)   
             cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/"+vendor[modelArr]+"/"+str(modelStr).replace("/","-")+".zip"
@@ -95,15 +98,16 @@ def main():
             dezip.deZip(cpath, cpath.strip(".zip"))
             print("All actions Attempted, moving to next BIOS...\n")
 
-    print("All download and unzipping attempted...")
-    statistics(myData, vendor, timeStart)
+        statisticsData.statistics(myData, vendor[modelArr], modelArr)
+        if clean:
+            print("Running Cleanup of "+vendor[modelArr]+"...")
+            mysetup.cleanup(myData.allVenArr[modelArr], vendor[modelArr])
 
-    if clean:
-        print("Running Cleanup...")
-        for v in range(len(vendor)):
-            mysetup.cleanup(myData.allVenArr[v], vendor[v])
     browser.driver.quit()
-    #print("Statistics are above the deleted files")
+    print("All downloading and unzipping attempted...\n")
+    
+    statisticsData.printstat(vendor)
+    
     print("Script Finished...")
     input("Press Enter to continue/exit...")
 

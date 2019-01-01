@@ -21,7 +21,7 @@ class setUp:
 
     def dl_Src_PCPP(self, vendor, array):
         mobo_count = pcpp.productLists.totalPages("motherboard")
-        print("Pages found: "+mobo_count)
+        print("Pages found: "+str(mobo_count))
         for page in range(0, mobo_count):
             skuName = pcpp.productLists.getProductList("motherboard", page)
             print("Collected page "+ str(page))
@@ -52,7 +52,7 @@ class setUp:
         model = '-'
         for strs in fullsku:
             model += "-"+strs 
-            model = model.replace("--","").upper()
+            model = model.replace("--","").upper().replace(":","")
         return model
 
     def dl_Src_PLE_API(self, vendor, array):
@@ -84,7 +84,7 @@ class setUp:
         
         for div in filter1:
             #print(div)
-            model = str(self.innerHTML(div)).replace(" ","-")
+            model = str(self.innerHTML(div)).replace(" ","-").replace(".","-").replace("/","-")
             print(model)
             array.append(model)
  
