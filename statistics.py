@@ -31,5 +31,5 @@ class datastatistics:
             for strings in self.Failed:
                 print(strings)
         else:
-            print("Failed Downloads: None")
+            print("\nFailed Downloads: None")
         print("\nTotal Time: "+str(self.timeDelta)+"min")

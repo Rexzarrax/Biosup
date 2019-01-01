@@ -7,7 +7,6 @@ from Unzip import unzip
 from getHTML import gethtml
 from biosDL import bioufiDL
 from setup import setUp
-from inputFiles import inputfiles
 from statistics import datastatistics
 from configparser import ConfigParser
 from getwebwithjs import webwithjs

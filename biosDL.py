@@ -24,8 +24,8 @@ class bioufiDL:
         if not os.path.exists(cpath):
             #prodURL = str(self.searchforlink(mymodel, urlchq)).replace("index.asp","")+"BIOS.html"
             prodURL = str(self.searchforlink(mymodel, urlchq))
-            if mymodel == 'B360M-ITX-AC':
-                prodURL = "None"
+            if prodURL == "None":
+                prodURL = str(self.searchforlink(mymodel, urlchq))
             #prodURL.replace("index.asp","BIOS.html")
             if not prodURL == "None":
                 prodURL += "#BIOS"
@@ -48,6 +48,8 @@ class bioufiDL:
         print("Finding Motherboard URL...")
         if not os.path.exists(cpath):
             prodURL = str(self.searchforlink(mymodel, urlchq))
+            if prodURL == "None":
+                prodURL = str(self.searchforlink(mymodel, urlchq))
             #print(prodURL)
             if not prodURL.endswith('HelpDesk_BIOS/'):        
                 prodURL.replace('_Download/', '_BIOS/')
@@ -75,6 +77,8 @@ class bioufiDL:
         print("Finding Motherboard URL...")
         if not os.path.exists(cpath):
             prodURL = str(self.searchforlink(mymodel+" bios", urlchq))
+            if prodURL == "None":
+                prodURL = str(self.searchforlink(mymodel, urlchq))
             print(prodURL)
             if not str(prodURL) == "None":
                 prodURL += "#support-dl-bios"
@@ -100,6 +104,8 @@ class bioufiDL:
         print("Finding Motherboard URL...")
         if not os.path.exists(cpath):
             prodURL = str(self.searchforlink(mymodel.replace("Z390-I", "Z390I"), urlchq))
+            if prodURL == "None":
+                prodURL = str(self.searchforlink(mymodel.replace("Z390-I", "Z390I"), urlchq))
             if not str(prodURL) == "None":
                 prodURL += "#down-bios"
                 print("Motherboard URL: "+prodURL)
