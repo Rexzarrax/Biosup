@@ -24,8 +24,8 @@ class moboData:
         if PLESrc == True:
             print("Src = PLE")
             for ven in range(len(vendor)):
-                #mysetup.dl_Src_PLE_API(vendor[ven], self.allVenArr[ven])
-                mysetup.dl_Src_PLE(myGetWeb, vendor[ven], self.allVenArr[ven])
+                mysetup.dl_Src_PLE_API(vendor[ven], self.allVenArr[ven])
+                #mysetup.dl_Src_PLE(myGetWeb, vendor[ven], self.allVenArr[ven])
         else:
             print("Src = PCPP")
             #for ven in range(len(self.allVenArr)):

@@ -52,44 +52,45 @@ class setUp:
         model = '-'
         for strs in fullsku:
             model += "-"+strs 
-            model = model.replace("--","").upper().replace(":","")
+            model = model.replace("--","").upper().replace(":","").replace(".", "-")
         return model
 
     def dl_Src_PLE_API(self, vendor, array):
         url = "https://www.ple.com.au/api/getItemGrid"
-        headers = {}
-        data = {'Content-type':'application/json','Body':{"InventoryCategoryId":302}}
-        r = requests.post(url, data=json.dumps(data), headers=headers)
-        
+        data = {"InventoryCategoryId":302}
+        r = requests.post(url, data=data)
+       
         if r.status_code == 200:
-            data = json.loads(r)['data']
-            #data = r.json()
-            print(str(data))
-            [obj for obj in data if data['ManufacturerName']==vendor]
-            for objectmodel in data:
-                print(str(objectmodel))
-                self.generic_State(objectmodel, vendor, array)
-                
+            #res holds the response object
+            res = r.json()
+            #vendorStore = {}
+            #vendorStore[vendor]
+            vendArr = [mobo['ManufacturerModel'] for mobo in res["data"] if mobo['ManufacturerName'].lower() == vendor.lower()]
+            for model in vendArr:
+                print("Adding "+model+" to "+vendor)
+                array.append(model.replace(" ", "-").replace("(","").replace(")","").replace("-I-", "I-"))
+
+            #print('{} : {}'.format(vendor, vendorStore[vendor]))                
         else:
             print("Error in Requesting "+vendor+" Bios, code: "+str(r.status_code))
 
     #Will be Deprecated in 2019
-    def dl_Src_PLE(self, myGetWeb, vendor, array):
-        site = "https://www.ple.com.au/Motherboards/"+vendor
-        print("Getting: "+site)
-        raw_html = myGetWeb.simple_get(site)
-        html = BeautifulSoup(raw_html, 'html.parser')
-        filter1 = html.find_all("div", {"class":"pg_manufacturermodel"})
+    #def dl_Src_PLE(self, myGetWeb, vendor, array):
+    #    site = "https://www.ple.com.au/Motherboards/"+vendor
+    #    print("Getting: "+site)
+    #    raw_html = myGetWeb.simple_get(site)
+    #    html = BeautifulSoup(raw_html, 'html.parser')
+    #    filter1 = html.find_all("div", {"class":"pg_manufacturermodel"})
+    #    
         
-        
-        for div in filter1:
-            #print(div)
-            model = str(self.innerHTML(div)).replace(" ","-").replace(".","-").replace("/","-")
-            print(model)
-            array.append(model)
+    #     for div in filter1:
+    #         #print(div)
+    #         model = str(self.innerHTML(div)).replace(" ","-").replace(".","-").replace("/","-")
+    #         print(model)
+    #         array.append(model)
  
-    def innerHTML(self, element):
-        return (element.encode_contents()).decode("utf-8").replace("SKU: ","").strip().replace(" ","-")
+    # def innerHTML(self, element):
+    #     return (element.encode_contents()).decode("utf-8").replace("SKU: ","").strip().replace(" ","-")
 
     def arrClean(self, array1):
         for i in range (len (array1)-1):
