@@ -16,6 +16,8 @@ try:
 except ImportError:  
     print("No module named 'google' found") 
 
+
+
 #class holds methods for downloading the BIOS from a vendor
 class bioufiDL:
     #Download bios from Asrock    
@@ -24,6 +26,8 @@ class bioufiDL:
         if not os.path.exists(cpath):
             prodURL = str(self.searchforlink(mymodel, urlchq))
             if prodURL == "None":
+                print("Could not find it on first search, Trying again...")
+                time.sleep(3)
                 prodURL = str(self.searchforlink(mymodel, urlchq))
             if not prodURL == "None":
                 prodURL += "#BIOS"
@@ -31,7 +35,7 @@ class bioufiDL:
             else:
                 print("Error in getting Src URL")
         else:
-            print("already Downloaded")
+            print("already Downloaded Zip")
     
     #Download bios from Asus
     def urlBuilderAsus(self,myGetWeb, mymodel, urlchq, cpath, driver):
@@ -39,6 +43,7 @@ class bioufiDL:
         if not os.path.exists(cpath):
             prodURL = str(self.searchforlink(mymodel, urlchq))
             if prodURL == "None":
+                time.sleep(3)
                 prodURL = str(self.searchforlink(mymodel, urlchq))
             if not prodURL.endswith('HelpDesk_BIOS/'):        
                 prodURL.replace('_Download/', '_BIOS/')
@@ -59,6 +64,7 @@ class bioufiDL:
         if not os.path.exists(cpath):
             prodURL = str(self.searchforlink(mymodel+" bios", urlchq))
             if prodURL == "None":
+                time.sleep(3)
                 prodURL = str(self.searchforlink(mymodel, urlchq))
             print(prodURL)
             if not str(prodURL) == "None":
@@ -77,6 +83,7 @@ class bioufiDL:
         if not os.path.exists(cpath):
             prodURL = str(self.searchforlink(mymodel, urlchq))
             if prodURL == "None":
+                time.sleep(3)
                 prodURL = str(self.searchforlink(mymodel, urlchq))
             if not str(prodURL) == "None":
                 prodURL += "#down-bios"
@@ -121,7 +128,7 @@ class bioufiDL:
             return False   
 
     def searchforlink(self, mymodel, urlchq):
-        print("Searching for "+mymodel)
+        print("Searching for "+mymodel+ " bios")
         for j in search(mymodel+" bios", tld="co.in", num=10, stop=1, pause=2): 
             if re.search(urlchq, j, re.IGNORECASE):
                 return j

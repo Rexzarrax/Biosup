@@ -83,10 +83,11 @@ def main():
         print("\n"+str(myData.allVenArr[ven2])+"\n")
     
     for modelArr in range (len (vendor)):
+        print(modelArr)
         for modelStr in myData.allVenArr[modelArr]:
             print(breaker)   
             cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/"+vendor[modelArr]+"/"+str(modelStr).replace("/","-")+".zip"
-            print(modelStr+"'s BIOS...")  
+            print(modelStr+"|Progress: "+str(myData.allVenArr[modelArr].index(modelStr)+1)+"/"+str(len(myData.allVenArr[modelArr])))  
             if vendor[modelArr] == "ASUS":
                 getBIO.urlBuilderAsus(myGetWeb, modelStr ,"^https:\/\/www\.asus\.com\/", cpath, browser)
             elif vendor[modelArr] == "ASROCK":
