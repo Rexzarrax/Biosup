@@ -29,7 +29,7 @@ class setUp:
                 fullsku = str(model["name"]).split(" ")
                 print("Found:"+ str(fullsku))
                 vendorpcpp = (fullsku[0]).upper()
-                modelsku = self.dl_Src_PCPP_cleanStr(fullsku)
+                modelsku = self.dl_Src_cleanStr(model["name"])
                 self.generic_State(modelsku, vendorpcpp, array)
     def dl_Src_PLE_API(self, vendor, array):
         url = "https://www.ple.com.au/api/getItemGrid"
@@ -41,15 +41,12 @@ class setUp:
             vendArr = [mobo['ManufacturerModel'] for mobo in res["data"] if mobo['ManufacturerName'].lower() == vendor.lower()]
             for model in vendArr:
                 print("Adding "+model+" to "+vendor)
-                array.append(model.replace(" ", "-").replace("(","").replace(")","").replace("-I-", "I-").replace("/","-"))              
+                array.append(vendor+"-"+self.dl_Src_cleanStr(model))              
         else:
             print("Error in Requesting "+vendor+" Bios, code: "+str(r.status_code))
 
-    def dl_Src_PCPP_cleanStr(self,fullsku):
-        model = '-'
-        for strs in fullsku:
-            model += "-"+strs 
-            model = model.replace("--","").upper().replace(":","").replace(".", "-")
+    def dl_Src_cleanStr(self,fullsku):
+        model = fullsku.upper().replace(":","").replace(".", "-").replace(" ", "-").replace("(","").replace(")","").replace("-I-", "I-").replace("/","-")
         return model
 
 

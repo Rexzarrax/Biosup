@@ -1,7 +1,7 @@
 import os
 import re
 import requests
-import time
+from time import sleep
 import html5lib
 from selenium import webdriver
 
@@ -25,10 +25,6 @@ class bioufiDL:
         print("Finding Motherboard URL...")
         if not os.path.exists(cpath):
             prodURL = str(self.searchforlink(mymodel, urlchq))
-            if prodURL == "None":
-                print("Could not find it on first search, Trying again...")
-                time.sleep(3)
-                prodURL = str(self.searchforlink(mymodel, urlchq))
             if not prodURL == "None":
                 prodURL += "#BIOS"
                 self.getdlURL(driver, prodURL, cpath, "^http://asrock.pc.cdn.bitgravity.com/BIOS/")
@@ -42,9 +38,6 @@ class bioufiDL:
         print("Finding Motherboard URL...")
         if not os.path.exists(cpath):
             prodURL = str(self.searchforlink(mymodel, urlchq))
-            if prodURL == "None":
-                time.sleep(3)
-                prodURL = str(self.searchforlink(mymodel, urlchq))
             if not prodURL.endswith('HelpDesk_BIOS/'):        
                 prodURL.replace('_Download/', '_BIOS/')
             if prodURL != "None" and not prodURL.endswith('_Download/') and not prodURL.endswith('_BIOS/'):
@@ -63,9 +56,6 @@ class bioufiDL:
         print("Finding Motherboard URL...")
         if not os.path.exists(cpath):
             prodURL = str(self.searchforlink(mymodel+" bios", urlchq))
-            if prodURL == "None":
-                time.sleep(3)
-                prodURL = str(self.searchforlink(mymodel, urlchq))
             print(prodURL)
             if not str(prodURL) == "None":
                 prodURL += "#support-dl-bios"
@@ -82,9 +72,6 @@ class bioufiDL:
         print("Finding Motherboard URL...")
         if not os.path.exists(cpath):
             prodURL = str(self.searchforlink(mymodel, urlchq))
-            if prodURL == "None":
-                time.sleep(3)
-                prodURL = str(self.searchforlink(mymodel, urlchq))
             if not str(prodURL) == "None":
                 prodURL += "#down-bios"
                 self.getdlURL(driver, prodURL, cpath, "^http://download.msi.com/bos")
@@ -96,13 +83,19 @@ class bioufiDL:
     def getdlURL(self, driver, prodURL, cpath, urlChq):
         print("Motherboard URL: "+prodURL)
         print("Finding Download URL...")
-        soup_html = driver.getwebwithjs(prodURL)
-        for link in soup_html.find_all('a', attrs={'href': re.compile(urlChq)}):
-            print("Found the URL:", link['href'])
-            if self.dlBIOS(link, cpath):
-                break  
-            else:
-                pass 
+        gotLink = False
+        retries = 0
+        while (gotLink == False):
+            print("No. Cycles: "+str(retries))
+            soup_html = driver.getwebwithjs(prodURL)
+            for link in soup_html.find_all('a', attrs={'href': re.compile(urlChq)}):
+                print("Found the URL:", link['href'])
+                if not link == "None":
+                    gotLink = True 
+                    self.dlBIOS(link, cpath)
+                    break 
+            retries += 1
+                    
 
     def dlBIOS(self, link, cpath):
         try:             
@@ -129,9 +122,14 @@ class bioufiDL:
 
     def searchforlink(self, mymodel, urlchq):
         print("Searching for "+mymodel+ " bios")
-        for j in search(mymodel+" bios", tld="co.in", num=10, stop=1, pause=2): 
+
+        for j in search(mymodel+" bios", tld="com", num=5, start=0, stop=5, pause=2): 
+            print("Checking "+j)
             if re.search(urlchq, j, re.IGNORECASE):
-                return j
+                if not j == "None":
+                    return j
+                else:
+                    print("Error in search")
 
     def __Init__(self):
         pass
