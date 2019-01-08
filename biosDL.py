@@ -93,7 +93,7 @@ class bioufiDL:
         print("Finding Download URL...")
         gotLink = False
         retries = 0
-        while (gotLink == False) and (retries < 5):
+        while (gotLink == False) and (retries < 7):
             soup_html = driver.getwebwithjs(prodURL)
             for link in soup_html.find_all('a', attrs={'href': re.compile(urlChq)}):
                 print("Found the URL:", link['href'])
@@ -102,8 +102,8 @@ class bioufiDL:
                     self.dlBIOS(link, cpath)
                     break
             if not gotLink:
-                print("Missed URL, retrying...")
-                sleep(3) 
+                print("Missed URL, retrying, waiting "+retries+"s...")
+                sleep(retries) 
                 retries += 1
                             
 
