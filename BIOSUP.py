@@ -37,8 +37,6 @@ def main():
     print("Initialising...")
     statisticsData = datastatistics()
 
-    vendor = ["ASROCK","ASUS", "GIGABYTE", "MSI"]
-    #vendor = ["ASROCK"]
     modelCount = 0
     modelTotal = 0
     breaker = "-------------------START---------------------"
@@ -52,6 +50,9 @@ def main():
         openBrowser = bool(config_object["SETTINGS"]["openBrowser"])#to see where the browser is going to
         PLESrc = bool(config_object["SETTINGS"]["PLESrc"]) #Get model from PLE 
         sleepTimer = int(config_object["SETTINGS"]["sleeptimer"])
+        #vendor = ["ASROCK","ASUS", "GIGABYTE", "MSI"]
+        #vendor = ["ASUS"]
+        vendor = (config_object["SETTINGS"]["vendor"]).split(",")
     except:
         print("Missing/invalid configuration file")
 
@@ -63,6 +64,7 @@ def main():
     print("Open browser window: "+str(openBrowser))
     print("Use PLE Website for models: "+str(PLESrc))
     print("Sleep Timer: "+ str(sleepTimer))
+    print("Vendor Array: "+str(vendor))
 
     mysetup = setUp()
     myGetWeb = gethtml()
@@ -70,7 +72,7 @@ def main():
     getBIO = bioufiDL()
     dezip = unzip()
     print("Opening browser...")
-    browser = webwithjs(FireFox, openBrowser, sleepTimer)
+    browser = webwithjs(FireFox, openBrowser)
 
     print(vendor)     
     
@@ -88,13 +90,13 @@ def main():
             cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/"+vendor[modelArr]+"/"+str(modelStr).replace("/","-")+".zip"
             print(modelStr+"|Progress: "+str(myData.allVenArr[modelArr].index(modelStr)+1)+"/"+str(len(myData.allVenArr[modelArr])))  
             if vendor[modelArr] == "ASUS":
-                getBIO.urlBuilderAsus(myGetWeb, modelStr ,"^https:\/\/www\.asus\.com\/", cpath, browser)
+                getBIO.urlBuilderAsus(modelStr ,"^https:\/\/www\.asus\.com\/", cpath, browser)
             elif vendor[modelArr] == "ASROCK":
-                getBIO.urlBuilderAsrock(myGetWeb, modelStr,"^https:\/\/www\.asrock\.com\/mb", cpath, browser)
+                getBIO.urlBuilderAsrock(modelStr,"^https:\/\/www\.asrock\.com\/mb", cpath, browser)
             elif vendor[modelArr] == "MSI":
-                getBIO.urlBuilderMSI(myGetWeb, modelStr ,"^https:\/\/www\.msi\.com\/Motherboard\/support\/", cpath, browser)
+                getBIO.urlBuilderMSI(modelStr ,"^https:\/\/www\.msi\.com\/Motherboard\/support\/", cpath, browser)
             elif vendor[modelArr] == "GIGABYTE":
-                getBIO.urlBuilderGigabyte(myGetWeb, modelStr ,"^https:\/\/www\.gigabyte\.com\/(us\/)?Motherboard\/", cpath, browser)
+                getBIO.urlBuilderGigabyte(modelStr ,"^https:\/\/www\.gigabyte\.com\/(us\/)?Motherboard\/", cpath, browser)
             print("Unzipping: "+cpath)
             dezip.deZip(cpath, cpath.strip(".zip"))
             print("All actions Attempted, moving to next BIOS...\n")

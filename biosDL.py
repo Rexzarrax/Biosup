@@ -4,6 +4,7 @@ import requests
 from time import sleep
 import html5lib
 from selenium import webdriver
+from time import sleep
 
 try: 
     from bs4 import BeautifulSoup
@@ -20,8 +21,19 @@ except ImportError:
 
 #class holds methods for downloading the BIOS from a vendor
 class bioufiDL:
+    def GenericUrlBuilder(self,vendor, mymodel, urlchq, cpath, driver, dlURLchq):
+        print("Finding "+vendor+ " Motherboard product URL...")
+        if not os.path.exists(cpath):
+            prodURL = str(self.searchforlink(mymodel, urlchq))
+            if not prodURL == "None":
+                prodURL += "#BIOS"
+                self.getdlURL(driver, prodURL, cpath, dlURLchq)
+            else:
+                print("Error in getting Src URL")
+        else:
+            print("already Downloaded Zip")
     #Download bios from Asrock    
-    def urlBuilderAsrock(self,myGetWeb, mymodel, urlchq, cpath, driver):
+    def urlBuilderAsrock(self, mymodel, urlchq, cpath, driver):
         print("Finding Motherboard URL...")
         if not os.path.exists(cpath):
             prodURL = str(self.searchforlink(mymodel, urlchq))
@@ -31,31 +43,27 @@ class bioufiDL:
             else:
                 print("Error in getting Src URL")
         else:
-            print("already Downloaded Zip")
+            print("Zip file already downloaded...")
     
     #Download bios from Asus
-    def urlBuilderAsus(self,myGetWeb, mymodel, urlchq, cpath, driver):
+    def urlBuilderAsus(self, mymodel, urlchq, cpath, driver):
         print("Finding Motherboard URL...")
         if not os.path.exists(cpath):
-            prodURL = str(self.searchforlink(mymodel, urlchq))
-            if not prodURL.endswith('HelpDesk_BIOS/'):        
-                prodURL.replace('_Download/', '_BIOS/')
-            if prodURL != "None" and not prodURL.endswith('_Download/') and not prodURL.endswith('_BIOS/'):
+            prodURL = str(self.searchforlink(mymodel, urlchq)).replace("HelpDesk_Download/", "HelpDesk_BIOS/")
+            if not prodURL.endswith('_BIOS/'):
                 prodURL += 'HelpDesk_BIOS/'
-            elif prodURL == "None":
-                print("Err in getting link...")
             if not prodURL == "None":
                 self.getdlURL(driver, prodURL, cpath, "^https://dlcdnets.asus.com/pub")
             else:
                 print("Error in getting Motherboard URL")      
         else:
-            print("already Downloaded\n")
+             print("Zip file already downloaded...")
 
     #Get link from Gigabyte
-    def urlBuilderGigabyte(self,myGetWeb, mymodel, urlchq, cpath, driver):
+    def urlBuilderGigabyte(self, mymodel, urlchq, cpath, driver):
         print("Finding Motherboard URL...")
         if not os.path.exists(cpath):
-            prodURL = str(self.searchforlink(mymodel+" bios", urlchq))
+            prodURL = str(self.searchforlink(mymodel, urlchq))
             print(prodURL)
             if not str(prodURL) == "None":
                 prodURL += "#support-dl-bios"
@@ -65,10 +73,10 @@ class bioufiDL:
 
 
         else:
-            print("already Downloaded\n")
+             print("Zip file already downloaded...")
 
     #get link from MSI
-    def urlBuilderMSI(self,myGetWeb, mymodel, urlchq, cpath, driver):
+    def urlBuilderMSI(self, mymodel, urlchq, cpath, driver):
         print("Finding Motherboard URL...")
         if not os.path.exists(cpath):
             prodURL = str(self.searchforlink(mymodel, urlchq))
@@ -78,24 +86,26 @@ class bioufiDL:
             else:
                 prodURL = "Error in Search"
         else:
-            print("already Downloaded\n")
+             print("Zip file already downloaded...")
 
     def getdlURL(self, driver, prodURL, cpath, urlChq):
         print("Motherboard URL: "+prodURL)
         print("Finding Download URL...")
         gotLink = False
         retries = 0
-        while (gotLink == False):
-            print("No. Cycles: "+str(retries))
+        while (gotLink == False) and (retries < 5):
             soup_html = driver.getwebwithjs(prodURL)
             for link in soup_html.find_all('a', attrs={'href': re.compile(urlChq)}):
                 print("Found the URL:", link['href'])
                 if not link == "None":
                     gotLink = True 
                     self.dlBIOS(link, cpath)
-                    break 
-            retries += 1
-                    
+                    break
+            if not gotLink:
+                print("Missed URL, retrying...")
+                sleep(3) 
+                retries += 1
+                            
 
     def dlBIOS(self, link, cpath):
         try:             
@@ -113,13 +123,7 @@ class bioufiDL:
     
         if os.path.exists(cpath):
             print("BIOS Successfully Downloaded...")
-            return True               
-        else:
-            print("Download Failed...\n")
-            text_file = open("ErrUnzip.txt", "a")
-            text_file.write("Error Link: %s\n" % link)
-            return False   
-
+            return True
     def searchforlink(self, mymodel, urlchq):
         print("Searching for "+mymodel+ " bios")
 

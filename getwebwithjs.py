@@ -8,16 +8,14 @@ class webwithjs:
     def getwebwithjs(self, link):           
             if not link == "None" or not link == self.tempURL:
                 self.driver.get(link)
-                self.driver
-                print("Sleeping...")
-                time.sleep(self.sleepTimer)
                 self.tempURL = link
             elif not link == self.tempURL:
                 print("Error in Web Driver, Link= "+link)
+            else:
+                print("Previous request still loading...")
             temp = BeautifulSoup(self.driver.page_source, "html5lib") #page_source fetches page after rendering is complete
             return temp
-    def __init__(self, FireFox, openBrowser, ST):
-        self.sleepTimer = ST
+    def __init__(self, FireFox, openBrowser):
         self.tempURL = ""
         if FireFox:
             #FireFox headless
