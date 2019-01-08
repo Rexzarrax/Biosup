@@ -5,8 +5,12 @@ try:
 except ImportError:  
     print("No module named 'BeautifulSoup' found") 
 class webwithjs:
-    def getwebwithjs(self, link):           
+    def getwebwithjs(self, link, refresh):           
             if not link == "None" or not link == self.tempURL:
+                self.driver.get(link)
+                self.tempURL = link
+            if refresh:
+                print("Running Refresh...")
                 self.driver.get(link)
                 self.tempURL = link
             elif not link == self.tempURL:

@@ -49,9 +49,10 @@ class bioufiDL:
     def urlBuilderAsus(self, mymodel, urlchq, cpath, driver):
         print("Finding Motherboard URL...")
         if not os.path.exists(cpath):
-            prodURL = str(self.searchforlink(mymodel, urlchq)).replace("HelpDesk_Download/", "HelpDesk_BIOS/")
+            prodURL = str(self.searchforlink(mymodel, urlchq)).replace("HelpDesk_Download/", "/HelpDesk_BIOS/")
             if not prodURL.endswith('_BIOS/'):
-                prodURL += 'HelpDesk_BIOS/'
+                print("Adding 'HelpDesk_BIOS/' to URL")
+                prodURL += '/HelpDesk_BIOS/'
             if not prodURL == "None":
                 self.getdlURL(driver, prodURL, cpath, "^https://dlcdnets.asus.com/pub")
             else:
@@ -91,10 +92,10 @@ class bioufiDL:
     def getdlURL(self, driver, prodURL, cpath, urlChq):
         print("Motherboard URL: "+prodURL)
         print("Finding Download URL...")
-        gotLink = False
+        gotLink = refresh = False
         retries = 0
-        while (gotLink == False) and (retries < 7):
-            soup_html = driver.getwebwithjs(prodURL)
+        while (gotLink == False) and (retries < 10):
+            soup_html = driver.getwebwithjs(prodURL, refresh)
             for link in soup_html.find_all('a', attrs={'href': re.compile(urlChq)}):
                 print("Found the URL:", link['href'])
                 if not link == "None":
@@ -102,8 +103,10 @@ class bioufiDL:
                     self.dlBIOS(link, cpath)
                     break
             if not gotLink:
-                print("Missed URL, retrying, waiting "+retries+"s...")
-                sleep(retries) 
+                print("Missed URL, retrying, waiting "+str(retries)+"s...")
+                sleep(retries)
+                if retries > 7:
+                    refresh = True 
                 retries += 1
                             
 
