@@ -54,7 +54,7 @@ def main():
         #vendor = ["ASUS"]
         vendor = (config_object["SETTINGS"]["vendor"]).split(",")
     except:
-        print("Missing/invalid configuration file")
+        input("Missing/invalid configuration file")
 
 
 
