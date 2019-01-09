@@ -6,21 +6,25 @@ except ImportError:
     print("No module named 'BeautifulSoup' found") 
 class webwithjs:
     def getwebwithjs(self, link, refresh):           
-            if not link == "None" or not link == self.tempURL:
+            if (not link == "None") and (not link == self.tempURL):
+                print("First Load of "+link+"...")
                 self.driver.get(link)
                 self.tempURL = link
+
             if refresh:
                 print("Running Refresh...")
                 self.driver.get(link)
-                self.tempURL = link
             elif not link == self.tempURL:
                 print("Error in Web Driver, Link= "+link)
             else:
                 print("Previous request still loading...")
+            time.sleep(self.sleepTimer)
             temp = BeautifulSoup(self.driver.page_source, "html5lib") #page_source fetches page after rendering is complete
             return temp
-    def __init__(self, FireFox, openBrowser):
+    def __init__(self, FireFox, openBrowser, sleepTimer):
         self.tempURL = ""
+        self.sleepTimer = sleepTimer
+        print("sleep timer:"+str(sleepTimer))
         if FireFox:
             #FireFox headless
             options = webdriver.firefox.options.Options()

@@ -56,9 +56,7 @@ def main():
     except:
         input("Missing/invalid configuration file")
 
-
-
-    print("Loading config: ")
+    print("Loading config... ")
     print("Clean up: "+str(clean))
     print("FireFox installed: "+str(FireFox))
     print("Open browser window: "+str(openBrowser))
@@ -72,7 +70,7 @@ def main():
     getBIO = bioufiDL()
     dezip = unzip()
     print("Opening browser...")
-    browser = webwithjs(FireFox, openBrowser)
+    browser = webwithjs(FireFox, openBrowser, sleepTimer)
 
     print(vendor)     
     
@@ -94,7 +92,7 @@ def main():
             elif vendor[modelArr] == "ASROCK":
                 getBIO.urlBuilderAsrock(modelStr,"^https:\/\/www\.asrock\.com\/mb", cpath, browser)
             elif vendor[modelArr] == "MSI":
-                getBIO.urlBuilderMSI(modelStr ,"^https:\/\/www\.msi\.com\/Motherboard\/support\/", cpath, browser)
+                getBIO.urlBuilderMSI(modelStr ,"^https:\/\/www\.msi\.com\/Motherboard\/(support\/)?", cpath, browser)
             elif vendor[modelArr] == "GIGABYTE":
                 getBIO.urlBuilderGigabyte(modelStr ,"^https:\/\/www\.gigabyte\.com\/(us\/)?Motherboard\/", cpath, browser)
             print("Unzipping: "+cpath)
