@@ -6,6 +6,7 @@ class unzip:
     def __init__(self):
         pass
     def deZip(self, file2unzip, folder2extract2):
+        print("Attempting to unzip "+file2unzip+"...")
         if os.path.exists(file2unzip):
             try:
                 unzip = zipfile.ZipFile(file2unzip)

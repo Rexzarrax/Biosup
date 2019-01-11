@@ -5,11 +5,12 @@ import time
 
 from Unzip import unzip
 from getHTML import gethtml
-from biosDL import bioufiDL
+from biosDL import biosDownload
 from setup import setUp
 from statistics import datastatistics
 from configparser import ConfigParser
 from getwebwithjs import webwithjs
+from linkSearching import searchForLink
 
 #stores motherboard data
 class moboData:
@@ -25,7 +26,6 @@ class moboData:
             print("Src = PLE")
             for ven in range(len(vendor)):
                 mysetup.dl_Src_PLE_API(vendor[ven], self.allVenArr[ven])
-                #mysetup.dl_Src_PLE(myGetWeb, vendor[ven], self.allVenArr[ven])
         else:
             print("Src = PCPP")
             #for ven in range(len(self.allVenArr)):
@@ -54,7 +54,8 @@ def main():
         #vendor = ["ASUS"]
         vendor = (config_object["SETTINGS"]["vendor"]).split(",")
     except:
-        input("Missing/invalid configuration file")
+        input("Error: Missing or Invalid configuration file(config.ini)")
+        exit()
 
     print("Loading config... ")
     print("Clean up: "+str(clean))
@@ -67,12 +68,12 @@ def main():
     mysetup = setUp()
     myGetWeb = gethtml()
     myData = moboData(mysetup, myGetWeb, vendor, PLESrc)  
-    getBIO = bioufiDL()
+    getBIO = biosDownload()
     dezip = unzip()
     print("Opening browser...")
-    browser = webwithjs(FireFox, openBrowser, sleepTimer)
-
-    print(vendor)     
+    driver = webwithjs(FireFox, openBrowser, sleepTimer)
+    linkSearching = searchForLink()
+    
     
     print("Sourcing models...")
     #Sort the arrays ready for further processing+delete duplicate entries
@@ -88,14 +89,13 @@ def main():
             cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/"+vendor[modelArr]+"/"+str(modelStr).replace("/","-")+".zip"
             print(modelStr+"|Progress: "+str(myData.allVenArr[modelArr].index(modelStr)+1)+"/"+str(len(myData.allVenArr[modelArr])))  
             if vendor[modelArr] == "ASUS":
-                getBIO.urlBuilderAsus(modelStr ,"^https:\/\/www\.asus\.com\/", cpath, browser)
+                getBIO.urlBuilderAsus(modelStr ,"^https:\/\/www\.asus\.com\/", cpath, driver, linkSearching)
             elif vendor[modelArr] == "ASROCK":
-                getBIO.urlBuilderAsrock(modelStr,"^https:\/\/www\.asrock\.com\/mb", cpath, browser)
+                getBIO.urlBuilderAsrock(modelStr,"^https:\/\/www\.asrock\.com\/mb", cpath, driver, linkSearching)
             elif vendor[modelArr] == "MSI":
-                getBIO.urlBuilderMSI(modelStr ,"^https:\/\/www\.msi\.com\/Motherboard\/(support\/)?", cpath, browser)
+                getBIO.urlBuilderMSI(modelStr ,"^https:\/\/www\.msi\.com\/Motherboard\/support\/", cpath, driver, linkSearching)
             elif vendor[modelArr] == "GIGABYTE":
-                getBIO.urlBuilderGigabyte(modelStr ,"^https:\/\/www\.gigabyte\.com\/(us\/)?Motherboard\/", cpath, browser)
-            print("Unzipping: "+cpath)
+                getBIO.urlBuilderGigabyte(modelStr ,"^https:\/\/www\.gigabyte\.com\/(us\/)?Motherboard\/", cpath, driver, linkSearching)
             dezip.deZip(cpath, cpath.strip(".zip"))
             print("All actions Attempted, moving to next BIOS...\n")
 
@@ -104,7 +104,7 @@ def main():
             print("Running Cleanup of "+vendor[modelArr]+"...")
             mysetup.cleanup(myData.allVenArr[modelArr], vendor[modelArr])
 
-    browser.driver.quit()
+    driver.driver.quit()
     print("All downloading and unzipping attempted...\n")
     
     statisticsData.printstat(vendor)
