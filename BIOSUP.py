@@ -53,6 +53,7 @@ def main():
         #vendor = ["ASROCK","ASUS", "GIGABYTE", "MSI"]
         #vendor = ["ASUS"]
         vendor = (config_object["SETTINGS"]["vendor"]).split(",")
+        vendorSort = (config_object["SETTINGS"]["vendorSort"].split(","))
     except:
         input("Error: Missing or Invalid configuration file(config.ini)")
         exit()
@@ -64,6 +65,7 @@ def main():
     print("Use PLE Website for models: "+str(PLESrc))
     print("Sleep Timer: "+ str(sleepTimer))
     print("Vendor Array: "+str(vendor))
+    print("Vendor Web Selector: "+str(vendorSort))
 
     mysetup = setUp()
     myGetWeb = gethtml()
@@ -89,13 +91,13 @@ def main():
             cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/"+vendor[modelArr]+"/"+str(modelStr).replace("/","-")+".zip"
             print(modelStr+"|Progress: "+str(myData.allVenArr[modelArr].index(modelStr)+1)+"/"+str(len(myData.allVenArr[modelArr])))  
             if vendor[modelArr] == "ASUS":
-                getBIO.urlBuilderAsus(modelStr ,"^https:\/\/www\.asus\.com\/", cpath, driver, linkSearching)
+                getBIO.urlBuilderAsus(modelStr ,vendorSort[modelArr], cpath, driver, linkSearching)
             elif vendor[modelArr] == "ASROCK":
-                getBIO.urlBuilderAsrock(modelStr,"^https:\/\/www\.asrock\.com\/mb", cpath, driver, linkSearching)
+                getBIO.urlBuilderAsrock(modelStr,vendorSort[modelArr], cpath, driver, linkSearching)
             elif vendor[modelArr] == "MSI":
-                getBIO.urlBuilderMSI(modelStr ,"^https:\/\/www\.msi\.com\/Motherboard\/support\/", cpath, driver, linkSearching)
+                getBIO.urlBuilderMSI(modelStr ,vendorSort[modelArr], cpath, driver, linkSearching)
             elif vendor[modelArr] == "GIGABYTE":
-                getBIO.urlBuilderGigabyte(modelStr ,"^https:\/\/www\.gigabyte\.com\/(us\/)?Motherboard\/", cpath, driver, linkSearching)
+                getBIO.urlBuilderGigabyte(modelStr ,vendorSort[modelArr], cpath, driver, linkSearching)
             dezip.deZip(cpath, cpath.strip(".zip"))
             print("All actions Attempted, moving to next BIOS...\n")
 

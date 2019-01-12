@@ -1,5 +1,7 @@
 import re
 import requests
+import html5lib
+import urllib.parse
 try: 
     from googlesearch import search 
 except ImportError:  
@@ -14,16 +16,18 @@ class searchForLink:
         numURL = 0
         url = "https://duckduckgo.com/html/?q="+mymodel+" +support"
         r = requests.get(url).text
-        soup_html = BeautifulSoup(r, 'html.parser')
-        for link in soup_html.find_all('a', attrs={'href': re.compile(urlchq, re.IGNORECASE)}):
-        #for link in soup_html.find_all('a'):
-            print(link)
-            print("Found the URL:", link['href'])
-            if (link != "None") and (numURL < 15):
-                return link['href']
+        soup_html = BeautifulSoup(r, 'html5lib')
+        #for link in soup_html.find_all('a', attrs={'href': re.compile(urlchq, re.IGNORECASE)}):
+        for link in soup_html.find_all('a', attrs={'class': "result__url"}):
+            unLinked = link['href']
+            unLinked = urllib.parse.unquote_plus(unLinked)
+            unLinked = unLinked.replace("/l/?kh=-1&uddg=","")
+            print("Found the URL:", unLinked)
+            if re.findall(urlchq, unLinked) :
+                return unLinked #make sure contains model in url
             elif not numURL > 15:
                 numURL += 1
-                print("Tried link "+numURL+":"+link)
+                print("Tried link "+str(numURL)+":"+str(unLinked))
             else:
                 break
         print("Switching to Google...")
