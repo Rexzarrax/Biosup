@@ -16,17 +16,17 @@ from clint.textui import progress
 class biosDownload:
     def __Init__(self):
         pass
-    def GenericUrlBuilder(self,vendor, mymodel, urlchq, cpath, driver, dlURLchq, URLaddON, linkSearching):
-        print("Finding "+vendor+ " Motherboard product URL...")
-        if not os.path.exists(cpath):
-            prodURL = str(linkSearching.searchforlinkDDG(mymodel, urlchq))
-            if not prodURL == "None":
-                prodURL += URLaddON
-                self.getdlURL(driver, prodURL, cpath, dlURLchq)
-            else:
-                print("Error in getting Src URL")
-        else:
-            print("Zip file already downloaded...")
+    # def GenericUrlBuilder(self,vendor, mymodel, urlchq, cpath, driver, dlURLchq, URLaddON, linkSearching):
+    #     print("Finding "+vendor+ " Motherboard product URL...")
+    #     if not os.path.exists(cpath):
+    #         prodURL = str(linkSearching.searchforlinkDDG(mymodel, urlchq))
+    #         if not prodURL == "None":
+    #             prodURL += URLaddON
+    #             self.getdlURL(driver, prodURL, cpath, dlURLchq)
+    #         else:
+    #             print("Error in getting Src URL")
+    #     else:
+    #         print("Zip file already downloaded...")
     #Download bios from Asrock    
     def urlBuilderAsrock(self, mymodel, urlchq, cpath, driver, linkSearching):
         print("Finding Motherboard URL...")
@@ -60,7 +60,7 @@ class biosDownload:
         print("Finding Motherboard URL...")
         if not os.path.exists(cpath):
             prodURL = str(linkSearching.searchforlinkDDG(mymodel, urlchq))
-            print(prodURL)
+            #print(prodURL)
             if not str(prodURL) == "None":
                 prodURL += "#support-dl-bios"
                 self.getdlURL(driver, prodURL, cpath, "^http://download.gigabyte.asia/FileList/BIOS")                         

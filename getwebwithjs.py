@@ -25,7 +25,7 @@ class webwithjs:
     def __init__(self, FireFox, openBrowser, sleepTimer):
         self.tempURL = ""
         self.sleepTimer = sleepTimer
-        print("sleep timer:"+str(sleepTimer))
+        print("sleep timer: "+str(sleepTimer))
         if FireFox:
             #FireFox headless
             options = webdriver.firefox.options.Options()
