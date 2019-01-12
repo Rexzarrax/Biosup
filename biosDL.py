@@ -44,7 +44,7 @@ class biosDownload:
     def urlBuilderAsus(self, mymodel, urlchq, cpath, driver, linkSearching):
         print("Finding Motherboard URL...")
         if not os.path.exists(cpath):
-            prodURL = str(linkSearching.searchforlinkDDG(mymodel, urlchq)).replace("HelpDesk_Download/", "/HelpDesk_BIOS/").replace("/specifications","")
+            prodURL = str(linkSearching.searchforlinkDDG(mymodel, urlchq)).replace("HelpDesk_Download/", "/HelpDesk_BIOS/").replace("/specifications","").replace("_CPU","_BIOS")
             if not prodURL.endswith('_BIOS/'):
                 print("Adding 'HelpDesk_BIOS/' to URL")
                 prodURL += '/HelpDesk_BIOS/'
