@@ -14,14 +14,11 @@ from linkSearching import searchForLink
 
 #stores motherboard data
 class moboData:
-    def __init__(self, mysetup, myGetWeb, vendor, PLESrc):
+    def __init__(self, mysetup, myGetWeb, vendor, PLESrc, allowedChipsets, allowedExtras):
         #need to make variable, based on length of vendor array in main
-        self.asrockArr = []
-        self.asusArr = []
-        self.gigabyteArr = []
-        self.msiArr = []
-
-        self.allVenArr = [self.asrockArr, self.asusArr, self.gigabyteArr, self.msiArr]
+        self.allVenArr = []
+        for x in range(len(vendor)):
+            self.allVenArr.append([])
         if PLESrc == True:
             print("Src = PLE")
             for ven in range(len(vendor)):
@@ -29,7 +26,7 @@ class moboData:
         else:
             print("Src = PCPP")
             #for ven in range(len(self.allVenArr)):
-            mysetup.dl_Src_PCPP(vendor, self.allVenArr)
+            mysetup.dl_Src_PCPP(vendor, self.allVenArr, allowedChipsets, allowedExtras)
            
 #initial checks and basic file creation
 def main():
@@ -50,10 +47,10 @@ def main():
         openBrowser = bool(config_object["SETTINGS"]["openBrowser"])#to see where the browser is going to
         PLESrc = bool(config_object["SETTINGS"]["PLESrc"]) #Get model from PLE 
         sleepTimer = int(config_object["SETTINGS"]["sleeptimer"])
-        #vendor = ["ASROCK","ASUS", "GIGABYTE", "MSI"]
-        #vendor = ["ASUS"]
         vendor = (config_object["SETTINGS"]["vendor"]).split(",")
         vendorSort = (config_object["SETTINGS"]["vendorSort"].split(","))
+        allowedChipsets = (config_object["SETTINGS"]["allowedChipsetsAMD"].split(","))+(config_object["SETTINGS"]["allowedChipsetsIntel"].split(","))
+        allowedExtras = (config_object["SETTINGS"]["allowedChipsetsAddon"])
     except:
         input("Error: Missing or Invalid configuration file(config.ini)")
         exit()
@@ -66,10 +63,12 @@ def main():
     print("Sleep Timer: "+ str(sleepTimer))
     print("Vendor Array: "+str(vendor))
     print("Vendor Web Selector: "+str(vendorSort))
+    print("Allowed Chipsets: "+str(allowedChipsets))
+    print("Allowed Extras: "+str(allowedExtras))
 
     mysetup = setUp()
     myGetWeb = gethtml()
-    myData = moboData(mysetup, myGetWeb, vendor, PLESrc)  
+    myData = moboData(mysetup, myGetWeb, vendor, PLESrc, allowedChipsets, allowedExtras)  
     getBIO = biosDownload()
     dezip = unzip()
     print("Opening browser...")

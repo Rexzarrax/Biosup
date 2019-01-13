@@ -1,6 +1,7 @@
 import os
 import json
 import requests
+import re
 from PCPartPicker_API import pcpartpicker as pcpp
 try: 
     from bs4 import BeautifulSoup
@@ -19,7 +20,7 @@ class setUp:
         else:
             print("Dir: \n" , cpwd+company ,  " \nalready exists\n")
 
-    def dl_Src_PCPP(self, vendor, array):
+    def dl_Src_PCPP(self, vendor, array, allowedChipsets, allowedExtras):
         mobo_count = pcpp.productLists.totalPages("motherboard")
         print("Pages found: "+str(mobo_count))
         for page in range(0, mobo_count):
@@ -27,10 +28,14 @@ class setUp:
             print("Collected page "+ str(page))
             for model in skuName:
                 fullsku = str(model["name"]).split(" ")
-                print("Found:"+ str(fullsku))
-                vendorpcpp = (fullsku[0]).upper()
-                modelsku = self.dl_Src_cleanStr(model["name"])
-                self.generic_State(modelsku, vendorpcpp, array)
+                for x in range(len(allowedChipsets)):
+                    regexString = (allowedChipsets[x]+allowedExtras)
+                    if re.search(regexString,model["name"],re.IGNORECASE):
+                        print("Match!...")
+                        vendorpcpp = (fullsku[0]).upper()
+                        modelsku = self.dl_Src_cleanStr(model["name"])
+                        self.generic_State(modelsku, vendorpcpp, array)
+
     def dl_Src_PLE_API(self, vendor, array):
         url = "https://www.ple.com.au/api/getItemGrid"
         data = {"InventoryCategoryId":302}
