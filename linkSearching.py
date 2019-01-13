@@ -27,7 +27,7 @@ class searchForLink:
                 return unLinked #make sure contains model in url
             elif not numURL > 15:
                 numURL += 1
-                print("Tried link "+str(numURL)+":"+str(unLinked))
+                print("Tried link "+str(numURL)+":"+str(unLinked+"\n"+str(urlchq)))
             else:
                 break
         print("Switching to Google...")
