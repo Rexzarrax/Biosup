@@ -34,42 +34,21 @@ class setUp:
                         print("Match!...")
                         vendorpcpp = (fullsku[0]).upper()
                         modelsku = self.dl_Src_cleanStr(model["name"])
-                        self.generic_State(modelsku, vendorpcpp, array)
-
-    def dl_Src_PLE_API(self, vendor, array):
-        url = "https://www.ple.com.au/api/getItemGrid"
-        data = {"InventoryCategoryId":302}
-        r = requests.post(url, data=data)
-       
-        if r.status_code == 200:
-            res = r.json()
-            vendArr = [mobo['ManufacturerModel'] for mobo in res["data"] if mobo['ManufacturerName'].lower() == vendor.lower()]
-            for model in vendArr:
-                print("Adding "+model+" to "+vendor)
-                array.append(vendor+"-"+self.dl_Src_cleanStr(model))              
-        else:
-            print("Error in Requesting "+vendor+" Bios, code: "+str(r.status_code))
+                        self.generic_Sort(modelsku, vendorpcpp, array, vendor)
 
     def dl_Src_cleanStr(self,fullsku):
         model = fullsku.upper().replace(":","").replace(".", "-").replace(" ", "-").replace("(","").replace(")","").replace("-I-", "I-").replace("/","-")
         return model
 
 
-    def generic_State(self,modelsku, vendor, array):
-        if vendor == "ASUS":
-            array[1].append(modelsku)
-            print("Sorted "+modelsku+" to "+vendor)
-        elif vendor == "GIGABYTE":
-            array[2].append(modelsku)
-            print("Sorted "+modelsku+" to "+vendor)
-        elif vendor == "MSI":
-            array[3].append(modelsku)
-            print("Sorted "+modelsku+" to "+vendor)
-        elif vendor == "ASROCK":
-            array[0].append(modelsku)
-            print("Sorted "+modelsku+" to "+vendor)
-        else:
-            print("Could not Sort: "+modelsku)
+    def generic_Sort(self,modelsku, vendor, array, vendorchq):
+        for index in range(len(vendorchq)):
+            if vendor == vendorchq[index]:
+                array[index].append(modelsku)
+                print("Sorted "+modelsku+" to "+vendorchq[index])
+                break
+            else:
+                print("Could not Sort: "+modelsku+" to "+vendorchq[index])
 
     def arrClean(self, array1):
         for i in range (len (array1)-1):
@@ -82,7 +61,7 @@ class setUp:
             for i in range (len(modelarray)):
                 cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/"+vendor+"/"+str(modelarray[i]).replace("/","-")+".zip"
                 try:
-                    #print("Deleting "+cpath)
+                    print("Deleting "+cpath)
                     os.remove(cpath)
                 except: 
-                    print("Err in Deleting "+cpath)
+                    print("Error in Deleting "+cpath)
