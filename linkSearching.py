@@ -23,7 +23,7 @@ class searchForLink:
             unLinked = urllib.parse.unquote_plus(unLinked)
             unLinked = unLinked.replace("/l/?kh=-1&uddg=","")
             print("Found the URL:", unLinked)
-            if re.findall(urlchq, unLinked, re.IGNORECASE) :
+            if re.findall(urlchq, unLinked, re.IGNORECASE):
                 return unLinked #make sure contains model in url
             elif not numURL > 15:
                 numURL += 1

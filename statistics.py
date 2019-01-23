@@ -12,7 +12,7 @@ class datastatistics:
     def statistics(self, myData, vendor, ven):
         intModelCount = 0
         for model1 in myData.allVenArr[ven]:
-            cpathchq = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/"+vendor+"/"+str(model1)+".zip"
+            cpathchq = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/BIOSHERE/"+vendor+"/"+str(model1)+".zip"
             if os.path.exists(cpathchq):
                 intModelCount += 1
             else:

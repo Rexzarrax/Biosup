@@ -16,37 +16,25 @@ from clint.textui import progress
 class biosDownload:
     def __Init__(self):
         pass
-    # def GenericUrlBuilder(self,vendor, mymodel, urlchq, cpath, driver, dlURLchq, URLaddON, linkSearching):
-    #     print("Finding "+vendor+ " Motherboard product URL...")
-    #     if not os.path.exists(cpath):
-    #         prodURL = str(linkSearching.searchforlinkDDG(mymodel, urlchq))
-    #         if not prodURL == "None":
-    #             prodURL += URLaddON
-    #             self.getdlURL(driver, prodURL, cpath, dlURLchq)
-    #         else:
-    #             print("Error in getting Src URL")
-    #     else:
-    #         print("Zip file already downloaded...")
-    #Download bios from Asrock    
-    def urlBuilderAsrock(self, mymodel, urlchq, cpath, driver, linkSearching):
-        print("Finding Motherboard URL...")
+    def GenericUrlBuilder(self,mymodel,vendor, urlchq, cpath, driver, dlURLchq, URLaddON, linkSearching):
+        print("Finding "+vendor+ " Motherboard product URL...")
         if not os.path.exists(cpath):
             prodURL = str(linkSearching.searchforlinkDDG(mymodel, urlchq))
             if not prodURL == "None":
-                prodURL += "#BIOS"
-                self.getdlURL(driver, prodURL, cpath, "^http://asrock.pc.cdn.bitgravity.com/BIOS/")
+                prodURL += URLaddON
+                self.getdlURL(driver, prodURL, cpath, dlURLchq)
             else:
                 print("Error in getting Src URL")
         else:
-            print("ZipFile: "+cpath+" already downloaded.")
-    
+            print("Zip file already downloaded...")
     #Download bios from Asus
     def urlBuilderAsus(self, mymodel, urlchq, cpath, driver, linkSearching):
         print("Finding Motherboard URL...")
         if not os.path.exists(cpath):
-            prodURL = str(linkSearching.searchforlinkDDG(mymodel, urlchq)).replace("HelpDesk_Download/", "/HelpDesk_BIOS/").replace("/specifications","").replace("_CPU","_BIOS")              
+            prodURL = str(linkSearching.searchforlinkDDG(mymodel, urlchq)).replace("/specifications","")
+            prodURL = re.sub('_Download(.*)|_CPU(.*)|_QVL(.*)','_BIOS', prodURL)             
             if not prodURL == "None" :
-                if not prodURL.endswith('_BIOS/'):
+                if not prodURL.endswith('_BIOS'):
                     print("Adding 'HelpDesk_BIOS/' to URL")
                     prodURL += '/HelpDesk_BIOS/'
                 self.getdlURL(driver, prodURL, cpath, "^https://dlcdnets.asus.com/pub")
@@ -55,41 +43,13 @@ class biosDownload:
         else:
              print("Zip file already downloaded...")
 
-    #Get link from Gigabyte
-    def urlBuilderGigabyte(self, mymodel, urlchq, cpath, driver, linkSearching):
-        print("Finding Motherboard URL...")
-        if not os.path.exists(cpath):
-            prodURL = str(linkSearching.searchforlinkDDG(mymodel, urlchq))
-            #print(prodURL)
-            if not str(prodURL) == "None":
-                prodURL += "#support-dl-bios"
-                self.getdlURL(driver, prodURL, cpath, "^http://download.gigabyte.asia/FileList/BIOS")                         
-            else:
-                prodURL = "Error in Search"
-
-
-        else:
-             print("Zip file already downloaded...")
-
-    #get link from MSI
-    def urlBuilderMSI(self, mymodel, urlchq, cpath, driver,linkSearching):
-        print("Finding Motherboard URL...")
-        if not os.path.exists(cpath):
-            prodURL = str(linkSearching.searchforlinkDDG(mymodel, urlchq))
-            if not str(prodURL) == "None":
-                prodURL += "#down-bios"
-                self.getdlURL(driver, prodURL, cpath, "^http://download.msi.com/bos")
-            else:
-                prodURL = "Error in Search"
-        else:
-             print("Zip file already downloaded...")
 
     def getdlURL(self, driver, prodURL, cpath, urlChq):
         print("Motherboard URL: "+prodURL)
         print("Finding Download URL...")
         gotLink = refresh = False
         retries = 1
-        while (gotLink == False) and (retries < 11):
+        while (gotLink == False) and (retries < 10):
             soup_html = driver.getwebwithjs(prodURL, refresh)
             for link in soup_html.find_all('a', attrs={'href': re.compile(urlChq)}):
                 print("Found the URL:", link['href'])

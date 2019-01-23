@@ -37,19 +37,24 @@ class loadConfig:
             self.vendorSort = (config_object["SETTINGS"]["vendorSort"].split(","))
             self.allowedChipsets = (config_object["SETTINGS"]["allowedChipsetsAMD"].split(","))+(config_object["SETTINGS"]["allowedChipsetsIntel"].split(","))
             self.allowedExtras = (config_object["SETTINGS"]["allowedChipsetsAddon"])
+            self.vendorDownloadURLbase = (config_object["SETTINGS"]["vendorDownloadURLbase"].split(","))
+            self.vendorURLaddon = (config_object["SETTINGS"]["vendorURLaddon"].split(","))
         except:
             input("Error: Missing or Invalid configuration file(config.ini)")
             exit()
 
         print("Loading config... ")
-        print("Clean up: "+str(self.clean))
-        print("FireFox installed: "+str(self.FireFox))
-        print("Open browser window: "+str(self.openBrowser))
-        print("Sleep Timer: "+ str(self.sleepTimer))
-        print("Vendor Array: "+str(self.vendor))
-        print("Vendor Web Selector: "+str(self.vendorSort))
-        print("Allowed Chipsets: "+str(self.allowedChipsets))
-        print("Allowed Extras: "+str(self.allowedExtras))
+        print(" Clean up: "+str(self.clean))
+        print(" FireFox installed: "+str(self.FireFox))
+        print(" Open browser window: "+str(self.openBrowser))
+        print(" Sleep Timer: "+ str(self.sleepTimer))
+        print(" Vendor Array: "+str(self.vendor))
+        print(" Vendor Web Selector: "+str(self.vendorSort))
+        print(" Allowed Chipsets: "+str(self.allowedChipsets))
+        print(" Allowed Extras: "+str(self.allowedExtras))
+        print(" Download URL base: "+str(self.vendorDownloadURLbase))
+        print(" Additions for URL:"+str(self.vendorURLaddon))
+        print("Configuration Loaded...")
 
 def main():
     print("----------BIOSUP----------")
@@ -79,16 +84,13 @@ def main():
     for modelArr in range (len (myConfig.vendor)):
         for modelStr in myData.allVenArr[modelArr]:
             print(breaker)   
-            cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/"+myConfig.vendor[modelArr]+"/"+str(modelStr).replace("/","-")+".zip"
+            cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/BIOSHERE/"+myConfig.vendor[modelArr]+"/"+str(modelStr).replace("/","-")+".zip"
             print(modelStr+"|Progress: "+str(myData.allVenArr[modelArr].index(modelStr)+1)+"/"+str(len(myData.allVenArr[modelArr])))
             if myConfig.vendor[modelArr] == "ASUS":
-                getBIO.urlBuilderAsus(modelStr ,myConfig.vendorSort[modelArr], cpath, driver, linkSearching)
-            elif myConfig.vendor[modelArr] == "ASROCK":
-                getBIO.urlBuilderAsrock(modelStr,myConfig.vendorSort[modelArr], cpath, driver, linkSearching)
-            elif myConfig.vendor[modelArr] == "MSI":
-                getBIO.urlBuilderMSI(modelStr ,myConfig.vendorSort[modelArr], cpath, driver, linkSearching)
-            elif myConfig.vendor[modelArr] == "GIGABYTE":
-                getBIO.urlBuilderGigabyte(modelStr ,myConfig.vendorSort[modelArr], cpath, driver, linkSearching)
+                getBIO.urlBuilderAsus(modelStr,myConfig.vendorSort[modelArr], cpath, driver, linkSearching)
+            else:
+                getBIO.GenericUrlBuilder(modelStr,myConfig.vendor[modelArr],myConfig.vendorSort[modelArr], cpath, driver, 
+                                         myConfig.vendorDownloadURLbase[modelArr],myConfig.vendorURLaddon[modelArr],linkSearching)
             dezip.deZip(cpath, cpath.strip(".zip"))
             print("All actions Attempted, moving to next BIOS...\n")
 

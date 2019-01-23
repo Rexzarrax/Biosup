@@ -13,12 +13,12 @@ class setUp:
     def __init__(self):
         pass
     def folderChq(self, company):
-        cpwd = os.path.dirname(os.path.realpath(__file__))+"/"
-        if not os.path.exists(cpwd+company):
-            os.mkdir(cpwd+company)
-            print("Dir: \n" , cpwd+company ,  " \nCreated \n") 
+        cpwd = os.path.dirname(os.path.realpath(__file__))
+        if not os.path.exists(cpwd+"\\BIOSHERE\\"+company):
+            os.makedirs(cpwd+"\\BIOSHERE\\"+company)
+            print("Dir: \n" , cpwd+"\\BIOSHERE\\"+company ,  " \nCreated \n") 
         else:
-            print("Dir: \n" , cpwd+company ,  " \nalready exists\n")
+            print("Dir: \n" , cpwd+"\\BIOSHERE\\"+company ,  " \nalready exists\n")
 
     def dl_Src_PCPP(self, vendor, array, allowedChipsets, allowedExtras):
         mobo_count = pcpp.productLists.totalPages("motherboard")
@@ -40,7 +40,6 @@ class setUp:
         model = fullsku.upper().replace(":","").replace(".", "-").replace(" ", "-").replace("(","").replace(")","").replace("-I-", "I-").replace("/","-")
         return model
 
-
     def generic_Sort(self,modelsku, vendor, array, vendorchq):
         for index in range(len(vendorchq)):
             if vendor == vendorchq[index]:
@@ -59,7 +58,7 @@ class setUp:
                 pass   
     def cleanup(self, modelarray, vendor):
             for i in range (len(modelarray)):
-                cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/"+vendor+"/"+str(modelarray[i]).replace("/","-")+".zip"
+                cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/BIOSHERE/"+vendor+"/"+str(modelarray[i]).replace("/","-")+".zip"
                 try:
                     print("Deleting "+cpath)
                     os.remove(cpath)
