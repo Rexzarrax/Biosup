@@ -38,7 +38,7 @@ class biosDownload:
             else:
                 print("Error in getting Src URL")
         else:
-            print("Zip file already downloaded...")
+            print("ZipFile: "+cpath+" already downloaded.")
     
     #Download bios from Asus
     def urlBuilderAsus(self, mymodel, urlchq, cpath, driver, linkSearching):
