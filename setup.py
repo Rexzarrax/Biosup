@@ -31,7 +31,6 @@ class setUp:
                 for x in range(len(allowedChipsets)):
                     regexString = (allowedChipsets[x]+allowedExtras)
                     if re.search(regexString,model["name"],re.IGNORECASE):
-                        print("Match!...")
                         vendorpcpp = (fullsku[0]).upper()
                         modelsku = self.dl_Src_cleanStr(model["name"])
                         self.generic_Sort(modelsku, vendorpcpp, array, vendor)
@@ -57,10 +56,10 @@ class setUp:
             except:
                 pass   
     def cleanup(self, modelarray, vendor):
-            for i in range (len(modelarray)):
-                cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/BIOSHERE/"+vendor+"/"+str(modelarray[i]).replace("/","-")+".zip"
-                try:
-                    print("Deleting "+cpath)
-                    os.remove(cpath)
-                except: 
-                    print("Error in Deleting "+cpath)
+        for i in range (len(modelarray)):
+            cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/BIOSHERE/"+vendor+"/"+str(modelarray[i]).replace("/","-")+".zip"
+            try:
+                print("Deleting "+cpath)
+                os.remove(cpath)
+            except: 
+                print("Error in Deleting "+cpath)

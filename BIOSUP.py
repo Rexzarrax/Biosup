@@ -3,6 +3,7 @@ import requests
 import os
 import time
 
+from csv import writer
 from Unzip import unzip
 from getHTML import gethtml
 from biosDL import biosDownload
@@ -60,10 +61,23 @@ def main():
     print("----------BIOSUP----------")
     print("Initialising...")
     statisticsData = datastatistics()
+    URLAlreadyGot = []
 
     modelCount = 0
     modelTotal = 0
+    datapath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"\\urlData.txt"
     breaker = "-------------------START---------------------"
+
+    try: 
+        with open(datapath) as datafile:
+            URLAlreadyGot = datafile.read().split("\n")
+            datafile.close()
+    except:
+        print("Creating "+datapath)
+        datafile=open(datapath,"x")
+        datafile.close()
+
+    print(str(URLAlreadyGot))
 
     myConfig = loadConfig()
     mysetup = setUp()
@@ -73,7 +87,8 @@ def main():
     dezip = unzip()
     print("Opening browser...")
     driver = webwithjs(myConfig.FireFox, myConfig.openBrowser, myConfig.sleepTimer)
-    linkSearching = searchForLink()  
+    linkSearching = searchForLink()
+
     print("Sourcing models...")
     for ven2 in range(len(myConfig.vendor)):
         mysetup.folderChq(myConfig.vendor[ven2])
@@ -87,10 +102,10 @@ def main():
             cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/BIOSHERE/"+myConfig.vendor[modelArr]+"/"+str(modelStr).replace("/","-")+".zip"
             print(modelStr+"|Progress: "+str(myData.allVenArr[modelArr].index(modelStr)+1)+"/"+str(len(myData.allVenArr[modelArr])))
             if myConfig.vendor[modelArr] == "ASUS":
-                getBIO.urlBuilderAsus(modelStr,myConfig.vendorSort[modelArr], cpath, driver, linkSearching)
+                getBIO.urlBuilderAsus(modelStr,myConfig.vendorSort[modelArr], cpath, driver, myConfig.vendorDownloadURLbase[modelArr], URLAlreadyGot, linkSearching)
             else:
-                getBIO.GenericUrlBuilder(modelStr,myConfig.vendor[modelArr],myConfig.vendorSort[modelArr], cpath, driver, 
-                                         myConfig.vendorDownloadURLbase[modelArr],myConfig.vendorURLaddon[modelArr],linkSearching)
+                getBIO.GenericUrlBuilder(modelStr,myConfig.vendorSort[modelArr], cpath, driver, 
+                                         myConfig.vendorDownloadURLbase[modelArr],myConfig.vendorURLaddon[modelArr], URLAlreadyGot, linkSearching)
             dezip.deZip(cpath, cpath.strip(".zip"))
             print("All actions Attempted, moving to next BIOS...\n")
 
@@ -101,7 +116,12 @@ def main():
 
     driver.driver.quit()
     print("All downloading and unzipping attempted...\n")
-    
+
+    print("Adding URL's to file...")
+    with open (datapath,"w") as file:
+        for item in URLAlreadyGot:
+            file.write("%s\n" % item)
+
     statisticsData.printstat(myConfig.vendor)
     
     print("Script Finished...")
