@@ -34,6 +34,7 @@ class loadConfig:
             self.FireFox = bool(config_object["SETTINGS"]["FireFox"]) 
             self.openBrowser = bool(config_object["SETTINGS"]["openBrowser"])
             self.sleepTimer = int(config_object["SETTINGS"]["sleeptimer"])
+            self.sleepwait = int(config_object["SETTINGS"]["sleepwait"])
             self.vendor = (config_object["SETTINGS"]["vendor"]).split(",")
             self.vendorSort = (config_object["SETTINGS"]["vendorSort"].split(","))
             self.allowedChipsets = (config_object["SETTINGS"]["allowedChipsetsAMD"].split(","))+(config_object["SETTINGS"]["allowedChipsetsIntel"].split(","))
@@ -51,6 +52,7 @@ class loadConfig:
         print(" Open browser window: "+str(self.openBrowser))
         print(" Save BIOS already Downloaded: "+str(self.saveState))
         print(" Sleep Timer: "+ str(self.sleepTimer))
+        print(" Sleep Timer: "+ str(self.sleepwait))
         print(" Vendor Array: "+str(self.vendor))
         print(" Vendor Web Selector: "+str(self.vendorSort))
         print(" Allowed Chipsets: "+str(self.allowedChipsets))
@@ -105,6 +107,7 @@ def main():
     print("Finding and Downloading BIOS...")
     for modelArr in range (len (myConfig.vendor)):
         for modelStr in myData.allVenArr[modelArr]:
+            timeMod = time.time()
             success = False
             print(breaker)   
             cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/BIOSHERE/"+myConfig.vendor[modelArr]+"/"+str(modelStr).replace("/","-")+".zip"
@@ -122,6 +125,9 @@ def main():
 
             dezip.deZip(cpath, cpath.strip(".zip"))
             statisticsData.statistics(myData, myConfig.vendor[modelArr], modelArr, modelStr, getBIO.DLSuccess)
+            if (time.time() - timeMod)<myConfig.sleepTimer:
+                print("Sleeping...")
+                time.sleep(myConfig.sleepwait) 
             print("Moving to next BIOS...\n")
         if myConfig.clean:
                 print("Running Cleanup of "+myConfig.vendor[modelArr]+"...")

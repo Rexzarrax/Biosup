@@ -32,7 +32,7 @@ class biosDownload:
         print("Finding Motherboard URL...")
         if not os.path.exists(cpath):
             prodURL = str(searchForLink.searchforlinkDDG(mymodel, urlchq)).replace("/specifications","")
-            prodURL = re.sub('_Download(.*)|_CPU(.*)|_QVL(.*)','_BIOS', prodURL, flags=re.IGNORECASE)             
+            prodURL = re.sub('_Download(.*)|_CPU(.*)|_QVL(.*)|_BIOS/','_BIOS', prodURL, flags=re.IGNORECASE)             
             if not prodURL == "None" :
                 if not prodURL.endswith('_BIOS'):
                     print("Adding 'HelpDesk_BIOS/' to URL")
