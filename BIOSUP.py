@@ -40,6 +40,7 @@ class loadConfig:
             self.allowedExtras = (config_object["SETTINGS"]["allowedChipsetsAddon"])
             self.vendorDownloadURLbase = (config_object["SETTINGS"]["vendorDownloadURLbase"].split(","))
             self.vendorURLaddon = (config_object["SETTINGS"]["vendorURLaddon"].split(","))
+            self.saveState = (config_object["SETTINGS"]["saveState"])
         except:
             input("Error: Missing or Invalid configuration file(config.ini)")
             exit()
@@ -48,6 +49,7 @@ class loadConfig:
         print(" Clean up: "+str(self.clean))
         print(" FireFox installed: "+str(self.FireFox))
         print(" Open browser window: "+str(self.openBrowser))
+        print(" Save BIOS already Downloaded: "+str(self.saveState))
         print(" Sleep Timer: "+ str(self.sleepTimer))
         print(" Vendor Array: "+str(self.vendor))
         print(" Vendor Web Selector: "+str(self.vendorSort))
@@ -60,12 +62,11 @@ class loadConfig:
 def main():
     print("----------BIOSUP----------")
     print("Initialising...")
-    statisticsData = datastatistics()
     URLAlreadyGot = []
 
     modelCount = 0
     modelTotal = 0
-    datapath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"\\urlData.txt"
+    datapath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"\\BIOSHERE\\urlData.txt"
     breaker = "-------------------START---------------------"
 
     try: 
@@ -73,6 +74,10 @@ def main():
             URLAlreadyGot = datafile.read().split("\n")
             datafile.close()
     except:
+        try:
+            os.mkdir(os.path.join(os.getcwd(), os.path.dirname(__file__))+"\\BIOSHERE\\")
+        except:
+            print("Path already exists")
         print("Creating "+datapath)
         datafile=open(datapath,"x")
         datafile.close()
@@ -80,6 +85,7 @@ def main():
     print(str(URLAlreadyGot))
 
     myConfig = loadConfig()
+    statisticsData = datastatistics(myConfig.vendor)
     mysetup = setUp()
     myGetWeb = gethtml()
     myData = moboData(mysetup, myGetWeb, myConfig.vendor, myConfig.allowedChipsets, myConfig.allowedExtras)  
@@ -96,33 +102,42 @@ def main():
         mysetup.arrClean(myData.allVenArr[ven2])
         print("\n"+str(myData.allVenArr[ven2])+"\n")
     
+    print("Finding and Downloading BIOS...")
     for modelArr in range (len (myConfig.vendor)):
         for modelStr in myData.allVenArr[modelArr]:
+            success = False
             print(breaker)   
             cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/BIOSHERE/"+myConfig.vendor[modelArr]+"/"+str(modelStr).replace("/","-")+".zip"
             print(modelStr+"|Progress: "+str(myData.allVenArr[modelArr].index(modelStr)+1)+"/"+str(len(myData.allVenArr[modelArr])))
             if myConfig.vendor[modelArr] == "ASUS":
-                getBIO.urlBuilderAsus(modelStr,myConfig.vendorSort[modelArr], cpath, driver, myConfig.vendorDownloadURLbase[modelArr], URLAlreadyGot, linkSearching)
+                getBIO.urlBuilderAsus(modelStr,myConfig.vendorSort[modelArr], 
+                                        cpath, driver, 
+                                        myConfig.vendorDownloadURLbase[modelArr], URLAlreadyGot, 
+                                        linkSearching)
             else:
-                getBIO.GenericUrlBuilder(modelStr,myConfig.vendorSort[modelArr], cpath, driver, 
-                                         myConfig.vendorDownloadURLbase[modelArr],myConfig.vendorURLaddon[modelArr], URLAlreadyGot, linkSearching)
-            dezip.deZip(cpath, cpath.strip(".zip"))
-            print("All actions Attempted, moving to next BIOS...\n")
+                getBIO.GenericUrlBuilder(modelStr,myConfig.vendorSort[modelArr], 
+                                        cpath, driver, 
+                                        myConfig.vendorDownloadURLbase[modelArr],myConfig.vendorURLaddon[modelArr], 
+                                        URLAlreadyGot, linkSearching)
 
-        statisticsData.statistics(myData, myConfig.vendor[modelArr], modelArr)
+            dezip.deZip(cpath, cpath.strip(".zip"))
+            statisticsData.statistics(myData, myConfig.vendor[modelArr], modelArr, modelStr, getBIO.DLSuccess)
+            print("Moving to next BIOS...\n")
         if myConfig.clean:
-            print("Running Cleanup of "+myConfig.vendor[modelArr]+"...")
-            mysetup.cleanup(myData.allVenArr[modelArr], myConfig.vendor[modelArr])
+                print("Running Cleanup of "+myConfig.vendor[modelArr]+"...")
+                mysetup.cleanup(myData.allVenArr[modelArr], myConfig.vendor[modelArr])
+        print("Adding URL's to file...")
+        if myConfig.saveState:
+            with open (datapath,"w") as file:
+                for item in URLAlreadyGot:
+                    file.write("%s\n" % item)
 
     driver.driver.quit()
     print("All downloading and unzipping attempted...\n")
 
-    print("Adding URL's to file...")
-    with open (datapath,"w") as file:
-        for item in URLAlreadyGot:
-            file.write("%s\n" % item)
+  
 
-    statisticsData.printstat(myConfig.vendor)
+    statisticsData.printstat(myConfig.vendor, myData)
     
     print("Script Finished...")
     input("Press Enter to continue/exit...")

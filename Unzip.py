@@ -18,6 +18,6 @@ class unzip:
             except:
                 print("Error in unziping...")
                 print("Deleting culprit file ("+file2unzip+")...")
-                os.remove(file2unzip)    
+                os.remove(file2unzip)   
         else:
             print("File does not exist...")

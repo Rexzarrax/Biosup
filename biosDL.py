@@ -15,7 +15,7 @@ from clint.textui import progress
 #class holds methods for downloading the BIOS from a vendor
 class biosDownload:
     def __Init__(self):
-        pass
+        self.DLSuccess = False
     def GenericUrlBuilder(self,mymodel, urlchq, cpath, driver, dlURLchq, URLaddON, URLAlreadyGot, searchForLink):
         print("Finding "+mymodel+ " URL...")
         if not os.path.exists(cpath):
@@ -55,7 +55,7 @@ class biosDownload:
                 print("Found the URL:", link['href'])
                 if not link == "None":
                     gotLink = True 
-                    self.dlBIOS(link['href'], cpath, dlDict)
+                    self.dlBIOS(link, cpath, dlDict)
                     break
             if not gotLink:
                 print("Missed URL, retrying, waiting "+str(retries-1)+"s...")
@@ -65,9 +65,10 @@ class biosDownload:
                 retries += 1                                
 
     def dlBIOS(self, link, cpath, dlDict):
-        if not link in dlDict:
+        self.DLSuccess = False
+        if not link['href'] in dlDict:
             try:             
-                print("DL and Save to "+cpath)
+                print("Download and Save to "+cpath)
                 with open(cpath, 'wb') as f:
                     r = requests.get(link.get('href'), allow_redirects=True)
                     total_length = int(r.headers.get('content-length'))
@@ -75,14 +76,16 @@ class biosDownload:
                         if chunk:
                             f.write(chunk)
                             f.flush()
+                    self.DLSuccess = True
             except Exception as e:
                 print("Error: "+str(e))
                     
             if os.path.exists(cpath):
                 print("BIOS Successfully Downloaded...")
-                dlDict.append(link)
-                return True
+                dlDict.append(link['href'])
+                self.DLSuccess = True
         else:
-            print("BIOS already downloaded...")
+            print("BIOS up-to-date :)")
+            self.DLSuccess = True
     
 
