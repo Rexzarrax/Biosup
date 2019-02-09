@@ -2,6 +2,7 @@ import sys
 import requests
 import os
 import time
+import json
 
 from csv import writer
 from Unzip import unzip
@@ -11,17 +12,7 @@ from setup import setUp
 from statistics import datastatistics
 from configparser import ConfigParser
 from getwebwithjs import webwithjs
-from linkSearching import searchForLink
-
-#stores motherboard data
-class moboData:
-    def __init__(self, mysetup, myGetWeb, vendor, allowedChipsets, allowedExtras):
-        #need to make variable, based on length of vendor array in main
-        self.allVenArr = []
-        for x in range(len(vendor)):
-            self.allVenArr.append([])
-        mysetup.dl_Src_PCPP(vendor, self.allVenArr, allowedChipsets, allowedExtras)
-           
+from linkSearching import searchForLink          
 
 class loadConfig:
     def __init__(self):
@@ -47,45 +38,64 @@ class loadConfig:
             exit()
 
         print("Loading config... ")
-        print(" Clean up: "+str(self.clean))
-        print(" FireFox installed: "+str(self.FireFox))
-        print(" Open browser window: "+str(self.openBrowser))
-        print(" Save BIOS already Downloaded: "+str(self.saveState))
-        print(" Sleep Timer: "+ str(self.sleepTimer))
-        print(" Sleep Timer: "+ str(self.sleepwait))
-        print(" Vendor Array: "+str(self.vendor))
-        print(" Vendor Web Selector: "+str(self.vendorSort))
-        print(" Allowed Chipsets: "+str(self.allowedChipsets))
-        print(" Allowed Extras: "+str(self.allowedExtras))
-        print(" Download URL base: "+str(self.vendorDownloadURLbase))
-        print(" Additions for URL:"+str(self.vendorURLaddon))
+        print(" > Clean up: "+str(self.clean))
+        print(" > FireFox installed: "+str(self.FireFox))
+        print(" > Open browser window: "+str(self.openBrowser))
+        print(" > Save BIOS already Downloaded: "+str(self.saveState))
+        print(" > Sleep Timer: "+ str(self.sleepTimer))
+        print(" > Sleep Timer: "+ str(self.sleepwait))
+        print(" > Vendor Array: "+str(self.vendor))
+        print(" > Vendor Web Selector: "+str(self.vendorSort))
+        print(" > Allowed Chipsets: "+str(self.allowedChipsets))
+        print(" > Allowed Extras: "+str(self.allowedExtras))
+        print(" > Download URL base: "+str(self.vendorDownloadURLbase))
+        print(" > Additions for URL:"+str(self.vendorURLaddon))
         print("Configuration Loaded...")
+
+#stores motherboard data
+class moboData:
+    def __init__(self, mysetup, myGetWeb, vendor, allowedChipsets, allowedExtras):
+        #need to make variable, based on length of vendor array in main
+        self.allVenArr = []
+        for x in range(len(vendor)):
+            self.allVenArr.append([])
+        mysetup.dl_Src_PCPP(vendor, self.allVenArr, allowedChipsets, allowedExtras)
 
 def main():
     print("----------BIOSUP----------")
     print("Initialising...")
-    URLAlreadyGot = []
+    #modelData = []
+    modelData = {}
+    modelData['model'] = []
+    #status status'-> 0=nothing attempted, 1= BIOS successfully downloaded, 2=Bios failed to downloaded, 4= already downloaded and upto date
+    #modelData['model'].append({'name':'','productURL':'','downloadURL':'','status':0,'vendor':'',chipset':''})
 
     modelCount = 0
     modelTotal = 0
     datapath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"\\BIOSHERE\\urlData.txt"
     breaker = "-------------------START---------------------"
 
+    #set up directories and files
     try: 
         with open(datapath) as datafile:
-            URLAlreadyGot = datafile.read().split("\n")
+            #modelData = datafile.read().split("\n")
+            modelData = json.load(datafile)
             datafile.close()
     except:
         try:
+            print("Attempting to create BIOSHERE folder...")
             os.mkdir(os.path.join(os.getcwd(), os.path.dirname(__file__))+"\\BIOSHERE\\")
         except:
-            print("Path already exists")
-        print("Creating "+datapath)
-        datafile=open(datapath,"x")
-        datafile.close()
+            print("Dir already exists")
+        try:
+            print("Creating "+datapath)
+            datafile=open(datapath,"x")
+            datafile.close()
+        except:
+            print('File already exists...')
 
-    print(str(URLAlreadyGot))
-
+    print(str(modelData))
+    #create required objects
     myConfig = loadConfig()
     statisticsData = datastatistics(myConfig.vendor)
     mysetup = setUp()
@@ -93,16 +103,18 @@ def main():
     myData = moboData(mysetup, myGetWeb, myConfig.vendor, myConfig.allowedChipsets, myConfig.allowedExtras)  
     getBIO = biosDownload()
     dezip = unzip()
+
+    #open headless web browser to access vendor websites
     print("Opening browser...")
     driver = webwithjs(myConfig.FireFox, myConfig.openBrowser, myConfig.sleepTimer)
     linkSearching = searchForLink()
 
     print("Sourcing models...")
-    for ven2 in range(len(myConfig.vendor)):
-        mysetup.folderChq(myConfig.vendor[ven2])
-        myData.allVenArr[ven2].sort()
-        mysetup.arrClean(myData.allVenArr[ven2])
-        print("\n"+str(myData.allVenArr[ven2])+"\n")
+    for vendorName in range(len(myConfig.vendor)):
+        mysetup.folderChq(myConfig.vendor[vendorName])
+        myData.allVenArr[vendorName].sort()
+        mysetup.arrClean(myData.allVenArr[vendorName])
+        print("\n"+str(myData.allVenArr[vendorName])+"\n")
     
     print("Finding and Downloading BIOS...")
     for modelArr in range (len (myConfig.vendor)):
@@ -115,16 +127,16 @@ def main():
             if myConfig.vendor[modelArr] == "ASUS":
                 getBIO.urlBuilderAsus(modelStr,myConfig.vendorSort[modelArr], 
                                         cpath, driver, 
-                                        myConfig.vendorDownloadURLbase[modelArr], URLAlreadyGot, 
+                                        myConfig.vendorDownloadURLbase[modelArr], modelData, 
                                         linkSearching)
             else:
                 getBIO.GenericUrlBuilder(modelStr,myConfig.vendorSort[modelArr], 
                                         cpath, driver, 
                                         myConfig.vendorDownloadURLbase[modelArr],myConfig.vendorURLaddon[modelArr], 
-                                        URLAlreadyGot, linkSearching)
+                                        modelData, linkSearching)
 
             dezip.deZip(cpath, cpath.strip(".zip"))
-            statisticsData.statistics(myData, myConfig.vendor[modelArr], modelArr, modelStr, getBIO.DLSuccess)
+            statisticsData.statistics(myData, myConfig.vendor[modelArr], modelArr, modelStr, getBIO.status)
             if (time.time() - timeMod)<myConfig.sleepTimer:
                 print("Sleeping...")
                 time.sleep(myConfig.sleepwait) 
@@ -134,14 +146,11 @@ def main():
                 mysetup.cleanup(myData.allVenArr[modelArr], myConfig.vendor[modelArr])
         print("Adding URL's to file...")
         if myConfig.saveState:
-            with open (datapath,"w") as file:
-                for item in URLAlreadyGot:
-                    file.write("%s\n" % item)
+            with open (datapath,"w") as outfile:
+                json.dump(modelData,outfile)
 
     driver.driver.quit()
     print("All downloading and unzipping attempted...\n")
-
-  
 
     statisticsData.printstat(myConfig.vendor, myData)
     

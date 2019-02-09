@@ -13,6 +13,7 @@ class setUp:
     def __init__(self):
         pass
     def folderChq(self, company):
+        #potentially add chipsets here
         cpwd = os.path.dirname(os.path.realpath(__file__))
         if not os.path.exists(cpwd+"\\BIOSHERE\\"+company):
             os.makedirs(cpwd+"\\BIOSHERE\\"+company)

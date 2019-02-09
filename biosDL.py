@@ -15,7 +15,7 @@ from clint.textui import progress
 #class holds methods for downloading the BIOS from a vendor
 class biosDownload:
     def __Init__(self):
-        self.DLSuccess = False
+        self.status = {'DLSuccess':False,'DLUpdate':False}
     def GenericUrlBuilder(self,mymodel, urlchq, cpath, driver, dlURLchq, URLaddON, URLAlreadyGot, searchForLink):
         print("Finding "+mymodel+ " URL...")
         if not os.path.exists(cpath):
@@ -49,7 +49,7 @@ class biosDownload:
         print("Finding Download URL...")
         gotLink = refresh = False
         retries = 1
-        while (gotLink == False) and (retries < 10):
+        while (gotLink == False) and (retries < 5):
             soup_html = driver.getwebwithjs(prodURL, refresh)
             for link in soup_html.find_all('a', attrs={'href': re.compile(urlChq)}):
                 print("Found the URL:", link['href'])
@@ -60,12 +60,13 @@ class biosDownload:
             if not gotLink:
                 print("Missed URL, retrying, waiting "+str(retries-1)+"s...")
                 sleep(retries)
-                if retries > 6:
+                if retries >= 5:
                     refresh = True 
                 retries += 1                                
 
     def dlBIOS(self, link, cpath, dlDict):
-        self.DLSuccess = False
+        self.status['DLSuccess'] = self.status['DLUpdate'] = False
+        
         if not link['href'] in dlDict:
             try:             
                 print("Download and Save to "+cpath)
@@ -76,16 +77,15 @@ class biosDownload:
                         if chunk:
                             f.write(chunk)
                             f.flush()
-                    self.DLSuccess = True
             except Exception as e:
                 print("Error: "+str(e))
                     
             if os.path.exists(cpath):
                 print("BIOS Successfully Downloaded...")
                 dlDict.append(link['href'])
-                self.DLSuccess = True
+                self.status['DLSuccess'] = True
         else:
             print("BIOS up-to-date :)")
-            self.DLSuccess = True
+            self.status['DLUpdate'] = True
     
 
