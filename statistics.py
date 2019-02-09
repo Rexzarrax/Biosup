@@ -6,9 +6,6 @@ class datastatistics:
         self.timeDelta = 0
         self.timeStart = time.time()
 
-        self.failedModel = []
-        self.successDownload = []
-        self.alreadyDownload = []
         self.successCount = {}
         for ven2 in vendor:
             self.successCount[ven2] = 0
@@ -25,7 +22,7 @@ class datastatistics:
         print("Statistics...")
         for ven2 in range(len(self.successCount)): 
             self.successDownload.append(vendor[ven2]+": Successful Download's: "+str(self.successCount[vendor[ven2]])+"/"+str(len(myData.allVenArr[ven2])))
-
+            print(str(self.successCount[vendor[ven2]]/len(myData.allVenArr[ven2]))+"% success")
         self.timeDelta = int((time.time() - self.timeStart)/60)
 
         for SucStr in self.successDownload:

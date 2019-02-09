@@ -38,48 +38,37 @@ class loadConfig:
             exit()
 
         print("Loading config... ")
-        print(" > Clean up: "+str(self.clean))
-        print(" > FireFox installed: "+str(self.FireFox))
-        print(" > Open browser window: "+str(self.openBrowser))
-        print(" > Save BIOS already Downloaded: "+str(self.saveState))
-        print(" > Sleep Timer: "+ str(self.sleepTimer))
-        print(" > Sleep Timer: "+ str(self.sleepwait))
-        print(" > Vendor Array: "+str(self.vendor))
-        print(" > Vendor Web Selector: "+str(self.vendorSort))
-        print(" > Allowed Chipsets: "+str(self.allowedChipsets))
-        print(" > Allowed Extras: "+str(self.allowedExtras))
-        print(" > Download URL base: "+str(self.vendorDownloadURLbase))
-        print(" > Additions for URL:"+str(self.vendorURLaddon))
+        print(" >Clean up: "+str(self.clean))
+        print(" >FireFox installed: "+str(self.FireFox))
+        print(" >Open browser window: "+str(self.openBrowser))
+        print(" >Save BIOS already Downloaded: "+str(self.saveState))
+        print(" >Sleep Timer: "+ str(self.sleepTimer))
+        print(" >Sleep Wait: "+ str(self.sleepwait))
+        print(" >Vendor Array: "+str(self.vendor))
+        print(" >Vendor Web Selector: "+str(self.vendorSort))
+        print(" >Allowed Chipsets: "+str(self.allowedChipsets))
+        print(" >Allowed Extras: "+str(self.allowedExtras))
+        print(" >Download URL base: "+str(self.vendorDownloadURLbase))
+        print(" >Additions for URL:"+str(self.vendorURLaddon))
         print("Configuration Loaded...")
 
 #stores motherboard data
 class moboData:
     def __init__(self, mysetup, myGetWeb, vendor, allowedChipsets, allowedExtras):
-        #need to make variable, based on length of vendor array in main
-        self.allVenArr = []
-        for x in range(len(vendor)):
-            self.allVenArr.append([])
-        mysetup.dl_Src_PCPP(vendor, self.allVenArr, allowedChipsets, allowedExtras)
+        self.modelData = {}
+        #status status'-> 0=nothing attempted, 1= BIOS successfully downloaded, 2=Bios failed to downloaded, 4= already downloaded and upto date
+        mysetup.dl_Src_PCPP(vendor, self.modelData, allowedChipsets, allowedExtras)
 
 def main():
     print("----------BIOSUP----------")
     print("Initialising...")
-    #modelData = []
-    modelData = {}
-    modelData['model'] = []
-    #status status'-> 0=nothing attempted, 1= BIOS successfully downloaded, 2=Bios failed to downloaded, 4= already downloaded and upto date
-    #modelData['model'].append({'name':'','productURL':'','downloadURL':'','status':0,'vendor':'',chipset':''})
 
-    modelCount = 0
-    modelTotal = 0
     datapath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"\\BIOSHERE\\urlData.txt"
     breaker = "-------------------START---------------------"
-
     #set up directories and files
     try: 
         with open(datapath) as datafile:
-            #modelData = datafile.read().split("\n")
-            modelData = json.load(datafile)
+            myData.modelData = json.load(datafile)
             datafile.close()
     except:
         try:
@@ -94,7 +83,6 @@ def main():
         except:
             print('File already exists...')
 
-    print(str(modelData))
     #create required objects
     myConfig = loadConfig()
     statisticsData = datastatistics(myConfig.vendor)
@@ -112,35 +100,38 @@ def main():
     print("Sourcing models...")
     for vendorName in range(len(myConfig.vendor)):
         mysetup.folderChq(myConfig.vendor[vendorName])
-        myData.allVenArr[vendorName].sort()
-        mysetup.arrClean(myData.allVenArr[vendorName])
-        print("\n"+str(myData.allVenArr[vendorName])+"\n")
+        #modelData[vendorName].sort(key='name',reverse=True)
+        #mysetup.arrClean(modelData[vendorName])
+        #print("\n"+str(myData.allVenArr[vendorName])+"\n")
+    print(str(myData.modelData))
     
     print("Finding and Downloading BIOS...")
-    for modelArr in range (len (myConfig.vendor)):
-        for modelStr in myData.allVenArr[modelArr]:
-            timeMod = time.time()
-            success = False
-            print(breaker)   
-            cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/BIOSHERE/"+myConfig.vendor[modelArr]+"/"+str(modelStr).replace("/","-")+".zip"
-            print(modelStr+"|Progress: "+str(myData.allVenArr[modelArr].index(modelStr)+1)+"/"+str(len(myData.allVenArr[modelArr])))
-            if myConfig.vendor[modelArr] == "ASUS":
-                getBIO.urlBuilderAsus(modelStr,myConfig.vendorSort[modelArr], 
-                                        cpath, driver, 
-                                        myConfig.vendorDownloadURLbase[modelArr], modelData, 
-                                        linkSearching)
-            else:
-                getBIO.GenericUrlBuilder(modelStr,myConfig.vendorSort[modelArr], 
-                                        cpath, driver, 
-                                        myConfig.vendorDownloadURLbase[modelArr],myConfig.vendorURLaddon[modelArr], 
-                                        modelData, linkSearching)
 
-            dezip.deZip(cpath, cpath.strip(".zip"))
-            statisticsData.statistics(myData, myConfig.vendor[modelArr], modelArr, modelStr, getBIO.status)
-            if (time.time() - timeMod)<myConfig.sleepTimer:
-                print("Sleeping...")
-                time.sleep(myConfig.sleepwait) 
-            print("Moving to next BIOS...\n")
+    modelLen = len(myData.modelData)
+
+    for index,model in enumerate(myData.modelData):
+        timeModerator = time.time()
+        success = False
+        print(breaker)
+        cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/BIOSHERE/"+myData.modelData[model]['vendor']+"/"+str(myData.modelData[model]['chipset'])+"/"+myData.modelData[model]['name'].replace("/","-")+".zip"
+        print(model+"|Progress: "+str(index)+"/"+str(modelLen))
+        if myData.modelData[model]['vendor'] == "ASUS":
+            getBIO.urlBuilderAsus(modelStr,myConfig.vendorSort[modelArr], 
+                                    cpath, driver, 
+                                    myConfig.vendorDownloadURLbase[modelArr], modelData, 
+                                    linkSearching)
+        else:
+            getBIO.GenericUrlBuilder(modelStr,myConfig.vendorSort[modelArr], 
+                                    cpath, driver, 
+                                    myConfig.vendorDownloadURLbase[modelArr],myConfig.vendorURLaddon[modelArr], 
+                                    modelData, linkSearching)
+
+        dezip.deZip(cpath, cpath.strip(".zip"))
+        statisticsData.statistics(myData, myConfig.vendor[modelArr], modelArr, modelStr, getBIO.status)
+        if (time.time() - timeModerator)<myConfig.sleepTimer:
+            print("Sleeping...")
+            time.sleep(myConfig.sleepwait) 
+        print("Moving to next BIOS...\n")
         if myConfig.clean:
                 print("Running Cleanup of "+myConfig.vendor[modelArr]+"...")
                 mysetup.cleanup(myData.allVenArr[modelArr], myConfig.vendor[modelArr])
