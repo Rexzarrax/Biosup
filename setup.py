@@ -54,9 +54,8 @@ class setUp:
             print(e)
             print('Not Added: '+dataDict['name'])
 
-    def cleanup(self, modelarray, vendor):
-        for i in range (len(modelarray)):
-            cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/BIOSHERE/"+vendor+"/"+str(modelarray[i]).replace("/","-")+".zip"
+    def cleanup(self, cpath, index):
+        for i in range (len(10)):
             try:
                 print("Deleting "+cpath)
                 os.remove(cpath)
