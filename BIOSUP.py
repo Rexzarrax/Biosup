@@ -62,8 +62,8 @@ class loadConfig:
 
 #stores motherboard data
 class moboData:
-    def __init__(self, mysetup, myGetWeb, vendor, allowedChipsets, allowedExtras):
-        self.modelData = {}
+    def __init__(self, mysetup, myGetWeb, vendor, allowedChipsets, allowedExtras, modelData):
+        self.modelData = modelData
         #status status'-> 0=nothing attempted, 1= BIOS successfully downloaded, 2=Bios failed to downloaded, 4= already downloaded and upto date
         mysetup.dl_Src_PCPP(vendor, self.modelData, allowedChipsets, allowedExtras)
 
@@ -76,10 +76,11 @@ def main():
     #set up directories and files
     try: 
         with open(datapath) as datafile:
-            myData.modelData = json.load(datafile)
-            print(myData.modelData)
+            modelData = json.load(datafile)
+            print(str(myData.modelData))
             datafile.close()
-    except:
+    except Exception as e: 
+        print(e)
         try:
             print("Attempting to create BIOSHERE folder...")
             os.mkdir(os.path.join(os.getcwd(), os.path.dirname(__file__))+"\\BIOSHERE\\")
@@ -89,6 +90,7 @@ def main():
             print("Creating "+datapath)
             datafile=open(datapath,"x")
             datafile.close()
+            modelData = {}
         except:
             print('File already exists...')
 
@@ -97,7 +99,7 @@ def main():
     statisticsData = datastatistics(myConfig.vendor)
     mysetup = setUp()
     myGetWeb = gethtml()
-    myData = moboData(mysetup, myGetWeb, myConfig.vendor, myConfig.allowedChipsets, myConfig.allowedExtras)  
+    myData = moboData(mysetup, myGetWeb, myConfig.vendor, myConfig.allowedChipsets, myConfig.allowedExtras, modelData)  
     getBIO = biosDownload()
     dezip = unzip()
 
@@ -151,7 +153,7 @@ def main():
             print("Running Cleanup of "+cpathZip+"...")
             mysetup.cleanup(cpathZip, index)
         if (index%10==0):
-            print("Adding last "+str(10)+"URL's to file...")
+            print("Adding last "+str(10)+" URL's to file...")
             if myConfig.saveState:
                 with open (datapath,"w") as outfile:
                     json.dump(myData.modelData,outfile)

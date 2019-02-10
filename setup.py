@@ -48,11 +48,14 @@ class setUp:
     def generic_Sort(self,modelsku, vendor, modelData, vendorchq, dataDict):
         try:
             moboKey = dataDict['name']
-            if not moboKey in modelData:
-                modelData[moboKey] = dataDict
-                print('Added: '+dataDict['name'])
+            if dataDict['vendor'] in vendorchq:
+                if not moboKey in modelData:   
+                    modelData[moboKey] = dataDict
+                    print('Added: '+dataDict['name'])
+                else:
+                    print(moboKey+" already in system...")
             else:
-                print(moboKey+" already in system...")
+                print('Invalid vendor: '+moboKey)
 
         except Exception as e: 
             print(e)
