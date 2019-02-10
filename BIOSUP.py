@@ -20,6 +20,8 @@ class loadConfig:
             config_object = ConfigParser()
             config_object.read("config.ini")
 
+            self.allvendordata = {}
+
             #config
             self.clean = bool(config_object["SETTINGS"]["clean"]) 
             self.FireFox = bool(config_object["SETTINGS"]["FireFox"]) 
@@ -33,6 +35,12 @@ class loadConfig:
             self.vendorDownloadURLbase = (config_object["SETTINGS"]["vendorDownloadURLbase"].split(","))
             self.vendorURLaddon = (config_object["SETTINGS"]["vendorURLaddon"].split(","))
             self.saveState = (config_object["SETTINGS"]["saveState"])
+
+            for x in range (len(self.vendor)):
+                self.allvendordata[self.vendor[x]] = {'vendorSort':self.vendorSort[x],
+                                                'vendorDownloadURLbase':self.vendorDownloadURLbase[x],
+                                                'vendorURLaddon':self.vendorURLaddon[x]}
+            print(str(self.allvendordata))
         except:
             input("Error: Missing or Invalid configuration file(config.ini)")
             exit()
@@ -100,9 +108,7 @@ def main():
     print("Sourcing models...")
     for vendorName in range(len(myConfig.vendor)):
         mysetup.folderChq(myConfig.vendor[vendorName])
-        #modelData[vendorName].sort(key='name',reverse=True)
-        #mysetup.arrClean(modelData[vendorName])
-        #print("\n"+str(myData.allVenArr[vendorName])+"\n")
+
     print(str(myData.modelData))
     
     print("Finding and Downloading BIOS...")
@@ -114,17 +120,20 @@ def main():
         success = False
         print(breaker)
         cpath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/BIOSHERE/"+myData.modelData[model]['vendor']+"/"+str(myData.modelData[model]['chipset'])+"/"+myData.modelData[model]['name'].replace("/","-")+".zip"
-        print(model+"|Progress: "+str(index)+"/"+str(modelLen))
-        if myData.modelData[model]['vendor'] == "ASUS":
-            getBIO.urlBuilderAsus(modelStr,myConfig.vendorSort[modelArr], 
+        print(model+"|Progress: "+str(index+1)+"/"+str(modelLen))
+        vendor = myData.modelData[model]['vendor']
+        if vendor == "ASUS":
+            getBIO.urlBuilderAsus(myData.modelData[model],
+                                    myConfig.allvendordata[vendor]['vendorSort'], 
                                     cpath, driver, 
-                                    myConfig.vendorDownloadURLbase[modelArr], modelData, 
+                                    myConfig.allvendordata[vendor]['vendorDownloadURLbase'], 
                                     linkSearching)
         else:
-            getBIO.GenericUrlBuilder(modelStr,myConfig.vendorSort[modelArr], 
+            getBIO.GenericUrlBuilder(myData.modelData[model],
+                                    myConfig.allvendordata[vendor]['vendorSort'], 
                                     cpath, driver, 
-                                    myConfig.vendorDownloadURLbase[modelArr],myConfig.vendorURLaddon[modelArr], 
-                                    modelData, linkSearching)
+                                    myConfig.allvendordata[vendor]['vendorDownloadURLbase'], 
+                                    linkSearching)
 
         dezip.deZip(cpath, cpath.strip(".zip"))
         statisticsData.statistics(myData, myConfig.vendor[modelArr], modelArr, modelStr, getBIO.status)

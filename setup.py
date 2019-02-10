@@ -27,7 +27,7 @@ class setUp:
 
         for page in range(0, mobo_count):
             skuName = pcpp.productLists.getProductList("motherboard", page)
-            print("Collected page "+ str(page))
+            print("Collected page %d/%d" % (page,mobo_count))
 
             for model in skuName:
                 fullsku = str(model["name"]).split(" ")
@@ -46,19 +46,13 @@ class setUp:
         return model
 
     def generic_Sort(self,modelsku, vendor, modelData, vendorchq, dataDict):
-        #for index in range(len(vendorchq)):
-        #    if vendor == vendorchq[index]:
         try:
             moboKey = dataDict['name']
             modelData[moboKey] = dataDict
             print('Added: '+dataDict['name'])
-#            print("Sorted "+modelsku+" to "+vendorchq[index])
-#            break
         except Exception as e: 
             print(e)
             print('Not Added: '+dataDict['name'])
-        #    else:
-        #        print("Could not Sort: "+modelsku+" to "+vendorchq[index])
 
     def cleanup(self, modelarray, vendor):
         for i in range (len(modelarray)):
