@@ -77,6 +77,7 @@ def main():
     try: 
         with open(datapath) as datafile:
             myData.modelData = json.load(datafile)
+            print(myData.modelData)
             datafile.close()
     except:
         try:
@@ -120,28 +121,28 @@ def main():
         success = False
         print(breaker)
         cpathDir = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/BIOSHERE/"+myData.modelData[model]['vendor']+"/"+str(myData.modelData[model]['chipset'])
+        print(model+"|Progress: "+str(index+1)+"/"+str(modelLen))
         try:
             os.makedirs(cpathDir)
         except:
             print(cpathDir+" Already Exists...")
         cpathZip = cpathDir+"/"+myData.modelData[model]['name'].replace("/","-")+".zip"
-        print(model+"|Progress: "+str(index+1)+"/"+str(modelLen))
         vendor = myData.modelData[model]['vendor']
         if vendor == "ASUS":
             getBIO.urlBuilderAsus(myData.modelData[model],
                                     myConfig.allvendordata[vendor]['vendorSort'], 
                                     cpathZip, driver, 
-                                    myConfig.allvendordata[vendor]['vendorDownloadURLbase'], 
+                                    myConfig.allvendordata[vendor]['vendorDownloadURLbase'],
                                     linkSearching)
         else:
             getBIO.GenericUrlBuilder(myData.modelData[model],
                                     myConfig.allvendordata[vendor]['vendorSort'], 
                                     cpathZip, driver, 
-                                    myConfig.allvendordata[vendor]['vendorDownloadURLbase'], 
+                                    myConfig.allvendordata[vendor]['vendorDownloadURLbase'],
+                                    myConfig.allvendordata[vendor]['vendorURLaddon'], 
                                     linkSearching)
 
         dezip.deZip(cpathZip, cpathZip.strip(".zip"))
-        statisticsData.statistics(myData, myConfig.vendor[modelArr], modelArr, modelStr, getBIO.status)
         if (time.time() - timeModerator)<myConfig.sleepTimer:
             print("Sleeping...")
             time.sleep(myConfig.sleepwait) 
@@ -150,8 +151,12 @@ def main():
             print("Running Cleanup of "+cpathZip+"...")
             mysetup.cleanup(cpathZip, index)
         if (index%10==0):
-            print("Adding URL's to file...")
+            print("Adding last "+str(10)+"URL's to file...")
             if myConfig.saveState:
+                with open (datapath,"w") as outfile:
+                    json.dump(myData.modelData,outfile)
+
+    if myConfig.saveState:
                 with open (datapath,"w") as outfile:
                     json.dump(myData.modelData,outfile)
 

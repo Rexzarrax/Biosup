@@ -72,7 +72,7 @@ class biosDownload:
             try:             
                 print("Download and Save to "+cpath)
                 with open(cpath, 'wb') as f:
-                    r = requests.get(link.get('href'), allow_redirects=True)
+                    r = requests.get(link, allow_redirects=True)
                     total_length = int(r.headers.get('content-length'))
                     for chunk in progress.bar(r.iter_content(chunk_size=1024), expected_size=(total_length/1024) + 1): 
                         if chunk:

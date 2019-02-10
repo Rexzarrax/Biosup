@@ -25,7 +25,7 @@ class setUp:
         mobo_count = pcpp.productLists.totalPages("motherboard")
         print("Pages found: "+str(mobo_count))
 
-        for page in range(0, mobo_count):
+        for page in range(1, mobo_count+1):
             skuName = pcpp.productLists.getProductList("motherboard", page)
             print("Collected page %d/%d" % (page,mobo_count))
 
@@ -48,16 +48,19 @@ class setUp:
     def generic_Sort(self,modelsku, vendor, modelData, vendorchq, dataDict):
         try:
             moboKey = dataDict['name']
-            modelData[moboKey] = dataDict
-            print('Added: '+dataDict['name'])
+            if not moboKey in modelData:
+                modelData[moboKey] = dataDict
+                print('Added: '+dataDict['name'])
+            else:
+                print(moboKey+" already in system...")
+
         except Exception as e: 
             print(e)
             print('Not Added: '+dataDict['name'])
 
     def cleanup(self, cpath, index):
-        for i in range (len(10)):
-            try:
-                print("Deleting "+cpath)
-                os.remove(cpath)
-            except: 
-                print("Error in Deleting "+cpath)
+        try:
+            print("Deleting "+cpath)
+            os.remove(cpath)
+        except: 
+            print("Error in Deleting "+cpath)
