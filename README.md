@@ -2,9 +2,11 @@
 > This program is designed to download all BIOS/UEFI from either ASUS, ASROCK, GIGABYTE or MSI. 
 
 
-One to two paragraph statement about your product and what it does.
+Biosup is a program designed to automate the sourcing and downloading of BIOS/UEFI from Various vendor websites. Using the config file, a user can manually set what chipsets and vendors (between ASUS, ASROCK, GIGABYTE and MSI) they wish to download.
 
-![](header.png)
+Furthermore, Biosup features progress saving and full automation, set and forget!
+
+![](header.PNG)
 
 ## Installation
 
@@ -19,13 +21,4 @@ Windows:
 Linux:
 ```
 Use WINE, detailed steps coming
-```
-
-## Development setup
-
-Describe how to install all development dependencies and how to run an automated test-suite of some kind. Potentially do this for multiple platforms.
-
-```sh
-make install
-npm test
 ```
