@@ -1,0 +1,6 @@
+html5lib==1.0.1
+google==2.0.1
+clint==0.5.1
+requests==2.21.0
+PCPartPicker_API==0.0.9
+beautifulsoup4==4.7.1
