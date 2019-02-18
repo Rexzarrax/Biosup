@@ -1,4 +1,5 @@
 from configparser import ConfigParser
+import os
 
 class loadConfig:
     def __init__(self, configfile):
@@ -16,21 +17,35 @@ class loadConfig:
             self.sleepwait = int(config_object["SETTINGS"]["sleepwait"])
             self.vendor = (config_object["SETTINGS"]["vendor"]).split(",")
             self.vendorSort = (config_object["SETTINGS"]["vendorSort"].split(","))
-            self.AMDallowedchipsets = (config_object["SETTINGS"]["allowedChipsetsAMD"].split(","))
-            self.AMDallowedchipsets.sort()
-            self.INTELallowedchipsets = (config_object["SETTINGS"]["allowedChipsetsIntel"].split(","))
-            self.INTELallowedchipsets.sort()
-            self.allowedChipsets = (self.AMDallowedchipsets+self.INTELallowedchipsets)
+            try:
+                self.AMDallowedchipsets = (config_object["SETTINGS"]["allowedChipsetsAMD"].split(","))
+                self.AMDallowedchipsets.sort()
+                self.INTELallowedchipsets = (config_object["SETTINGS"]["allowedChipsetsIntel"].split(","))
+                self.INTELallowedchipsets.sort()
+                self.allowedChipsets = (self.AMDallowedchipsets+self.INTELallowedchipsets)
+            except:
+                self.allowedChipsets = (config_object["SETTINGS"]["allowedChipsets"].split(","))
             self.allowedChipsets.sort()
-            self.allowedExtras = (config_object["SETTINGS"]["allowedChipsetsAddon"])
-            self.vendorDownloadURLbase = (config_object["SETTINGS"]["vendorDownloadURLbase"].split(","))
-            self.vendorURLaddon = (config_object["SETTINGS"]["vendorURLaddon"].split(","))
-            self.saveState = (config_object["SETTINGS"]["saveState"])
+            
+            try:
+                self.allowedExtras = (config_object["SETTINGS"]["allowedChipsetsAddon"])
+                self.vendorDownloadURLbase = (config_object["SETTINGS"]["vendorDownloadURLbase"].split(","))
+                self.vendorURLaddon = (config_object["SETTINGS"]["vendorURLaddon"].split(","))
+                self.saveState = (config_object["SETTINGS"]["saveState"])
+                for x in range (len(self.vendor)):
+                    self.allvendordata[self.vendor[x]] = {'vendorSort':self.vendorSort[x],
+                                    'vendorDownloadURLbase':self.vendorDownloadURLbase[x],
+                                    'vendorURLaddon':self.vendorURLaddon[x]}  
+            except:
+                try:
+                    self.datapath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"\\vendorInfo.txt"
+                    with open (self.datapath,"w") as infile:
+                        self.allvendordata = infile.readlines()
+                except:
+                    print("Error loading config")
+                    exit()
 
-            for x in range (len(self.vendor)):
-                self.allvendordata[self.vendor[x]] = {'vendorSort':self.vendorSort[x],
-                                                'vendorDownloadURLbase':self.vendorDownloadURLbase[x],
-                                                'vendorURLaddon':self.vendorURLaddon[x]}
+
             print(str(self.allvendordata))
         except:
             input("Error: Missing or Invalid configuration file(config.ini)")

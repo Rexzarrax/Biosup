@@ -114,8 +114,8 @@ def main():
                     json.dump(myData.modelData,outfile)
 
     if myConfig.saveState:
-                with open (datapath,"w") as outfile:
-                    json.dump(myData.modelData,outfile)
+        with open (datapath,"w") as outfile:
+            json.dump(myData.modelData,outfile)
 
     driver.driver.quit()
     print("All downloading and unzipping attempted...\n")
