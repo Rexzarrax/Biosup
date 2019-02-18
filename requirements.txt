@@ -1,6 +1,6 @@
 html5lib==1.0.1
-wxPython==4.0.4
 requests==2.21.0
+wxPython==4.0.4
 clint==0.5.1
 google==2.0.1
 PCPartPicker_API==0.0.9
