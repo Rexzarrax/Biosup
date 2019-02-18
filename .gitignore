@@ -58,9 +58,7 @@ docs/_build/
 target/
 
 # irrelevent bios folders
-ASROCK/
-ASUS/
-MSI/
-GIGABYTE/
+BIOSHERE/
+MovPyth/
 node_modules/
 urlData.txt

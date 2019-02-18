@@ -10,55 +10,9 @@ from getHTML import gethtml
 from biosDL import biosDownload
 from setup import setUp
 from statistics import datastatistics
-from configparser import ConfigParser
 from getwebwithjs import webwithjs
-from linkSearching import searchForLink          
-
-class loadConfig:
-    def __init__(self):
-        try:
-            config_object = ConfigParser()
-            config_object.read("config.ini")
-
-            self.allvendordata = {}
-
-            #config
-            self.clean = bool(config_object["SETTINGS"]["clean"]) 
-            self.FireFox = bool(config_object["SETTINGS"]["FireFox"]) 
-            self.openBrowser = bool(config_object["SETTINGS"]["openBrowser"])
-            self.sleepTimer = int(config_object["SETTINGS"]["sleeptimer"])
-            self.sleepwait = int(config_object["SETTINGS"]["sleepwait"])
-            self.vendor = (config_object["SETTINGS"]["vendor"]).split(",")
-            self.vendorSort = (config_object["SETTINGS"]["vendorSort"].split(","))
-            self.allowedChipsets = (config_object["SETTINGS"]["allowedChipsetsAMD"].split(","))+(config_object["SETTINGS"]["allowedChipsetsIntel"].split(","))
-            self.allowedExtras = (config_object["SETTINGS"]["allowedChipsetsAddon"])
-            self.vendorDownloadURLbase = (config_object["SETTINGS"]["vendorDownloadURLbase"].split(","))
-            self.vendorURLaddon = (config_object["SETTINGS"]["vendorURLaddon"].split(","))
-            self.saveState = (config_object["SETTINGS"]["saveState"])
-
-            for x in range (len(self.vendor)):
-                self.allvendordata[self.vendor[x]] = {'vendorSort':self.vendorSort[x],
-                                                'vendorDownloadURLbase':self.vendorDownloadURLbase[x],
-                                                'vendorURLaddon':self.vendorURLaddon[x]}
-            print(str(self.allvendordata))
-        except:
-            input("Error: Missing or Invalid configuration file(config.ini)")
-            exit()
-
-        print("Loading config... ")
-        print(" >Clean up: "+str(self.clean))
-        print(" >FireFox installed: "+str(self.FireFox))
-        print(" >Open browser window: "+str(self.openBrowser))
-        print(" >Save BIOS already Downloaded: "+str(self.saveState))
-        print(" >Sleep Timer: "+ str(self.sleepTimer))
-        print(" >Sleep Wait: "+ str(self.sleepwait))
-        print(" >Vendor Array: "+str(self.vendor))
-        print(" >Vendor Web Selector: "+str(self.vendorSort))
-        print(" >Allowed Chipsets: "+str(self.allowedChipsets))
-        print(" >Allowed Extras: "+str(self.allowedExtras))
-        print(" >Download URL base: "+str(self.vendorDownloadURLbase))
-        print(" >Additions for URL:"+str(self.vendorURLaddon))
-        print("Configuration Loaded...")
+from linkSearching import searchForLink       
+from loadConfig import loadConfig   
 
 #stores motherboard data
 class moboData:
@@ -95,7 +49,7 @@ def main():
             print('File already exists...')
 
     #create required objects
-    myConfig = loadConfig()
+    myConfig = loadConfig("config.ini")
     statisticsData = datastatistics(myConfig.vendor)
     mysetup = setUp()
     myGetWeb = gethtml()
@@ -118,6 +72,7 @@ def main():
 
     modelLen = len(myData.modelData)
 
+    #loops through all entries in the myData.modelData dictionary
     for index,model in enumerate(myData.modelData):
         timeModerator = time.time()
         success = False
