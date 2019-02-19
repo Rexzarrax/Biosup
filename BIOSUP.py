@@ -24,14 +24,14 @@ class moboData:
 def main():
     print("----------BIOSUP----------")
     print("Initialising...")
-
+    modelData = {}
     datapath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"\\BIOSHERE\\urlData.txt"
     breaker = "-------------------START---------------------"
     #set up directories and files
     try: 
         with open(datapath) as datafile:
             modelData = json.load(datafile)
-            print(str(myData.modelData))
+            print(str(modelData))
             datafile.close()
     except Exception as e: 
         print(e)
@@ -44,7 +44,6 @@ def main():
             print("Creating "+datapath)
             datafile=open(datapath,"x")
             datafile.close()
-            modelData = {}
         except:
             print('File already exists...')
 

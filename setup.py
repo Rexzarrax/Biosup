@@ -48,6 +48,7 @@ class setUp:
     def generic_Sort(self,modelsku, vendor, modelData, vendorchq, dataDict):
         try:
             moboKey = dataDict['name']
+           # print(dataDict['vendor']+":"+str(vendorchq))
             if dataDict['vendor'] in vendorchq:
                 if not moboKey in modelData:   
                     modelData[moboKey] = dataDict
