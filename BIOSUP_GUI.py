@@ -29,10 +29,11 @@ class GUI_Window(wx.Frame):
         ico = wx.Icon('ICO_BIOSUP.ico', wx.BITMAP_TYPE_ICO)
         self.SetIcon(ico)
 
-        self.selectall = True
+        self.selectall = self.running = True
         self.allchiparr = []
         self.config = loadConfig("GUI_config.ini")
         #self.SetSize((400, 300))
+        #Create all UI elements
         self.AMD_Chq_List = wx.CheckListBox(self, wx.ID_ANY, choices=self.config.AMDallowedchipsets)
         self.Intel_Chq_List = wx.CheckListBox(self, wx.ID_ANY, choices=self.config.INTELallowedchipsets)
         self.Vendor_Chq_List = wx.CheckListBox(self, wx.ID_ANY, choices=self.config.vendor)
@@ -45,6 +46,7 @@ class GUI_Window(wx.Frame):
         self.__set_properties()
         self.__do_layout()
         # end wxGlade
+        #Bind events
         self.Run_Btn.Bind(wx.EVT_BUTTON, self.Run_Event)
         self.Selectall_Btn.Bind(wx.EVT_BUTTON, self.Select_All_Chq_Box)
         self.useLast_ChqBox.Bind(wx.EVT_CHECKBOX, self.Select_Last_Run)
@@ -93,6 +95,8 @@ class GUI_Window(wx.Frame):
                 outfile.write("[SETTINGS]\nclean = t\nFireFox = \nopenBrowser = \n")
                 outfile.write("saveState = t\nsleeptimer = 6\nsleepwait = 5\n")
                 outfile.write("allowedChipsets = "+",".join(self.allchiparr)+"\n")
+                outfile.write("allowedChipsetsAMD = "+",".join(self.AMD_Chq_List.GetCheckedStrings())+"\n")
+                outfile.write("allowedChipsetsIntel = "+",".join(self.Intel_Chq_List.GetCheckedStrings())+"\n")
                 outfile.write("allowedChipsetsAddon = [CIM]?\n")
                 outfile.write("vendor = "+",".join(self.Vendor_Chq_List.GetCheckedStrings())+"\n")
                 self.Status_text_ctrl.AppendText("Done...\n")
@@ -103,7 +107,6 @@ class GUI_Window(wx.Frame):
             self.Create_Thread()
         else:
             self.Status_text_ctrl.AppendText("Select at least 1 chipset and vendor or tick 'Run last config' \n")
-        self.Status_text_ctrl.AppendText("BIOSUP Completed...\n")
 
     def Create_Thread(self):
         try:
@@ -113,7 +116,7 @@ class GUI_Window(wx.Frame):
 
     def Chq_fields(self):
         self.allchiparr = self.AMD_Chq_List.GetCheckedStrings() + self.Intel_Chq_List.GetCheckedStrings()
-        self.allarr = self.Vendor_Chq_List.GetCheckedStrings()
+        self.allarr = self.allchiparr + self.Vendor_Chq_List.GetCheckedStrings()
         
         if not len(self.allarr) == 0:    
             return True
@@ -123,32 +126,36 @@ class GUI_Window(wx.Frame):
     def Select_All_Chq_Box(self, evt): 
         if self.selectall:
             self.Status_text_ctrl.AppendText("Selected all tick boxes\n")
-            self.Set_Check_Lists()
+            self.Set_Check_Lists(self.config)
             self.useLast_ChqBox.SetValue(False)
             self.selectall = False
             self.Selectall_Btn.SetLabel("De-select All")
         else:
             self.Status_text_ctrl.AppendText("Unselecting all tick boxes\n")
             self.useLast_ChqBox.SetValue(False)
-            for cb in self.AMD_Chq_List.GetCheckedItems():
-                self.AMD_Chq_List.Check(cb, False)
-            for cb in self.Intel_Chq_List.GetCheckedItems():
-                self.Intel_Chq_List.Check(cb, False)
-            for cb in self.Vendor_Chq_List.GetCheckedItems():
-                self.Vendor_Chq_List.Check(cb, False)
+            self.deselect_Check_Lists(self.AMD_Chq_List)
+            self.deselect_Check_Lists(self.Intel_Chq_List)
+            self.deselect_Check_Lists(self.Vendor_Chq_List)
             self.selectall = True
             self.Selectall_Btn.SetLabel("Select All")
 
-    def Set_Check_Lists(self):
-        self.AMD_Chq_List.SetCheckedStrings(self.config.AMDallowedchipsets)
-        self.Intel_Chq_List.SetCheckedStrings(self.config.INTELallowedchipsets)
-        self.Vendor_Chq_List.SetCheckedStrings(self.config.vendor)
+    def deselect_Check_Lists(self, mylist):
+        for cb in mylist.GetCheckedItems():
+                mylist.Check(cb, False)
+
+    def Set_Check_Lists(self, config):
+        self.AMD_Chq_List.SetCheckedStrings(config.AMDallowedchipsets)
+        self.Intel_Chq_List.SetCheckedStrings(config.INTELallowedchipsets)
+        self.Vendor_Chq_List.SetCheckedStrings(config.vendor)
 
     def Select_Last_Run(self, evt):
         if self.useLast_ChqBox.IsChecked():
             self.Status_text_ctrl.AppendText("Loading last run\n")
-            loadConfig("config.ini")
-            self.Set_Check_Lists()
+            self.deselect_Check_Lists(self.AMD_Chq_List)
+            self.deselect_Check_Lists(self.Intel_Chq_List)
+            self.deselect_Check_Lists(self.Vendor_Chq_List)
+            self.lastconfig = loadConfig("config.ini")
+            self.Set_Check_Lists(self.lastconfig)
         else:
             self.Status_text_ctrl.AppendText("Unchecked 'Last Run'\n")
 # end of class GUI_Window
