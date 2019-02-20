@@ -4,6 +4,7 @@
 #
 import wx
 import os
+import threading
 
 from time import sleep
 
@@ -28,6 +29,7 @@ class GUI_Window(wx.Frame):
         ico = wx.Icon('ICO_BIOSUP.ico', wx.BITMAP_TYPE_ICO)
         self.SetIcon(ico)
 
+        self.selectall = True
         self.allchiparr = []
         self.config = loadConfig("GUI_config.ini")
         #self.SetSize((400, 300))
@@ -36,7 +38,7 @@ class GUI_Window(wx.Frame):
         self.Vendor_Chq_List = wx.CheckListBox(self, wx.ID_ANY, choices=self.config.vendor)
         self.Run_Btn = wx.Button(self, wx.ID_ANY, "Run")
         self.Selectall_Btn = wx.Button(self,wx.ID_ANY,"Select All")
-        self.useLast_Btn = wx.CheckBox(self,wx.ID_ANY,"Run last config")
+        self.useLast_ChqBox = wx.CheckBox(self,wx.ID_ANY,"Run last config")
         self.Status_text_ctrl = wx.TextCtrl(self, wx.ID_ANY, "",style=wx.TE_READONLY|wx.TE_MULTILINE)
 
 
@@ -45,9 +47,8 @@ class GUI_Window(wx.Frame):
         # end wxGlade
         self.Run_Btn.Bind(wx.EVT_BUTTON, self.Run_Event)
         self.Selectall_Btn.Bind(wx.EVT_BUTTON, self.Select_All_Chq_Box)
-        self.useLast_Btn.Bind(wx.EVT_BUTTON, self.Select_Last_Run)
-
-        self.useLast_Btn.SetValue(True)
+        self.useLast_ChqBox.Bind(wx.EVT_CHECKBOX, self.Select_Last_Run)
+        #self.useLast_ChqBox.SetValue(True)
 
     def __set_properties(self):
         # begin wxGlade: GUI_Window.__set_properties
@@ -71,7 +72,7 @@ class GUI_Window(wx.Frame):
         grid_sizer_1.Add(sizer_4, 1, wx.EXPAND, 0)
 
         grid_sizer_1.Add(self.Selectall_Btn, 0, wx.ALIGN_CENTER, 0)
-        grid_sizer_1.Add(self.useLast_Btn, 0, wx.ALIGN_CENTER, 0)
+        grid_sizer_1.Add(self.useLast_ChqBox, 0, wx.ALIGN_CENTER, 0)
         grid_sizer_1.Add(self.Run_Btn, 0, wx.ALIGN_RIGHT, 0)
 
         sizer_1.Add(grid_sizer_1, 0, 0, 0)
@@ -86,6 +87,7 @@ class GUI_Window(wx.Frame):
         print("Attempting to run BIOSUP...")
         self.datapath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"\\config.ini"
         if self.Chq_fields():
+            #Build the configuration for Biosup core
             with open (self.datapath,"w") as outfile:
                 self.Status_text_ctrl.AppendText("Writing config file...\n")
                 outfile.write("[SETTINGS]\nclean = t\nFireFox = \nopenBrowser = \n")
@@ -95,13 +97,20 @@ class GUI_Window(wx.Frame):
                 outfile.write("vendor = "+",".join(self.Vendor_Chq_List.GetCheckedStrings())+"\n")
                 self.Status_text_ctrl.AppendText("Done...\n")
             self.Status_text_ctrl.AppendText("GUI may freeze during run time...\n")
-            BIOSUP.main()
-        elif self.useLast_Btn.IsChecked():
+            self.Create_Thread()
+        elif self.useLast_ChqBox.IsChecked():
             self.Status_text_ctrl.AppendText("GUI may freeze during run time...\n")
-            BIOSUP.main()
+            self.Create_Thread()
         else:
             self.Status_text_ctrl.AppendText("Select at least 1 chipset and vendor or tick 'Run last config' \n")
         self.Status_text_ctrl.AppendText("BIOSUP Completed...\n")
+
+    def Create_Thread(self):
+        try:
+            threading.Thread.start(BIOSUP.main(),("Thread-Core", 2, ))
+        except:
+            self.Status_text_ctrl.AppendText("Unable to start thread...\n")
+
     def Chq_fields(self):
         self.allchiparr = self.AMD_Chq_List.GetCheckedStrings() + self.Intel_Chq_List.GetCheckedStrings()
         self.allarr = self.Vendor_Chq_List.GetCheckedStrings()
@@ -112,14 +121,36 @@ class GUI_Window(wx.Frame):
             return False
 
     def Select_All_Chq_Box(self, evt): 
-        self.Status_text_ctrl.AppendText("Selected all tick boxes\n")
+        if self.selectall:
+            self.Status_text_ctrl.AppendText("Selected all tick boxes\n")
+            self.Set_Check_Lists()
+            self.useLast_ChqBox.SetValue(False)
+            self.selectall = False
+            self.Selectall_Btn.SetLabel("De-select All")
+        else:
+            self.Status_text_ctrl.AppendText("Unselecting all tick boxes\n")
+            self.useLast_ChqBox.SetValue(False)
+            for cb in self.AMD_Chq_List.GetCheckedItems():
+                self.AMD_Chq_List.Check(cb, False)
+            for cb in self.Intel_Chq_List.GetCheckedItems():
+                self.Intel_Chq_List.Check(cb, False)
+            for cb in self.Vendor_Chq_List.GetCheckedItems():
+                self.Vendor_Chq_List.Check(cb, False)
+            self.selectall = True
+            self.Selectall_Btn.SetLabel("Select All")
+
+    def Set_Check_Lists(self):
         self.AMD_Chq_List.SetCheckedStrings(self.config.AMDallowedchipsets)
         self.Intel_Chq_List.SetCheckedStrings(self.config.INTELallowedchipsets)
         self.Vendor_Chq_List.SetCheckedStrings(self.config.vendor)
-        self.useLast_Btn.SetValue(False)
 
     def Select_Last_Run(self, evt):
-        print("Loading last run")
+        if self.useLast_ChqBox.IsChecked():
+            self.Status_text_ctrl.AppendText("Loading last run\n")
+            loadConfig("config.ini")
+            self.Set_Check_Lists()
+        else:
+            self.Status_text_ctrl.AppendText("Unchecked 'Last Run'\n")
 # end of class GUI_Window
 
 class MyApp(wx.App):
