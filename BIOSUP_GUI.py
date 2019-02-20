@@ -110,7 +110,8 @@ class GUI_Window(wx.Frame):
 
     def Create_Thread(self):
         try:
-            threading.Thread.start(BIOSUP.main(),("Thread-Core", 2, ))
+            self.biosCore = threading.Thread(None, BIOSUP.main())
+            self.biosCore.start()
         except:
             self.Status_text_ctrl.AppendText("Unable to start thread...\n")
 

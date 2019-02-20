@@ -19,7 +19,7 @@ class loadConfig:
             self.vendor = (config_object["SETTINGS"]["vendor"]).split(",")
             self.allowedExtras = (config_object["SETTINGS"]["allowedChipsetsAddon"])
             self.saveState = (config_object["SETTINGS"]["saveState"])
-
+            #Builds the 'allowedcjipsets' array to sort incoming models in setup.py
             try:
                 self.AMDallowedchipsets = (config_object["SETTINGS"]["allowedChipsetsAMD"].split(","))
                 self.INTELallowedchipsets = (config_object["SETTINGS"]["allowedChipsetsIntel"].split(","))
@@ -27,7 +27,9 @@ class loadConfig:
             except:
                 self.allowedChipsets = (config_object["SETTINGS"]["allowedChipsets"].split(","))
             self.allowedChipsets.sort()
+            #Build a json object to hold all relevent vendor information, either from config file or from vendorinfo.txt
             try:
+                #to be deprecated
                 self.vendorSort = (config_object["SETTINGS"]["vendorSort"].split(","))
                 self.vendorDownloadURLbase = (config_object["SETTINGS"]["vendorDownloadURLbase"].split(","))
                 self.vendorURLaddon = (config_object["SETTINGS"]["vendorURLaddon"].split(","))
@@ -50,7 +52,7 @@ class loadConfig:
             print("Failure in loading vendors "+str(e))
             input("Error: Missing or Invalid configuration file(config.ini)")
             exit()
-
+        #print all loaded config data to console
         print("Loading config... ")
         print(" >Clean up: "+str(self.clean))
         print(" >FireFox installed: "+str(self.FireFox))
