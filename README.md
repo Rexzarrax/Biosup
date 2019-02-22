@@ -9,14 +9,14 @@ Furthermore, Biosup features progress saving and full automation, set and forget
 ![](header.PNG)
 
 ## Installation
+No installation needed :D
 
+to run Biosup on:
 Windows:
-
 
 1. Download the latest version from [here](https://bitbucket.org/Rexzarrax/biosup/downloads/).
 2. Unzip the downloaded file.
 3. Run BIOSUP.exe.
-
 
 Linux:
 
