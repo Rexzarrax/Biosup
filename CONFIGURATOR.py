@@ -26,21 +26,27 @@ class BIOSUP_CONFIG(wx.Frame):
 
         self.selectall = self.running = True
         self.allchiparr = []
-        self.config = loadConfig("GUI_config.ini")
 
         self.STATUS_TEXT_CTRL = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_LEFT | wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_WORDWRAP)
+        self.STATUS_TEXT_CTRL.AppendText("Loading 'GUI_config.ini'...\n")
+
+        self.config = loadConfig("GUI_config.ini")
+       
+
         self.AMD_SIZER_ALL_CB = wx.CheckBox(self, wx.ID_ANY, "Select All")
-        self.AMD_Chq_List = wx.CheckListBox(self, wx.ID_ANY, choices=self.config.AMDallowedchipsetssort())
+        self.AMD_Chq_List = wx.CheckListBox(self, wx.ID_ANY, choices=self.config.AMDallowedchipsets)
         self.INTEL_SIZER_ALL_CB = wx.CheckBox(self, wx.ID_ANY, "Select All")
-        self.Intel_Chq_List = wx.CheckListBox(self, wx.ID_ANY, choices=self.config.INTELallowedchipsetssort())
+        self.Intel_Chq_List = wx.CheckListBox(self, wx.ID_ANY, choices=self.config.INTELallowedchipsets)
         self.VENDOR_SIZER_ALL_CB = wx.CheckBox(self, wx.ID_ANY, "Select All")
-        self.Vendor_Chq_List = wx.CheckListBox(self, wx.ID_ANY, choices=self.config.vendor.sort())
-        self.BROWSER_CB = wx.CheckBox(self, wx.ID_ANY, "Google Chrome")
+        self.Vendor_Chq_List = wx.CheckListBox(self, wx.ID_ANY, choices=self.config.vendor)
+        self.BROWSER_CB = wx.CheckBox(self, wx.ID_ANY, "FireFox")
         self.CLEANUP_CB = wx.CheckBox(self, wx.ID_ANY, "Remove Zips")
         self.SH_BROWSER_CB = wx.CheckBox(self, wx.ID_ANY, "Show Browser")
         self.useLast_ChqBox = wx.CheckBox(self, wx.ID_ANY, "Last Config")
         self.Selectall_Btn = wx.Button(self, wx.ID_ANY, "SELECT ALL")
         self.Run_Btn = wx.Button(self, wx.ID_ANY, "Generate")
+
+        self.CLEANUP_CB.IsChecked()
 
         self.__set_properties()
         self.__do_layout()
@@ -52,10 +58,17 @@ class BIOSUP_CONFIG(wx.Frame):
         #self.BROWSER_CB.Bind(wx.EVT_CHECKBOX, )
         #self.CLEANUP_CB.Bind(wx.EVT_CHECKBOX, )
         #self.SH_BROWSER_CB.Bind(wx.EVT_CHECKBOX, )
-        self.AMD_SIZER_ALL_CB.Bind(wx.EVT_CHECKBOX, )
-        self.INTEL_SIZER_ALL_CB.Bind(wx.EVT_CHECKBOX, )
-        self.VENDOR_SIZER_ALL_CB.Bind(wx.EVT_CHECKBOX, )
+        self.AMD_SIZER_ALL_CB.Bind(wx.EVT_CHECKBOX, self.singular_Chq_AMD)
+        self.INTEL_SIZER_ALL_CB.Bind(wx.EVT_CHECKBOX, self.singular_Chq_INTEL)
+        self.VENDOR_SIZER_ALL_CB.Bind(wx.EVT_CHECKBOX, self.singular_Chq_Vendor)
         #self.useLast_ChqBox.SetValue(True)
+    
+    def singular_Chq_AMD(self, evt):
+        self.AMD_Chq_List.SetCheckedStrings(self.config.AMDallowedchipsets)
+    def singular_Chq_INTEL(self, evt):
+        self.Intel_Chq_List.SetCheckedStrings(self.config.INTELallowedchipsets)
+    def singular_Chq_Vendor(self, evt):
+        self.Vendor_Chq_List.SetCheckedStrings(self.config.vendor)
 
     def Run_Event(self, evt):
             #print("Attempting to run BIOSUP...")
@@ -64,16 +77,22 @@ class BIOSUP_CONFIG(wx.Frame):
             #Build the configuration for Biosup core
             with open (self.datapath,"w") as outfile:
                 self.STATUS_TEXT_CTRL.AppendText("Writing config file...\n")
-                outfile.write("[SETTINGS]\nclean = "+self.CLEANUP_CB.IsChecked())
-                outfile.write("FireFox = "+self.BROWSER_CB.IsChecked())
-                outfile.write("openBrowser = "+self.SH_BROWSER_CB.IsChecked())
-                outfile.write("saveState = t")
-                outfile.write("sleeptimer = 6\nsleepwait = 5\n")
-                outfile.write("allowedChipsets = "+",".join(self.allchiparr)+"\n")
-                outfile.write("allowedChipsetsAMD = "+",".join(self.AMD_Chq_List.GetCheckedStrings())+"\n")
-                outfile.write("allowedChipsetsIntel = "+",".join(self.Intel_Chq_List.GetCheckedStrings())+"\n")
-                outfile.write("allowedChipsetsAddon = [CIM]?\n")
-                outfile.write("vendor = "+",".join(self.Vendor_Chq_List.GetCheckedStrings())+"\n")
+                outfile.write("[SETTINGS]\nclean = "+str(self.CLEANUP_CB.IsChecked()))
+                self.STATUS_TEXT_CTRL.AppendText("clean = "+str(self.CLEANUP_CB.IsChecked())+"\n")
+                outfile.write("\nFireFox = "+str(self.BROWSER_CB.IsChecked()))
+                self.STATUS_TEXT_CTRL.AppendText("FireFox = "+str(self.BROWSER_CB.IsChecked())+"\n")
+                outfile.write("\nopenBrowser = "+str(self.SH_BROWSER_CB.IsChecked()))
+                self.STATUS_TEXT_CTRL.AppendText("openBrowser = "+str(self.SH_BROWSER_CB.IsChecked())+"\n")
+                outfile.write("\nsaveState = t")
+                outfile.write("\nsleeptimer = 6\nsleepwait = 5")
+                outfile.write("\nallowedChipsetsAMD = "+str(",".join(self.AMD_Chq_List.GetCheckedStrings())))
+                self.STATUS_TEXT_CTRL.AppendText("Allowed AMD chipsets = "+str(",".join(self.AMD_Chq_List.GetCheckedStrings()))+"\n")
+                outfile.write("\nallowedChipsetsIntel = "+str(",".join(self.Intel_Chq_List.GetCheckedStrings())))
+                self.STATUS_TEXT_CTRL.AppendText("Allowed INTEL chipsets = "+str(",".join(self.Intel_Chq_List.GetCheckedStrings()))+"\n")
+                outfile.write("\nallowedChipsets = "+str(",".join(self.allchiparr)))
+                outfile.write("\nallowedChipsetsAddon = [CIM]?")
+                outfile.write("\nvendor = "+str(",".join(self.Vendor_Chq_List.GetCheckedStrings())))
+                self.STATUS_TEXT_CTRL.AppendText("Allowed Vendors = "+str(",".join(self.Vendor_Chq_List.GetCheckedStrings()))+"\n")
                 #self.STATUS_TEXT_CTRL.AppendText("Done...\n")
             self.STATUS_TEXT_CTRL.AppendText("Creating Config...\n")
             #self.Create_Thread()

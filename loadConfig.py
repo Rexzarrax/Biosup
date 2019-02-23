@@ -11,9 +11,9 @@ class loadConfig:
             self.allvendordata = {}
 
             #config
-            self.clean = bool(config_object["SETTINGS"]["clean"]) 
-            self.FireFox = bool(config_object["SETTINGS"]["FireFox"]) 
-            self.openBrowser = bool(config_object["SETTINGS"]["openBrowser"])
+            self.clean = (config_object["SETTINGS"]["clean"]) 
+            self.FireFox = (config_object["SETTINGS"]["FireFox"]) 
+            self.openBrowser = (config_object["SETTINGS"]["openBrowser"])
             self.sleepTimer = int(config_object["SETTINGS"]["sleeptimer"])
             self.sleepwait = int(config_object["SETTINGS"]["sleepwait"])
             self.vendor = (config_object["SETTINGS"]["vendor"]).split(",")
@@ -21,11 +21,12 @@ class loadConfig:
             self.saveState = (config_object["SETTINGS"]["saveState"])
             #Builds the 'allowedcjipsets' array to sort incoming models in setup.py
             try:
-                self.AMDallowedchipsets = (config_object["SETTINGS"]["allowedChipsetsAMD"].split(","))
-                self.INTELallowedchipsets = (config_object["SETTINGS"]["allowedChipsetsIntel"].split(","))
+                self.AMDallowedchipsets = config_object["SETTINGS"]["allowedChipsetsAMD"].split(",")
+                self.INTELallowedchipsets = config_object["SETTINGS"]["allowedChipsetsIntel"].split(",")
                 self.allowedChipsets = (self.AMDallowedchipsets+self.INTELallowedchipsets)
             except:
                 self.allowedChipsets = (config_object["SETTINGS"]["allowedChipsets"].split(","))
+                print('allowed chipsets')
             self.allowedChipsets.sort()
             #Build a json object to hold all relevent vendor information, either from config file or from vendorinfo.txt
             try:
