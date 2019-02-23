@@ -64,11 +64,20 @@ class BIOSUP_CONFIG(wx.Frame):
         #self.useLast_ChqBox.SetValue(True)
     
     def singular_Chq_AMD(self, evt):
-        self.AMD_Chq_List.SetCheckedStrings(self.config.AMDallowedchipsets)
+        if self.AMD_SIZER_ALL_CB.IsChecked():
+            self.AMD_Chq_List.SetCheckedStrings(self.config.AMDallowedchipsets)
+        else:
+            self.deselect_Check_Lists(self.AMD_Chq_List)
     def singular_Chq_INTEL(self, evt):
-        self.Intel_Chq_List.SetCheckedStrings(self.config.INTELallowedchipsets)
+        if self.INTEL_SIZER_ALL_CB.IsChecked():
+            self.Intel_Chq_List.SetCheckedStrings(self.config.INTELallowedchipsets)
+        else:
+            self.deselect_Check_Lists(self.Intel_Chq_List)
     def singular_Chq_Vendor(self, evt):
-        self.Vendor_Chq_List.SetCheckedStrings(self.config.vendor)
+        if self.VENDOR_SIZER_ALL_CB.IsChecked():
+            self.Vendor_Chq_List.SetCheckedStrings(self.config.vendor)
+        else:
+            self.deselect_Check_Lists(self.Vendor_Chq_List)
 
     def Run_Event(self, evt):
             #print("Attempting to run BIOSUP...")
