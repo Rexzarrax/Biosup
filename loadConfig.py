@@ -11,9 +11,9 @@ class loadConfig:
             self.allvendordata = {}
 
             #config
-            self.clean = (config_object["SETTINGS"]["clean"]) 
-            self.FireFox = (config_object["SETTINGS"]["FireFox"]) 
-            self.openBrowser = (config_object["SETTINGS"]["openBrowser"])
+            self.clean = self.str_to_bool((config_object["SETTINGS"]["clean"])) 
+            self.FireFox = self.str_to_bool((config_object["SETTINGS"]["FireFox"])) 
+            self.openBrowser = self.str_to_bool((config_object["SETTINGS"]["openBrowser"]))
             self.sleepTimer = int(config_object["SETTINGS"]["sleeptimer"])
             self.sleepwait = int(config_object["SETTINGS"]["sleepwait"])
             self.vendor = (config_object["SETTINGS"]["vendor"]).split(",")
@@ -71,3 +71,10 @@ class loadConfig:
         print(" >Allowed Chipsets: "+str(self.allowedChipsets))
         print(" >Allowed Extras: "+str(self.allowedExtras))
         print("Configuration Loaded...")
+    def str_to_bool(self, s):
+        if s == 'True':
+         return True
+        elif s == 'False':
+            return False
+        else:
+            raise ValueError
