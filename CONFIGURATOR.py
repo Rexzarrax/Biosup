@@ -44,7 +44,7 @@ class BIOSUP_CONFIG(wx.Frame):
         self.SH_BROWSER_CB = wx.CheckBox(self, wx.ID_ANY, "Show Browser")
         self.useLast_ChqBox = wx.CheckBox(self, wx.ID_ANY, "Last Config")
         self.Selectall_Btn = wx.Button(self, wx.ID_ANY, "SELECT ALL")
-        self.Run_Btn = wx.Button(self, wx.ID_ANY, "Generate")
+        self.Run_Btn = wx.Button(self, wx.ID_ANY, "Generate\n and Run")
 
         self.CLEANUP_CB.IsChecked()
 
@@ -110,6 +110,8 @@ class BIOSUP_CONFIG(wx.Frame):
             #self.Create_Thread()
         else:
             self.STATUS_TEXT_CTRL.AppendText("Select at least 1 chipset and vendor or tick 'Run last config' \n")
+        #os.system(r"C:\Documents and Settings\flow_model\flow.exe")
+
 
     #def Create_Thread(self):
     #    try:

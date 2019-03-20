@@ -29,29 +29,29 @@ class loadConfig:
                 print('allowed chipsets')
             self.allowedChipsets.sort()
             #Build a json object to hold all relevent vendor information, either from config file or from vendorinfo.txt
-            try:
+            #try:
                 #to be deprecated
-                self.vendorSort = (config_object["SETTINGS"]["vendorSort"].split(","))
-                self.vendorDownloadURLbase = (config_object["SETTINGS"]["vendorDownloadURLbase"].split(","))
-                self.vendorURLaddon = (config_object["SETTINGS"]["vendorURLaddon"].split(","))
-                for x in range (len(self.vendor)):
-                    self.allvendordata[self.vendor[x]] = {"vendorSort":self.vendorSort[x],
-                                    "vendorDownloadURLbase":self.vendorDownloadURLbase[x],
-                                    "vendorURLaddon":self.vendorURLaddon[x]}  
+                #self.vendorSort = (config_object["SETTINGS"]["vendorSort"].split(","))
+                #self.vendorDownloadURLbase = (config_object["SETTINGS"]["vendorDownloadURLbase"].split(","))
+                #self.vendorURLaddon = (config_object["SETTINGS"]["vendorURLaddon"].split(","))
+                #for x in range (len(self.vendor)):
+                #    self.allvendordata[self.vendor[x]] = {"vendorSort":self.vendorSort[x],
+                #                    "vendorDownloadURLbase":self.vendorDownloadURLbase[x],
+                #                    "vendorURLaddon":self.vendorURLaddon[x]}  
+            #except Exception as e: 
+            #    print("Failure in Loading vendor data from config "+str(e))
+            try:
+                self.datapath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/vendorInfo.txt"
+                with open (self.datapath) as infile:
+                    self.allvendordata = load(infile)
+                    infile.close()
             except Exception as e: 
-                print("Failure in Loading vendor data from config "+str(e))
-                try:
-                    self.datapath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"\\vendorInfo.txt"
-                    with open (self.datapath) as infile:
-                        self.allvendordata = load(infile)
-                        infile.close()
-                except Exception as e: 
-                    print("Failure in loading vendors "+str(e))
-                    exit()
+                print("Failure in loading vendors (in)"+str(e))
+                exit()
             print(str(self.allvendordata))
         except Exception as e: 
-            print("Failure in loading vendors "+str(e))
-            input("Error: Missing or Invalid configuration file(config.ini)")
+            print("Failure in loading vendors (out)"+str(e))
+            input("Error: Missing or Invalid configuration file(config.ini or GUI_config.txt)")
             exit()
         #print all loaded config data to console
         print("Loading config... ")

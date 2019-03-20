@@ -15,20 +15,20 @@ class datastatistics:
     
     def printstat(self, vendor, myData):
         print("Statistics...")
-        for index,model in enumerate(myData.modelData):
-            if myData.modelData[model]['status'] == 0:
+        for index,model in enumerate(myData.dict_modelData):
+            if myData.dict_modelData[model]['status'] == 0:
                 print('Nothing attempted on '+model)
-                self.vendorCounts[myData.modelData[model]['vendor']]['failCount'] +=1
+                self.vendorCounts[myData.dict_modelData[model]['vendor']]['failCount'] +=1
                 self.failedDownloadList.append(model)
-            elif myData.modelData[model]['status'] == 1:
-                self.vendorCounts[myData.modelData[model]['vendor']]['successCount'] +=1
-            elif myData.modelData[model]['status'] == 2:
-                self.vendorCounts[myData.modelData[model]['vendor']]['failCount'] +=1
+            elif myData.dict_modelData[model]['status'] == 1:
+                self.vendorCounts[myData.dict_modelData[model]['vendor']]['successCount'] +=1
+            elif myData.dict_modelData[model]['status'] == 2:
+                self.vendorCounts[myData.dict_modelData[model]['vendor']]['failCount'] +=1
                 self.failedDownloadList.append(model)
-            elif myData.modelData[model]['status'] == 3:
-                self.vendorCounts[myData.modelData[model]['vendor']]['updateCount'] +=1
+            elif myData.dict_modelData[model]['status'] == 3:
+                self.vendorCounts[myData.dict_modelData[model]['vendor']]['updateCount'] +=1
             else:
-                print('Corrupted status in '+myData.modelData[model])
+                print('Corrupted status in '+myData.dict_modelData[model])
 
         #print(str(self.vendorCounts))
 

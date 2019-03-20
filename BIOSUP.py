@@ -16,23 +16,23 @@ from loadConfig import loadConfig
 
 #stores motherboard data
 class moboData:
-    def __init__(self, mysetup, myGetWeb, vendor, allowedChipsets, allowedExtras, modelData):
-        self.modelData = modelData
+    def __init__(self, mysetup, myGetWeb, vendor, allowedChipsets, allowedExtras, dict_modelData):
+        self.dict_modelData = dict_modelData
         #status status'-> 0=nothing attempted, 1= BIOS successfully downloaded, 2=Bios failed to downloaded, 4= already downloaded and upto date
-        mysetup.dl_Src_PCPP(vendor, self.modelData, allowedChipsets, allowedExtras)
+        mysetup.dl_Src_PCPP(vendor, self.dict_modelData, allowedChipsets, allowedExtras)
 
 def main():
     print("----------BIOSUP----------")
     print("Initialising...")
-    modelData = {}
-    datapath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"\\BIOSHERE\\urlData.txt"
-    breaker = "-------------------START---------------------"
+    dict_ModelData = {}
+    str_datapath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"\\BIOSHERE\\urlData.txt"
+    str_breaker = "-------------------START---------------------"
     #set up directories and files
     try: 
-        with open(datapath) as datafile:
-            modelData = json.load(datafile)
-            print(str(modelData))
-            datafile.close()
+        with open(str_datapath) as file_datafile:
+            dict_ModelData = json.load(file_datafile)
+            print(str(dict_ModelData))
+            file_datafile.close()
     except Exception as e: 
         print(e)
         try:
@@ -41,85 +41,89 @@ def main():
         except:
             print("Dir already exists")
         try:
-            print("Creating "+datapath)
-            datafile=open(datapath,"x")
-            datafile.close()
+            print("Creating "+str_datapath)
+            file_datafile=open(str_datapath,"x")
+            file_datafile.close()
         except:
             print('File already exists...')
 
     #create required objects
-    myConfig = loadConfig("config.ini")
-    statisticsData = datastatistics(myConfig.vendor)
-    mysetup = setUp()
-    myGetWeb = gethtml()
-    myData = moboData(mysetup, myGetWeb, myConfig.vendor, myConfig.allowedChipsets, myConfig.allowedExtras, modelData)  
-    getBIO = biosDownload()
-    dezip = unzip()
+    obj_myConfig = loadConfig("config.ini")
+    obj_statisticsData = datastatistics(obj_myConfig.vendor)
+    obj_mysetup = setUp()
+    obj_myGetWeb = gethtml()
+    obj_myData = moboData(obj_mysetup, obj_myGetWeb, obj_myConfig.vendor, obj_myConfig.allowedChipsets, obj_myConfig.allowedExtras, dict_ModelData)  
+    obj_getBIO = biosDownload()
+    obj_dezip = unzip()
 
     #open headless web browser to access vendor websites
     print("Opening browser...")
-    driver = webwithjs(myConfig.FireFox, myConfig.openBrowser, myConfig.sleepTimer)
-    linkSearching = searchForLink()
+    driver = webwithjs(obj_myConfig.FireFox, obj_myConfig.openBrowser, obj_myConfig.sleepTimer)
+    obj_linkSearching = searchForLink()
 
     print("Sourcing models...")
-    for vendorName in range(len(myConfig.vendor)):
-        mysetup.folderChq(myConfig.vendor[vendorName])
+    for vendorName in range(len(obj_myConfig.vendor)):
+        obj_mysetup.folderChq(obj_myConfig.vendor[vendorName])
 
-    print(str(myData.modelData))
+    print(str(obj_myData.dict_modelData))
     
     print("Finding and Downloading BIOS...")
 
-    modelLen = len(myData.modelData)
+    int_modelLen = len(obj_myData.dict_modelData)
 
     #loops through all entries in the myData.modelData dictionary
-    for index,model in enumerate(myData.modelData):
-        timeModerator = time.time()
-        success = False
-        print(breaker)
-        cpathDir = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/BIOSHERE/"+myData.modelData[model]['vendor']+"/"+str(myData.modelData[model]['chipset'])
-        print(model+"|Progress: "+str(index+1)+"/"+str(modelLen))
+    for int_index,str_model in enumerate(obj_myData.dict_modelData):
         try:
-            os.makedirs(cpathDir)
+            timeModerator = time.time()
+            success = False
+            print(str_breaker)
+            cpathDir = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/BIOSHERE/"+obj_myData.dict_modelData[str_model]['vendor']+"/"+str(obj_myData.dict_modelData[str_model]['chipset'])
+            print(str_model+"|Progress: "+str(int_index+1)+"/"+str(int_modelLen))
+            try:
+                os.makedirs(cpathDir)
+            except:
+                print(cpathDir+" Already Exists...")
+            str_cpathZip = cpathDir+"/"+obj_myData.dict_modelData[str_model]['name'].replace("/","-")+".zip"
+            str_vendor = obj_myData.dict_modelData[str_model]['vendor']
+            if str_vendor == "ASUS":
+                obj_getBIO.urlBuilderAsus(obj_myData.dict_modelData[str_model],
+                        obj_myConfig.allvendordata[str_vendor]['vendorSort'], 
+                        str_cpathZip, driver, 
+                        obj_myConfig.allvendordata[str_vendor]['vendorDownloadURLbase'],
+                        obj_linkSearching)
+            else:
+                obj_getBIO.GenericUrlBuilder(obj_myData.dict_modelData[str_model],
+                        obj_myConfig.allvendordata[str_vendor]['vendorSort'], 
+                        str_cpathZip, driver, 
+                        obj_myConfig.allvendordata[str_vendor]['vendorDownloadURLbase'],
+                        obj_myConfig.allvendordata[str_vendor]['vendorURLaddon'], 
+                        obj_linkSearching)
+
+            obj_dezip.deZip(str_cpathZip, str_cpathZip.strip(".zip"))
+            if (time.time() - timeModerator)<obj_myConfig.sleepTimer:
+                print("Sleeping...")
+                time.sleep(obj_myConfig.sleepwait) 
+            print("Moving to next BIOS...\n")
+            if obj_myConfig.clean:
+                print("Running Cleanup of "+str_cpathZip+"...")
+                obj_mysetup.cleanup(str_cpathZip, int_index)
+            if (int_index%10==0):
+                print("Adding last "+str(10)+" URL's to file...")
+                if obj_myConfig.saveState:
+                    with open (str_datapath,"w") as outfile:
+                        json.dump(obj_myData.dict_modelData,outfile)
         except:
-            print(cpathDir+" Already Exists...")
-        cpathZip = cpathDir+"/"+myData.modelData[model]['name'].replace("/","-")+".zip"
-        vendor = myData.modelData[model]['vendor']
-        if vendor == "ASUS":
-            getBIO.urlBuilderAsus(myData.modelData[model],
-                                    myConfig.allvendordata[vendor]['vendorSort'], 
-                                    cpathZip, driver, 
-                                    myConfig.allvendordata[vendor]['vendorDownloadURLbase'],
-                                    linkSearching)
-        else:
-            getBIO.GenericUrlBuilder(myData.modelData[model],
-                                    myConfig.allvendordata[vendor]['vendorSort'], 
-                                    cpathZip, driver, 
-                                    myConfig.allvendordata[vendor]['vendorDownloadURLbase'],
-                                    myConfig.allvendordata[vendor]['vendorURLaddon'], 
-                                    linkSearching)
+            print("Error Collecting..."+str_model)
+            wait = input("Press Enter to continue...")
 
-        dezip.deZip(cpathZip, cpathZip.strip(".zip"))
-        if (time.time() - timeModerator)<myConfig.sleepTimer:
-            print("Sleeping...")
-            time.sleep(myConfig.sleepwait) 
-        print("Moving to next BIOS...\n")
-        if myConfig.clean:
-            print("Running Cleanup of "+cpathZip+"...")
-            mysetup.cleanup(cpathZip, index)
-        if (index%10==0):
-            print("Adding last "+str(10)+" URL's to file...")
-            if myConfig.saveState:
-                with open (datapath,"w") as outfile:
-                    json.dump(myData.modelData,outfile)
-
-    if myConfig.saveState:
-        with open (datapath,"w") as outfile:
-            json.dump(myData.modelData,outfile)
+    if obj_myConfig.saveState:
+        with open (str_datapath,"w") as outfile:
+            json.dump(obj_myData.dict_modelData,outfile)
 
     driver.driver.quit()
     print("All downloading and unzipping attempted...\n")
 
-    statisticsData.printstat(myConfig.vendor, myData)
+    obj_statisticsData.printstat(obj_myConfig.vendor, obj_myData)
     
     print("Script Finished...")
     input("Press Enter to continue/exit...")
