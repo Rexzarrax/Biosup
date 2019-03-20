@@ -44,7 +44,8 @@ class BIOSUP_CONFIG(wx.Frame):
         self.SH_BROWSER_CB = wx.CheckBox(self, wx.ID_ANY, "Show Browser")
         self.useLast_ChqBox = wx.CheckBox(self, wx.ID_ANY, "Last Config")
         self.Selectall_Btn = wx.Button(self, wx.ID_ANY, "SELECT ALL")
-        self.Run_Btn = wx.Button(self, wx.ID_ANY, "Generate\n and Run")
+        self.Run_Btn = wx.Button(self, wx.ID_ANY, "Generate\nConfig")
+        self.Run_n_Gen_Btn = wx.Button(self, wx.ID_ANY, "Generate\n and Run")
 
         self.CLEANUP_CB.IsChecked()
 
@@ -53,6 +54,7 @@ class BIOSUP_CONFIG(wx.Frame):
         # end wxGlade
         #Bind events
         self.Run_Btn.Bind(wx.EVT_BUTTON, self.Run_Event)
+        self.Run_n_Gen_Btn.Bind(wx.EVT_BUTTON, self.Run_Gen_Event)
         self.Selectall_Btn.Bind(wx.EVT_BUTTON, self.Select_All_Chq_Box)
         self.useLast_ChqBox.Bind(wx.EVT_CHECKBOX, self.Select_Last_Run)
         #self.BROWSER_CB.Bind(wx.EVT_CHECKBOX, )
@@ -78,8 +80,19 @@ class BIOSUP_CONFIG(wx.Frame):
             self.Vendor_Chq_List.SetCheckedStrings(self.config.vendor)
         else:
             self.deselect_Check_Lists(self.Vendor_Chq_List)
+    
+    def Run_Gen_Event(self, evt):
+        self.Gen_Config()
+        try:
+            runner = os.path.join(os.path.dirname(__file__),'BIOSUP.py')
+        except:
+            runner = os.path.join(os.path.dirname(__file__),'BIOSUP.exe')
+        print(runner)
 
     def Run_Event(self, evt):
+        self.Gen_Config()
+
+    def Gen_Config(self):
             #print("Attempting to run BIOSUP...")
         self.datapath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"\\config.ini"
         if self.Chq_fields():
@@ -103,7 +116,7 @@ class BIOSUP_CONFIG(wx.Frame):
                 outfile.write("\nvendor = "+str(",".join(self.Vendor_Chq_List.GetCheckedStrings())))
                 self.STATUS_TEXT_CTRL.AppendText("Allowed Vendors = "+str(",".join(self.Vendor_Chq_List.GetCheckedStrings()))+"\n")
                 #self.STATUS_TEXT_CTRL.AppendText("Done...\n")
-            self.STATUS_TEXT_CTRL.AppendText("Creating Config...\n")
+            self.STATUS_TEXT_CTRL.AppendText("Config Generated...\n")
             #self.Create_Thread()
         elif self.useLast_ChqBox.IsChecked():
             self.STATUS_TEXT_CTRL.AppendText("Overwriting old config...\n")
@@ -136,6 +149,9 @@ class BIOSUP_CONFIG(wx.Frame):
             self.useLast_ChqBox.SetValue(False)
             self.selectall = False
             self.Selectall_Btn.SetLabel("De-select All")
+            self.AMD_SIZER_ALL_CB.SetValue(True)
+            self.INTEL_SIZER_ALL_CB.SetValue(True)
+            self.VENDOR_SIZER_ALL_CB.SetValue(True)
         else:
             self.STATUS_TEXT_CTRL.AppendText("Unselecting all tick boxes\n")
             self.useLast_ChqBox.SetValue(False)
@@ -144,6 +160,9 @@ class BIOSUP_CONFIG(wx.Frame):
             self.deselect_Check_Lists(self.Vendor_Chq_List)
             self.selectall = True
             self.Selectall_Btn.SetLabel("Select All")
+            self.AMD_SIZER_ALL_CB.SetValue(False)
+            self.INTEL_SIZER_ALL_CB.SetValue(False)
+            self.VENDOR_SIZER_ALL_CB.SetValue(False)
 
     def deselect_Check_Lists(self, mylist):
         for cb in mylist.GetCheckedItems():
@@ -170,7 +189,7 @@ class BIOSUP_CONFIG(wx.Frame):
         # begin wxGlade: BIOSUP_CONFIG.__set_properties
         self.SetTitle("BIOSUP")
         _icon = wx.NullIcon
-        _icon.CopyFromBitmap(wx.Bitmap("C:\\Users\\user\\Desktop\\Dev\\Base Complete\\Project_Biosup\\biosup_noPLEase\\ICO_BIOSUP.ico", wx.BITMAP_TYPE_ANY))
+        _icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.getcwd(),'ICO_BIOSUP.ico'), wx.BITMAP_TYPE_ANY))
         self.SetIcon(_icon)
         self.STATUS_TEXT_CTRL.SetMinSize((175, 250))
         # end wxGlade
@@ -201,9 +220,10 @@ class BIOSUP_CONFIG(wx.Frame):
         FAT_CONTROLLER_GRID_SIZER.Add((0, 0), 0, 0, 0)
         FAT_CONTROLLER_GRID_SIZER.Add((0, 0), 0, 0, 0)
         FAT_CONTROLLER_GRID_SIZER.Add((0, 0), 0, 0, 0)
-        FAT_CONTROLLER_GRID_SIZER.Add((0, 0), 0, 0, 0)
         FAT_CONTROLLER_GRID_SIZER.Add(self.Selectall_Btn, 0, wx.ALIGN_CENTER, 0)
-        FAT_CONTROLLER_GRID_SIZER.Add(self.Run_Btn, 0, wx.ALIGN_RIGHT, 0)
+        #FAT_CONTROLLER_GRID_SIZER.Add((0, 0), 0, 0, 0)
+        FAT_CONTROLLER_GRID_SIZER.Add(self.Run_Btn, 0, wx.ALIGN_CENTER, 0)
+        FAT_CONTROLLER_GRID_SIZER.Add(self.Run_n_Gen_Btn, 0, wx.ALIGN_RIGHT, 0)
         ALL_CTRLR.Add(FAT_CONTROLLER_GRID_SIZER, 0, 0, 0)
         self.SetSizer(ALL_CTRLR)
         ALL_CTRLR.Fit(self)

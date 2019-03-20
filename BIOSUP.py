@@ -25,7 +25,7 @@ def main():
     print("----------BIOSUP----------")
     print("Initialising...")
     dict_ModelData = {}
-    str_datapath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"\\BIOSHERE\\urlData.txt"
+    str_datapath = os.path.join(os.getcwd(), os.path.dirname(__file__),"BIOSHERE","urlData.txt")
     str_breaker = "-------------------START---------------------"
     #set up directories and files
     try: 
@@ -37,7 +37,7 @@ def main():
         print(e)
         try:
             print("Attempting to create BIOSHERE folder...")
-            os.mkdir(os.path.join(os.getcwd(), os.path.dirname(__file__))+"\\BIOSHERE\\")
+            os.mkdir(os.path.join(os.getcwd(), os.path.dirname(__file__),"BIOSHERE"))
         except:
             print("Dir already exists")
         try:
@@ -113,8 +113,11 @@ def main():
                     with open (str_datapath,"w") as outfile:
                         json.dump(obj_myData.dict_modelData,outfile)
         except:
-            print("Error Collecting..."+str_model)
-            wait = input("Press Enter to continue...")
+            print("Error Detected with ..."+str_model)
+            wait = input("Press Enter to continue. \nPress any key and then Enter to exit.")
+            if len(wait)>0:
+                driver.driver.quit()
+                quit()
 
     if obj_myConfig.saveState:
         with open (str_datapath,"w") as outfile:

@@ -9,7 +9,6 @@ class loadConfig:
             config_object.read(configfile)
 
             self.allvendordata = {}
-
             #config
             self.clean = self.str_to_bool((config_object["SETTINGS"]["clean"])) 
             self.FireFox = self.str_to_bool((config_object["SETTINGS"]["FireFox"])) 
@@ -19,7 +18,7 @@ class loadConfig:
             self.vendor = (config_object["SETTINGS"]["vendor"]).split(",")
             self.allowedExtras = (config_object["SETTINGS"]["allowedChipsetsAddon"])
             self.saveState = (config_object["SETTINGS"]["saveState"])
-            #Builds the 'allowedcjipsets' array to sort incoming models in setup.py
+            #Builds the 'allowedchipsets' array to sort incoming models in setup.py
             try:
                 self.AMDallowedchipsets = config_object["SETTINGS"]["allowedChipsetsAMD"].split(",")
                 self.INTELallowedchipsets = config_object["SETTINGS"]["allowedChipsetsIntel"].split(",")
@@ -41,7 +40,7 @@ class loadConfig:
             #except Exception as e: 
             #    print("Failure in Loading vendor data from config "+str(e))
             try:
-                self.datapath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/vendorInfo.txt"
+                self.datapath = os.path.join(os.getcwd(), os.path.dirname(__file__),"vendorInfo.txt")
                 with open (self.datapath) as infile:
                     self.allvendordata = load(infile)
                     infile.close()
@@ -51,7 +50,7 @@ class loadConfig:
             print(str(self.allvendordata))
         except Exception as e: 
             print("Failure in loading vendors (out)"+str(e))
-            input("Error: Missing or Invalid configuration file(config.ini or GUI_config.txt)")
+            input("Critical Error: Missing or Invalid configuration file(config.ini or GUI_config.ini)")
             exit()
         #print all loaded config data to console
         print("Loading config... ")
@@ -72,9 +71,9 @@ class loadConfig:
         print(" >Allowed Extras: "+str(self.allowedExtras))
         print("Configuration Loaded...")
     def str_to_bool(self, s):
-        if s == 'True':
-         return True
-        elif s == 'False':
+        if len(s)>0:
+            return True
+        elif len(s) == 0:
             return False
         else:
             raise ValueError

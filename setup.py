@@ -15,11 +15,12 @@ class setUp:
     def folderChq(self, company):
         #potentially add chipsets here
         cpwd = os.path.dirname(os.path.realpath(__file__))
-        if not os.path.exists(cpwd+"\\BIOSHERE\\"+company):
-            os.makedirs(cpwd+"\\BIOSHERE\\"+company)
-            print("Dir: \n" , cpwd+"\\BIOSHERE\\"+company ,  " \nCreated \n") 
+        cpwd_full = os.path.join(cpwd,"BIOSHERE",company)
+        if not os.path.exists(cpwd_full):
+            os.makedirs(cpwd_full)
+            print("Dir: \n" , cpwd_full ,  " \nCreated \n") 
         else:
-            print("Dir: \n" , cpwd+"\\BIOSHERE\\"+company ,  " \nalready exists\n")
+            print("Dir: \n" , cpwd_full ,  " \nalready exists\n")
 
     def dl_Src_PCPP(self, vendor, modelData, allowedChipsets, allowedExtras):
         mobo_count = pcpp.productLists.totalPages("motherboard")
