@@ -6,9 +6,12 @@
 
 import wx
 import os
-import threading
+from multiprocessing.pool import ThreadPool
+import multiprocessing
 import time
-from BIOSUP import main
+from datetime import datetime
+import sys
+from BIOSUP import main as entry_BIOSUP
 
 from time import sleep
 
@@ -32,9 +35,12 @@ class BIOSUP_CONFIG(wx.Frame):
 
         self.STATUS_TEXT_CTRL = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_LEFT | wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_WORDWRAP)
         self.STATUS_TEXT_CTRL.AppendText("Loading 'GUI_config.ini'...\n")
-
-        self.config = loadConfig("GUI_config.ini")
-       
+        
+        try:
+            self.config = loadConfig("GUI_config.ini")
+            self.STATUS_TEXT_CTRL.AppendText("'GUI_config.ini' successfully loaded...\n")
+        except:
+            self.STATUS_TEXT_CTRL.AppendText("'GUI_config.ini' failed to load...\n")
 
         self.AMD_SIZER_ALL_CB = wx.CheckBox(self, wx.ID_ANY, "Select All")
         self.AMD_Chq_List = wx.CheckListBox(self, wx.ID_ANY, choices=self.config.AMDallowedchipsets)
@@ -42,7 +48,6 @@ class BIOSUP_CONFIG(wx.Frame):
         self.Intel_Chq_List = wx.CheckListBox(self, wx.ID_ANY, choices=self.config.INTELallowedchipsets)
         self.VENDOR_SIZER_ALL_CB = wx.CheckBox(self, wx.ID_ANY, "Select All")
         self.Vendor_Chq_List = wx.CheckListBox(self, wx.ID_ANY, choices=self.config.vendor)
-        self.BROWSER_CB = wx.CheckBox(self, wx.ID_ANY, "FireFox")
         self.CLEANUP_CB = wx.CheckBox(self, wx.ID_ANY, "Remove Zips")
         self.SH_BROWSER_CB = wx.CheckBox(self, wx.ID_ANY, "Show Browser")
         self.useLast_ChqBox = wx.CheckBox(self, wx.ID_ANY, "Last Config")
@@ -60,9 +65,6 @@ class BIOSUP_CONFIG(wx.Frame):
         self.Run_n_Gen_Btn.Bind(wx.EVT_BUTTON, self.Run_Gen_Event)
         self.Selectall_Btn.Bind(wx.EVT_BUTTON, self.Select_All_Chq_Box)
         self.useLast_ChqBox.Bind(wx.EVT_CHECKBOX, self.Select_Last_Run)
-        #self.BROWSER_CB.Bind(wx.EVT_CHECKBOX, )
-        #self.CLEANUP_CB.Bind(wx.EVT_CHECKBOX, )
-        #self.SH_BROWSER_CB.Bind(wx.EVT_CHECKBOX, )
         self.AMD_SIZER_ALL_CB.Bind(wx.EVT_CHECKBOX, self.singular_Chq_AMD)
         self.INTEL_SIZER_ALL_CB.Bind(wx.EVT_CHECKBOX, self.singular_Chq_INTEL)
         self.VENDOR_SIZER_ALL_CB.Bind(wx.EVT_CHECKBOX, self.singular_Chq_Vendor)
@@ -86,23 +88,40 @@ class BIOSUP_CONFIG(wx.Frame):
     
     def Run_Gen_Event(self, evt):
         self.Gen_Config()
-
-        self.Thr_Biosup_run = threading.Thread(target=main,name='BIOSUP_THREAD')
-        self.Thr_Biosup_run.daemon = True
-        self.Thr_Biosup_run.start()
-
-        self.Thr_checker = threading.Thread(target=self.Checker,name='CHECKER_THREAD')
-        self.Thr_checker.daemon = True
-        self.Thr_checker.start()
+        self.pool = ThreadPool(processes=2)
+        try:
+            self.Thr_Biosup_run = ThreadPool.Process(target=entry_BIOSUP,name='BIOSUP_THREAD')
+            self.Thr_Biosup_run.daemon = True
+            self.Thr_Biosup_run.start()
+        except Exception as e:
+            self.STATUS_TEXT_CTRL.AppendText("Unable to start BIOSUP thread...\n Error: "+str(e)+"\n")
         
-    def Checker(self):
-        while self.Thr_Biosup_run.is_alive:       
-            self.STATUS_TEXT_CTRL.AppendText(threading.sys.stdout.readline())
-            sleep(5)
-        self.STATUS_TEXT_CTRL.AppendText("Biosup Completed...")
+        try:
+            self.Thr_checker = ThreadPool.Process(target=self.meth_Checker,name='CHECKER_THREAD')
+            self.Thr_checker.daemon = True
+            self.Thr_checker.start()
             
+        except Exception as e: 
+            self.STATUS_TEXT_CTRL.AppendText("Unable to start CHECKER thread...\n Error: "+str(e)+"\n")
+
+    def meth_Checker(self):
+        try:
+            while self.Thr_Biosup_run.is_alive: 
+                dt = datetime.fromtimestamp(time.time())
+                self.STATUS_TEXT_CTRL.AppendText("Running as of "+str(dt.strftime('%H:%M:%S'))+"\n")
+                sleep(1)
+            self.STATUS_TEXT_CTRL.AppendText("Biosup Exited...")
+        except Exception as e:
+            self.STATUS_TEXT_CTRL.AppendText("Unable to run CHECKER thread...\n Error: "+str(e)+"\n")   
+
     def Run_Event(self, evt):
         self.Gen_Config()
+
+    def True_False_checker(self, Bool_State):
+        if Bool_State:
+            return "t"
+        else:
+            return ""
 
     def Gen_Config(self):
             #print("Attempting to run BIOSUP...")
@@ -111,18 +130,23 @@ class BIOSUP_CONFIG(wx.Frame):
             #Build the configuration for Biosup core
             with open (self.datapath,"w") as outfile:
                 self.STATUS_TEXT_CTRL.AppendText("Writing config file...\n")
-                outfile.write("[SETTINGS]\nclean = "+str(self.CLEANUP_CB.IsChecked()))
-                self.STATUS_TEXT_CTRL.AppendText("clean = "+str(self.CLEANUP_CB.IsChecked())+"\n")
-                outfile.write("\nFireFox = "+str(self.BROWSER_CB.IsChecked()))
-                self.STATUS_TEXT_CTRL.AppendText("FireFox = "+str(self.BROWSER_CB.IsChecked())+"\n")
-                outfile.write("\nopenBrowser = "+str(self.SH_BROWSER_CB.IsChecked()))
-                self.STATUS_TEXT_CTRL.AppendText("openBrowser = "+str(self.SH_BROWSER_CB.IsChecked())+"\n")
+                
+                outfile.write("[SETTINGS]\nclean = "+self.True_False_checker(self.CLEANUP_CB.IsChecked()))
+                self.STATUS_TEXT_CTRL.AppendText("clean = "+self.True_False_checker(self.CLEANUP_CB.IsChecked())+"\n")
+                
+                outfile.write("\nopenBrowser = "+self.True_False_checker(self.SH_BROWSER_CB.IsChecked()))
+                self.STATUS_TEXT_CTRL.AppendText("openBrowser = "+self.True_False_checker(self.SH_BROWSER_CB.IsChecked())+"\n")
+                
                 outfile.write("\nsaveState = t")
+                self.STATUS_TEXT_CTRL.AppendText("saveState = t\n")
+                
                 outfile.write("\nsleeptimer = 6\nsleepwait = 5")
+                
                 outfile.write("\nallowedChipsetsAMD = "+str(",".join(self.AMD_Chq_List.GetCheckedStrings())))
-                self.STATUS_TEXT_CTRL.AppendText("Allowed AMD chipsets = "+str(",".join(self.AMD_Chq_List.GetCheckedStrings()))+"\n")
+                self.STATUS_TEXT_CTRL.AppendText("Allowed AMD chipsets = "+str(", ".join(self.AMD_Chq_List.GetCheckedStrings()))+"\n")
+                
                 outfile.write("\nallowedChipsetsIntel = "+str(",".join(self.Intel_Chq_List.GetCheckedStrings())))
-                self.STATUS_TEXT_CTRL.AppendText("Allowed INTEL chipsets = "+str(",".join(self.Intel_Chq_List.GetCheckedStrings()))+"\n")
+                self.STATUS_TEXT_CTRL.AppendText("Allowed INTEL chipsets = "+str(", ".join(self.Intel_Chq_List.GetCheckedStrings()))+"\n")
                 outfile.write("\nallowedChipsets = "+str(",".join(self.allchiparr)))
                 outfile.write("\nallowedChipsetsAddon = [CIM]?")
                 outfile.write("\nvendor = "+str(",".join(self.Vendor_Chq_List.GetCheckedStrings())))
@@ -138,12 +162,6 @@ class BIOSUP_CONFIG(wx.Frame):
         #os.system(r"C:\Documents and Settings\flow_model\flow.exe")
 
 
-    #def Create_Thread(self):
-    #    try:
-    #        self.biosCore = threading.Thread(None, BIOSUP.main())
-    #        self.biosCore.start()
-    #    except:
-    #        self.STATUS_TEXT_CTRL.AppendText("Unable to start thread...\n")
 
     def Chq_fields(self):
         self.allchiparr = self.AMD_Chq_List.GetCheckedStrings() + self.Intel_Chq_List.GetCheckedStrings()
@@ -194,7 +212,6 @@ class BIOSUP_CONFIG(wx.Frame):
             self.lastconfig = loadConfig("config.ini")
             self.Set_Check_Lists(self.lastconfig)
             self.CLEANUP_CB.SetValue(bool(self.lastconfig.saveState))
-            #self.BROWSER_CB.SetValue(bool(self.lastconfig.FireFox))
         else:
             self.STATUS_TEXT_CTRL.AppendText("Unchecked 'Last Run'\n")
 
@@ -210,12 +227,13 @@ class BIOSUP_CONFIG(wx.Frame):
 
     def __do_layout(self):
         # begin wxGlade: BIOSUP_CONFIG.__do_layout
-        ALL_CTRLR = wx.BoxSizer(wx.HORIZONTAL)
+        ALL_CTRLR = wx.BoxSizer(wx.VERTICAL)
         FAT_CONTROLLER_GRID_SIZER = wx.FlexGridSizer(5, 3, 0, 0)
+
         VENDOR_Sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, "Vendor"), wx.VERTICAL)
         INTEL_Sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, "INTEL"), wx.VERTICAL)
         AMD_Sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, "AMD"), wx.VERTICAL)
-        ALL_CTRLR.Add(self.STATUS_TEXT_CTRL, 0, wx.EXPAND, 0)
+        
         AMD_Sizer.Add(self.AMD_SIZER_ALL_CB, 0, 0, 0)
         AMD_Sizer.Add(self.AMD_Chq_List, 0, 0, 0)
         FAT_CONTROLLER_GRID_SIZER.Add(AMD_Sizer, 1, wx.EXPAND, 0)
@@ -225,7 +243,6 @@ class BIOSUP_CONFIG(wx.Frame):
         VENDOR_Sizer.Add(self.VENDOR_SIZER_ALL_CB, 0, 0, 0)
         VENDOR_Sizer.Add(self.Vendor_Chq_List, 0, 0, 0)
         FAT_CONTROLLER_GRID_SIZER.Add(VENDOR_Sizer, 1, wx.EXPAND, 0)
-        #FAT_CONTROLLER_GRID_SIZER.Add(self.BROWSER_CB, 0, wx.ALIGN_CENTER_VERTICAL, 0)
         FAT_CONTROLLER_GRID_SIZER.Add(self.useLast_ChqBox, 0, wx.ALIGN_CENTER_VERTICAL, 0)
         FAT_CONTROLLER_GRID_SIZER.Add(self.CLEANUP_CB, 0, wx.ALIGN_CENTER_VERTICAL, 0)
         FAT_CONTROLLER_GRID_SIZER.Add(self.SH_BROWSER_CB, 0, wx.ALIGN_CENTER_VERTICAL, 0)
@@ -238,7 +255,9 @@ class BIOSUP_CONFIG(wx.Frame):
         FAT_CONTROLLER_GRID_SIZER.Add(self.Selectall_Btn, 0, wx.ALIGN_CENTER, 0)
         FAT_CONTROLLER_GRID_SIZER.Add(self.Run_Btn, 0, wx.ALIGN_CENTER, 0)
         FAT_CONTROLLER_GRID_SIZER.Add(self.Run_n_Gen_Btn, 0, wx.ALIGN_RIGHT, 0)
+
         ALL_CTRLR.Add(FAT_CONTROLLER_GRID_SIZER, 0, 0, 0)
+        ALL_CTRLR.Add(self.STATUS_TEXT_CTRL, 0, wx.EXPAND, 0)
         self.SetSizer(ALL_CTRLR)
         ALL_CTRLR.Fit(self)
         self.Layout()
