@@ -58,7 +58,7 @@ def main():
     
     #open headless web browser to access vendor websites
     print("Opening browser...")
-    driver = webwithjs(obj_myConfig.FireFox, obj_myConfig.openBrowser, obj_myConfig.sleepTimer)
+    driver = webwithjs(obj_myConfig.openBrowser, obj_myConfig.sleepTimer)
     obj_linkSearching = searchForLink()
 
     print("Sourcing models...")

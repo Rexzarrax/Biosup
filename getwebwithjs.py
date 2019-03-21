@@ -22,7 +22,7 @@ class webwithjs:
             temp = BeautifulSoup(self.driver.page_source, "html5lib") #page_source fetches page after rendering is complete
             return temp
             
-    def __init__(self, FireFox, openBrowser, sleepTimer):
+    def __init__(self, openBrowser, sleepTimer):
         self.tempURL = ""
         self.sleepTimer = sleepTimer
         print("sleep timer: "+str(sleepTimer))

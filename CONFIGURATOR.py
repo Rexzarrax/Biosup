@@ -7,6 +7,7 @@
 import wx
 import os
 import threading
+import time
 from BIOSUP import main
 
 from time import sleep
@@ -85,18 +86,21 @@ class BIOSUP_CONFIG(wx.Frame):
     
     def Run_Gen_Event(self, evt):
         self.Gen_Config()
-        #try:
-        #    runner = os.path.join(os.path.dirname(__file__),'BIOSUP.exe')
-        #    print(runner)
-        #    os.startfile(runner)
-        #except:
-        print('Exe not found, switching to Script')
-        runner = os.path.join(os.path.dirname(__file__),'BIOSUP.py')
-        print(runner)
-        t = threading.Thread(target=main,name='BIOSUP_THREAD')
-        t.daemon = True
-        t.start()       
 
+        self.Thr_Biosup_run = threading.Thread(target=main,name='BIOSUP_THREAD')
+        self.Thr_Biosup_run.daemon = True
+        self.Thr_Biosup_run.start()
+
+        self.Thr_checker = threading.Thread(target=self.Checker,name='CHECKER_THREAD')
+        self.Thr_checker.daemon = True
+        self.Thr_checker.start()
+        
+    def Checker(self):
+        while self.Thr_Biosup_run.is_alive:       
+            self.STATUS_TEXT_CTRL.AppendText(threading.sys.stdout.readline())
+            sleep(5)
+        self.STATUS_TEXT_CTRL.AppendText("Biosup Completed...")
+            
     def Run_Event(self, evt):
         self.Gen_Config()
 
@@ -189,6 +193,8 @@ class BIOSUP_CONFIG(wx.Frame):
             self.deselect_Check_Lists(self.Vendor_Chq_List)
             self.lastconfig = loadConfig("config.ini")
             self.Set_Check_Lists(self.lastconfig)
+            self.CLEANUP_CB.SetValue(bool(self.lastconfig.saveState))
+            #self.BROWSER_CB.SetValue(bool(self.lastconfig.FireFox))
         else:
             self.STATUS_TEXT_CTRL.AppendText("Unchecked 'Last Run'\n")
 
@@ -219,10 +225,11 @@ class BIOSUP_CONFIG(wx.Frame):
         VENDOR_Sizer.Add(self.VENDOR_SIZER_ALL_CB, 0, 0, 0)
         VENDOR_Sizer.Add(self.Vendor_Chq_List, 0, 0, 0)
         FAT_CONTROLLER_GRID_SIZER.Add(VENDOR_Sizer, 1, wx.EXPAND, 0)
-        FAT_CONTROLLER_GRID_SIZER.Add(self.BROWSER_CB, 0, wx.ALIGN_CENTER_VERTICAL, 0)
+        #FAT_CONTROLLER_GRID_SIZER.Add(self.BROWSER_CB, 0, wx.ALIGN_CENTER_VERTICAL, 0)
+        FAT_CONTROLLER_GRID_SIZER.Add(self.useLast_ChqBox, 0, wx.ALIGN_CENTER_VERTICAL, 0)
         FAT_CONTROLLER_GRID_SIZER.Add(self.CLEANUP_CB, 0, wx.ALIGN_CENTER_VERTICAL, 0)
         FAT_CONTROLLER_GRID_SIZER.Add(self.SH_BROWSER_CB, 0, wx.ALIGN_CENTER_VERTICAL, 0)
-        FAT_CONTROLLER_GRID_SIZER.Add(self.useLast_ChqBox, 0, wx.ALIGN_CENTER_VERTICAL, 0)
+        FAT_CONTROLLER_GRID_SIZER.Add((0, 0), 0, 0, 0)
         FAT_CONTROLLER_GRID_SIZER.Add((0, 0), 0, 0, 0)
         FAT_CONTROLLER_GRID_SIZER.Add((0, 0), 0, 0, 0)
         FAT_CONTROLLER_GRID_SIZER.Add((0, 0), 0, 0, 0)

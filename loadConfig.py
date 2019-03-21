@@ -11,7 +11,7 @@ class loadConfig:
             self.allvendordata = {}
             #config
             self.clean = self.str_to_bool((config_object["SETTINGS"]["clean"])) 
-            self.FireFox = self.str_to_bool((config_object["SETTINGS"]["FireFox"])) 
+            #self.FireFox = self.str_to_bool((config_object["SETTINGS"]["FireFox"])) 
             self.openBrowser = self.str_to_bool((config_object["SETTINGS"]["openBrowser"]))
             self.sleepTimer = int(config_object["SETTINGS"]["sleeptimer"])
             self.sleepwait = int(config_object["SETTINGS"]["sleepwait"])
@@ -55,7 +55,7 @@ class loadConfig:
         #print all loaded config data to console
         print("Loading config... ")
         print(" >Clean up: "+str(self.clean))
-        print(" >FireFox installed: "+str(self.FireFox))
+        #print(" >FireFox installed: "+str(self.FireFox))
         print(" >Open browser window: "+str(self.openBrowser))
         print(" >Save BIOS already Downloaded: "+str(self.saveState))
         print(" >Sleep Timer: "+ str(self.sleepTimer))
