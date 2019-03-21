@@ -55,7 +55,7 @@ def main():
     obj_myData = moboData(obj_mysetup, obj_myGetWeb, obj_myConfig.vendor, obj_myConfig.allowedChipsets, obj_myConfig.allowedExtras, dict_ModelData)  
     obj_getBIO = biosDownload()
     obj_dezip = unzip()
-
+    
     #open headless web browser to access vendor websites
     print("Opening browser...")
     driver = webwithjs(obj_myConfig.FireFox, obj_myConfig.openBrowser, obj_myConfig.sleepTimer)
@@ -114,8 +114,9 @@ def main():
                         json.dump(obj_myData.dict_modelData,outfile)
         except:
             print("Error Detected with ..."+str_model)
-            wait = input("Press Enter to continue. \nPress any key and then Enter to exit.")
+            wait = input("Press Enter to continue. \nPress any key and then Enter to exit:")
             if len(wait)>0:
+                print('Exiting...')
                 driver.driver.quit()
                 quit()
 

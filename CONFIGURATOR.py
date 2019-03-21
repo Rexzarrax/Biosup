@@ -6,6 +6,8 @@
 
 import wx
 import os
+import threading
+from BIOSUP import main
 
 from time import sleep
 
@@ -83,18 +85,24 @@ class BIOSUP_CONFIG(wx.Frame):
     
     def Run_Gen_Event(self, evt):
         self.Gen_Config()
-        try:
-            runner = os.path.join(os.path.dirname(__file__),'BIOSUP.py')
-        except:
-            runner = os.path.join(os.path.dirname(__file__),'BIOSUP.exe')
+        #try:
+        #    runner = os.path.join(os.path.dirname(__file__),'BIOSUP.exe')
+        #    print(runner)
+        #    os.startfile(runner)
+        #except:
+        print('Exe not found, switching to Script')
+        runner = os.path.join(os.path.dirname(__file__),'BIOSUP.py')
         print(runner)
+        t = threading.Thread(target=main,name='BIOSUP_THREAD')
+        t.daemon = True
+        t.start()       
 
     def Run_Event(self, evt):
         self.Gen_Config()
 
     def Gen_Config(self):
             #print("Attempting to run BIOSUP...")
-        self.datapath = os.path.join(os.getcwd(), os.path.dirname(__file__))+"\\config.ini"
+        self.datapath = os.path.join(os.getcwd(), os.path.dirname(__file__),"config.ini")
         if self.Chq_fields():
             #Build the configuration for Biosup core
             with open (self.datapath,"w") as outfile:
@@ -221,7 +229,6 @@ class BIOSUP_CONFIG(wx.Frame):
         FAT_CONTROLLER_GRID_SIZER.Add((0, 0), 0, 0, 0)
         FAT_CONTROLLER_GRID_SIZER.Add((0, 0), 0, 0, 0)
         FAT_CONTROLLER_GRID_SIZER.Add(self.Selectall_Btn, 0, wx.ALIGN_CENTER, 0)
-        #FAT_CONTROLLER_GRID_SIZER.Add((0, 0), 0, 0, 0)
         FAT_CONTROLLER_GRID_SIZER.Add(self.Run_Btn, 0, wx.ALIGN_CENTER, 0)
         FAT_CONTROLLER_GRID_SIZER.Add(self.Run_n_Gen_Btn, 0, wx.ALIGN_RIGHT, 0)
         ALL_CTRLR.Add(FAT_CONTROLLER_GRID_SIZER, 0, 0, 0)
