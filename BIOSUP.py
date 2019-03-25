@@ -3,6 +3,7 @@ import requests
 import os
 import time
 import json
+import logging
 
 from csv import writer
 from Unzip import unzip
@@ -22,8 +23,8 @@ class moboData:
         mysetup.dl_Src_PCPP(vendor, self.dict_modelData, allowedChipsets, allowedExtras)
 
 def main():
-    print("----------BIOSUP----------")
-    print("Initialising...")
+    sys.stdout.write("----------BIOSUP----------")
+    sys.stdout.write("Initialising...")
     dict_ModelData = {}
     str_datapath = os.path.join(os.getcwd(), os.path.dirname(__file__),"BIOSHERE","urlData.txt")
     str_breaker = "-------------------START---------------------"
@@ -132,8 +133,8 @@ def main():
     print("Script Finished...")
     input("Press Enter to continue/exit...")
 
-if __name__ == "__main__":
-    main()
+#if __name__ == "__main__":
+#    main()
 
 
 #extra scopes:

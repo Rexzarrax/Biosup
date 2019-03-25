@@ -8,6 +8,9 @@ import wx
 import os
 from multiprocessing.pool import ThreadPool
 import multiprocessing
+import subprocess
+#import pexpect
+import logging
 import time
 from datetime import datetime
 import sys
@@ -23,7 +26,6 @@ from loadConfig import loadConfig
 # begin wxGlade: extracode
 # end wxGlade
 
-
 class BIOSUP_CONFIG(wx.Frame):
     def __init__(self, *args, **kwds):
         # begin wxGlade: BIOSUP_CONFIG.__init__
@@ -33,14 +35,14 @@ class BIOSUP_CONFIG(wx.Frame):
         self.selectall = self.running = True
         self.allchiparr = []
 
-        self.STATUS_TEXT_CTRL = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_LEFT | wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_WORDWRAP)
-        self.STATUS_TEXT_CTRL.AppendText("Loading 'GUI_config.ini'...\n")
+        self.TEXT_CTRL_STATUS = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_LEFT | wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_WORDWRAP)
+        self.TEXT_CTRL_STATUS.AppendText("Loading 'GUI_config.ini'...\n")
         
         try:
             self.config = loadConfig("GUI_config.ini")
-            self.STATUS_TEXT_CTRL.AppendText("'GUI_config.ini' successfully loaded...\n")
+            self.TEXT_CTRL_STATUS.AppendText("'GUI_config.ini' successfully loaded...\n")
         except:
-            self.STATUS_TEXT_CTRL.AppendText("'GUI_config.ini' failed to load...\n")
+            self.TEXT_CTRL_STATUS.AppendText("'GUI_config.ini' failed to load...\n")
 
         self.AMD_SIZER_ALL_CB = wx.CheckBox(self, wx.ID_ANY, "Select All")
         self.AMD_Chq_List = wx.CheckListBox(self, wx.ID_ANY, choices=self.config.AMDallowedchipsets)
@@ -94,25 +96,25 @@ class BIOSUP_CONFIG(wx.Frame):
             self.Thr_Biosup_run.daemon = True
             self.Thr_Biosup_run.start()
         except Exception as e:
-            self.STATUS_TEXT_CTRL.AppendText("Unable to start BIOSUP thread...\n Error: "+str(e)+"\n")
-        
+            self.TEXT_CTRL_STATUS.AppendText("Unable to start BIOSUP thread...\n Error: "+str(e)+"\n")
+                
         try:
             self.Thr_checker = ThreadPool.Process(target=self.meth_Checker,name='CHECKER_THREAD')
             self.Thr_checker.daemon = True
             self.Thr_checker.start()
-            
+           
         except Exception as e: 
-            self.STATUS_TEXT_CTRL.AppendText("Unable to start CHECKER thread...\n Error: "+str(e)+"\n")
+            self.TEXT_CTRL_STATUS.AppendText("Unable to start CHECKER thread...\n Error: "+str(e)+"\n")
 
     def meth_Checker(self):
         try:
             while self.Thr_Biosup_run.is_alive: 
-                dt = datetime.fromtimestamp(time.time())
-                self.STATUS_TEXT_CTRL.AppendText("Running as of "+str(dt.strftime('%H:%M:%S'))+"\n")
+               #self.STATUS_TEXT_CTRL.AppendText("Running as of "+str(dt.strftime('%H:%M:%S'))+"\n")
+                self.TEXT_CTRL_STATUS.AppendText(str(self.str_output)+"\n")
                 sleep(1)
-            self.STATUS_TEXT_CTRL.AppendText("Biosup Exited...")
+            self.TEXT_CTRL_STATUS.AppendText("Biosup Exited...")
         except Exception as e:
-            self.STATUS_TEXT_CTRL.AppendText("Unable to run CHECKER thread...\n Error: "+str(e)+"\n")   
+            self.TEXT_CTRL_STATUS.AppendText("Unable to run CHECKER thread...\n Error: "+str(e)+"\n")   
 
     def Run_Event(self, evt):
         self.Gen_Config()
@@ -129,36 +131,36 @@ class BIOSUP_CONFIG(wx.Frame):
         if self.Chq_fields():
             #Build the configuration for Biosup core
             with open (self.datapath,"w") as outfile:
-                self.STATUS_TEXT_CTRL.AppendText("Writing config file...\n")
+                self.TEXT_CTRL_STATUS.AppendText("Writing config file...\n")
                 
                 outfile.write("[SETTINGS]\nclean = "+self.True_False_checker(self.CLEANUP_CB.IsChecked()))
-                self.STATUS_TEXT_CTRL.AppendText("clean = "+self.True_False_checker(self.CLEANUP_CB.IsChecked())+"\n")
+                self.TEXT_CTRL_STATUS.AppendText("clean = "+self.True_False_checker(self.CLEANUP_CB.IsChecked())+"\n")
                 
                 outfile.write("\nopenBrowser = "+self.True_False_checker(self.SH_BROWSER_CB.IsChecked()))
-                self.STATUS_TEXT_CTRL.AppendText("openBrowser = "+self.True_False_checker(self.SH_BROWSER_CB.IsChecked())+"\n")
+                self.TEXT_CTRL_STATUS.AppendText("openBrowser = "+self.True_False_checker(self.SH_BROWSER_CB.IsChecked())+"\n")
                 
                 outfile.write("\nsaveState = t")
-                self.STATUS_TEXT_CTRL.AppendText("saveState = t\n")
+                self.TEXT_CTRL_STATUS.AppendText("saveState = t\n")
                 
                 outfile.write("\nsleeptimer = 6\nsleepwait = 5")
                 
                 outfile.write("\nallowedChipsetsAMD = "+str(",".join(self.AMD_Chq_List.GetCheckedStrings())))
-                self.STATUS_TEXT_CTRL.AppendText("Allowed AMD chipsets = "+str(", ".join(self.AMD_Chq_List.GetCheckedStrings()))+"\n")
+                self.TEXT_CTRL_STATUS.AppendText("Allowed AMD chipsets = "+str(", ".join(self.AMD_Chq_List.GetCheckedStrings()))+"\n")
                 
                 outfile.write("\nallowedChipsetsIntel = "+str(",".join(self.Intel_Chq_List.GetCheckedStrings())))
-                self.STATUS_TEXT_CTRL.AppendText("Allowed INTEL chipsets = "+str(", ".join(self.Intel_Chq_List.GetCheckedStrings()))+"\n")
+                self.TEXT_CTRL_STATUS.AppendText("Allowed INTEL chipsets = "+str(", ".join(self.Intel_Chq_List.GetCheckedStrings()))+"\n")
                 outfile.write("\nallowedChipsets = "+str(",".join(self.allchiparr)))
                 outfile.write("\nallowedChipsetsAddon = [CIM]?")
                 outfile.write("\nvendor = "+str(",".join(self.Vendor_Chq_List.GetCheckedStrings())))
-                self.STATUS_TEXT_CTRL.AppendText("Allowed Vendors = "+str(",".join(self.Vendor_Chq_List.GetCheckedStrings()))+"\n")
+                self.TEXT_CTRL_STATUS.AppendText("Allowed Vendors = "+str(",".join(self.Vendor_Chq_List.GetCheckedStrings()))+"\n")
                 #self.STATUS_TEXT_CTRL.AppendText("Done...\n")
-            self.STATUS_TEXT_CTRL.AppendText("Config Generated...\n")
+            self.TEXT_CTRL_STATUS.AppendText("Config Generated...\n")
             #self.Create_Thread()
         elif self.useLast_ChqBox.IsChecked():
-            self.STATUS_TEXT_CTRL.AppendText("Overwriting old config...\n")
+            self.TEXT_CTRL_STATUS.AppendText("Overwriting old config...\n")
             #self.Create_Thread()
         else:
-            self.STATUS_TEXT_CTRL.AppendText("Select at least 1 chipset and vendor or tick 'Run last config' \n")
+            self.TEXT_CTRL_STATUS.AppendText("Select at least 1 chipset and vendor or tick 'Run last config' \n")
         #os.system(r"C:\Documents and Settings\flow_model\flow.exe")
 
 
@@ -174,7 +176,7 @@ class BIOSUP_CONFIG(wx.Frame):
 
     def Select_All_Chq_Box(self, evt): 
         if self.selectall:
-            self.STATUS_TEXT_CTRL.AppendText("Selected all tick boxes\n")
+            self.TEXT_CTRL_STATUS.AppendText("Selected all tick boxes\n")
             self.Set_Check_Lists(self.config)
             self.useLast_ChqBox.SetValue(False)
             self.selectall = False
@@ -183,7 +185,7 @@ class BIOSUP_CONFIG(wx.Frame):
             self.INTEL_SIZER_ALL_CB.SetValue(True)
             self.VENDOR_SIZER_ALL_CB.SetValue(True)
         else:
-            self.STATUS_TEXT_CTRL.AppendText("Unselecting all tick boxes\n")
+            self.TEXT_CTRL_STATUS.AppendText("Unselecting all tick boxes\n")
             self.useLast_ChqBox.SetValue(False)
             self.deselect_Check_Lists(self.AMD_Chq_List)
             self.deselect_Check_Lists(self.Intel_Chq_List)
@@ -205,7 +207,7 @@ class BIOSUP_CONFIG(wx.Frame):
 
     def Select_Last_Run(self, evt):
         if self.useLast_ChqBox.IsChecked():
-            self.STATUS_TEXT_CTRL.AppendText("Loading last run\n")
+            self.TEXT_CTRL_STATUS.AppendText("Loading last run\n")
             self.deselect_Check_Lists(self.AMD_Chq_List)
             self.deselect_Check_Lists(self.Intel_Chq_List)
             self.deselect_Check_Lists(self.Vendor_Chq_List)
@@ -213,7 +215,7 @@ class BIOSUP_CONFIG(wx.Frame):
             self.Set_Check_Lists(self.lastconfig)
             self.CLEANUP_CB.SetValue(bool(self.lastconfig.saveState))
         else:
-            self.STATUS_TEXT_CTRL.AppendText("Unchecked 'Last Run'\n")
+            self.TEXT_CTRL_STATUS.AppendText("Unchecked 'Last Run'\n")
 
 
     def __set_properties(self):
@@ -222,7 +224,7 @@ class BIOSUP_CONFIG(wx.Frame):
         _icon = wx.NullIcon
         _icon.CopyFromBitmap(wx.Bitmap(os.path.join(os.getcwd(),'ICO_BIOSUP.ico'), wx.BITMAP_TYPE_ANY))
         self.SetIcon(_icon)
-        self.STATUS_TEXT_CTRL.SetMinSize((175, 250))
+        self.TEXT_CTRL_STATUS.SetMinSize((175, 250))
         # end wxGlade
 
     def __do_layout(self):
@@ -257,7 +259,7 @@ class BIOSUP_CONFIG(wx.Frame):
         FAT_CONTROLLER_GRID_SIZER.Add(self.Run_n_Gen_Btn, 0, wx.ALIGN_RIGHT, 0)
 
         ALL_CTRLR.Add(FAT_CONTROLLER_GRID_SIZER, 0, 0, 0)
-        ALL_CTRLR.Add(self.STATUS_TEXT_CTRL, 0, wx.EXPAND, 0)
+        ALL_CTRLR.Add(self.TEXT_CTRL_STATUS, 0, wx.EXPAND, 0)
         self.SetSizer(ALL_CTRLR)
         ALL_CTRLR.Fit(self)
         self.Layout()
