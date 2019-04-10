@@ -19,12 +19,12 @@ from loadConfig import loadConfig
 class moboData:
     def __init__(self, mysetup, myGetWeb, vendor, allowedChipsets, allowedExtras, dict_modelData):
         self.dict_modelData = dict_modelData
-        #status status'-> 0=nothing attempted, 1= BIOS successfully downloaded, 2=Bios failed to downloaded, 4= already downloaded and upto date
+        #status status'-> 0=nothing attempted, 1= BIOS bool_successfully downloaded, 2=Bios failed to downloaded, 4= already downloaded and upto date
         mysetup.dl_Src_PCPP(vendor, self.dict_modelData, allowedChipsets, allowedExtras)
 
-def main():
-    sys.stdout.write("----------BIOSUP----------")
-    sys.stdout.write("Initialising...")
+def main(pipe_connection):
+    pipe_connection.send('----------BIOSUP----------')
+    pipe_connection.send("Initialising...")
     dict_ModelData = {}
     str_datapath = os.path.join(os.getcwd(), os.path.dirname(__file__),"BIOSHERE","urlData.txt")
     str_breaker = "-------------------START---------------------"
@@ -59,7 +59,7 @@ def main():
     
     #open headless web browser to access vendor websites
     print("Opening browser...")
-    driver = webwithjs(obj_myConfig.openBrowser, obj_myConfig.sleepTimer)
+    browser_driver = webwithjs(obj_myConfig.openBrowser, obj_myConfig.sleepTimer)
     obj_linkSearching = searchForLink()
 
     print("Sourcing models...")
@@ -75,33 +75,37 @@ def main():
     #loops through all entries in the myData.modelData dictionary
     for int_index,str_model in enumerate(obj_myData.dict_modelData):
         try:
-            timeModerator = time.time()
-            success = False
+            int_timeModerator = time.time()
+            bool_success = False
             print(str_breaker)
-            cpathDir = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/BIOSHERE/"+obj_myData.dict_modelData[str_model]['vendor']+"/"+str(obj_myData.dict_modelData[str_model]['chipset'])
+            str_cpathDir = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/BIOSHERE/"+obj_myData.dict_modelData[str_model]['vendor']+"/"+str(obj_myData.dict_modelData[str_model]['chipset'])
             print(str_model+"|Progress: "+str(int_index+1)+"/"+str(int_modelLen))
             try:
-                os.makedirs(cpathDir)
+                os.makedirs(str_cpathDir)
             except:
-                print(cpathDir+" Already Exists...")
-            str_cpathZip = cpathDir+"/"+obj_myData.dict_modelData[str_model]['name'].replace("/","-")+".zip"
+                print(str_cpathDir+" Already Exists...")
+            str_cpathZip = str_cpathDir+"/"+obj_myData.dict_modelData[str_model]['name'].replace("/","-")+".zip"
             str_vendor = obj_myData.dict_modelData[str_model]['vendor']
             if str_vendor == "ASUS":
-                obj_getBIO.urlBuilderAsus(obj_myData.dict_modelData[str_model],
+                obj_getBIO.urlBuilderAsus(
+                        obj_myData.dict_modelData[str_model],
                         obj_myConfig.allvendordata[str_vendor]['vendorSort'], 
-                        str_cpathZip, driver, 
+                        str_cpathZip, 
+                        browser_driver, 
                         obj_myConfig.allvendordata[str_vendor]['vendorDownloadURLbase'],
                         obj_linkSearching)
             else:
-                obj_getBIO.GenericUrlBuilder(obj_myData.dict_modelData[str_model],
+                obj_getBIO.GenericUrlBuilder(
+                        obj_myData.dict_modelData[str_model],
                         obj_myConfig.allvendordata[str_vendor]['vendorSort'], 
-                        str_cpathZip, driver, 
+                        str_cpathZip, 
+                        browser_driver, 
                         obj_myConfig.allvendordata[str_vendor]['vendorDownloadURLbase'],
                         obj_myConfig.allvendordata[str_vendor]['vendorURLaddon'], 
                         obj_linkSearching)
 
             obj_dezip.deZip(str_cpathZip, str_cpathZip.strip(".zip"))
-            if (time.time() - timeModerator)<obj_myConfig.sleepTimer:
+            if (time.time() - int_timeModerator)<obj_myConfig.sleepTimer:
                 print("Sleeping...")
                 time.sleep(obj_myConfig.sleepwait) 
             print("Moving to next BIOS...\n")
@@ -118,14 +122,14 @@ def main():
             wait = input("Press Enter to continue. \nPress any key and then Enter to exit:")
             if len(wait)>0:
                 print('Exiting...')
-                driver.driver.quit()
+                browser_driver.browser_driver.quit()
                 quit()
 
     if obj_myConfig.saveState:
         with open (str_datapath,"w") as outfile:
             json.dump(obj_myData.dict_modelData,outfile)
 
-    driver.driver.quit()
+    browser_driver.browser_driver.quit()
     print("All downloading and unzipping attempted...\n")
 
     obj_statisticsData.printstat(obj_myConfig.vendor, obj_myData)
@@ -135,9 +139,3 @@ def main():
 
 #if __name__ == "__main__":
 #    main()
-
-
-#extra scopes:
-#-> generate local lists to reduce dl time in future
-#-> cli/gui menu system
-#-> options for specific sources/vendors

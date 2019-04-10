@@ -15,7 +15,8 @@ from clint.textui import progress
 #class holds methods for downloading the BIOS from a vendor
 class biosDownload:
     def __Init__(self):
-        self.status = {'DLSuccess':False,'DLUpdate':False}
+        #self.status = {'DLSuccess':False,'DLUpdate':False}
+        pass
     def GenericUrlBuilder(self,mymodel, urlchq, cpath, driver, dlURLchq, URLaddON, searchForLink):
         print("Finding "+mymodel['name']+ " URL...")
         if not os.path.exists(cpath):

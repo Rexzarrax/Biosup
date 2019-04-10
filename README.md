@@ -20,7 +20,9 @@ Windows:
 
 Linux:
 
-Use WINE, detailed steps coming
+    WINE: detailed steps coming
+
+    Git: detailed steps coming
 
 
 ## Requirements 

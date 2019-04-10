@@ -100,26 +100,13 @@ class BIOSUP_CONFIG(wx.Frame):
                 self.TEXT_CTRL_STATUS.AppendText("Unable to start BIOSUP thread...\n Error: "+str(e)+"\n")
             sleep(1)
             try:
-                #self.Thr_checker = pool.Process(target=chq_status.meth_Checker,name='CHECKER_THREAD', args=(self.Thr_Biosup_run,self.TEXT_CTRL_STATUS,self.parent_conn))
-                self.Thr_checker = pool.Process(target=self.meth_Checker2,name='CHECKER_THREAD')
-                
+                self.Thr_checker = pool.Process(target=chq_status.meth_Checker,name='CHECKER_THREAD', args=(self.Thr_Biosup_run,self.TEXT_CTRL_STATUS,self.parent_conn))
                 self.Thr_checker.daemon = True
                 self.Thr_checker.start()
                 self.TEXT_CTRL_STATUS.AppendText("Checker subscript started successfully...\n")
             
             except Exception as e: 
                 self.TEXT_CTRL_STATUS.AppendText("Unable to start CHECKER thread...\n Error: "+str(e)+"\n")
-
-    def meth_Checker2(self):
-            try:
-                while self.Thr_Biosup_run.is_alive: 
-                #TEXT_CTRL_STATUS.AppendText("Running as of "+str(dt.strftime('%H:%M:%S'))+"\n")
-                    #self.TEXT_CTRL_STATUS.AppendText(parent_conn.recv()+"\n")
-                    self.TEXT_CTRL_STATUS.AppendText("test"+"\n")
-                    sleep(1)
-                self.TEXT_CTRL_STATUS.AppendText("Biosup Exited...")
-            except Exception as e:
-                self.TEXT_CTRL_STATUS.AppendText("Unable to run CHECKER thread...\n Error: "+str(e)+"\n")                  
 
     def Run_Event(self, evt):
         self.Gen_Config()
@@ -133,7 +120,7 @@ class BIOSUP_CONFIG(wx.Frame):
     def Gen_Config(self):
             #print("Attempting to run BIOSUP...")
         self.datapath = os.path.join(os.getcwd(), os.path.dirname(__file__),"config.ini")
-        if self.Chq_fields():
+        if self.Chq_fields():C
             #Build the configuration for Biosup core
             with open (self.datapath,"w") as outfile:
                 self.TEXT_CTRL_STATUS.AppendText("Writing config file...\n")
@@ -285,4 +272,3 @@ class MyApp(wx.App):
 if __name__ == "__main__":
     BIOSUP = MyApp(0)
     BIOSUP.MainLoop()
-    
