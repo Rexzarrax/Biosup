@@ -20,6 +20,7 @@ class biosDownload:
     def GenericUrlBuilder(self,mymodel, urlchq, cpath, driver, dlURLchq, URLaddON, searchForLink):
         print("Finding "+mymodel['name']+ " URL...")
         if not os.path.exists(cpath):
+            #could add ability to use prod url is already in system but need to imp checking system
             mymodel['productURL'] = str(searchForLink.searchforlinkDDG(mymodel['name'], urlchq))
             if not mymodel['productURL'] == "None":
                 mymodel['productURL'] += URLaddON

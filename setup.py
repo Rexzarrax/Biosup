@@ -12,56 +12,62 @@ from clint.textui import progress
 class setUp:
     def __init__(self):
         pass
-    def folderChq(self, company):
+    def folderChq(self, str_vendor):
         #potentially add chipsets here
-        cpwd = os.path.dirname(os.path.realpath(__file__))
-        cpwd_full = os.path.join(cpwd,"BIOSHERE",company)
-        if not os.path.exists(cpwd_full):
-            os.makedirs(cpwd_full)
-            print("Dir: \n" , cpwd_full ,  " \nCreated \n") 
+        str_cpwd = os.path.dirname(os.path.realpath(__file__))
+        str_cpwd_full = os.path.join(str_cpwd,"BIOSHERE",str_vendor)
+        if not os.path.exists(str_cpwd_full):
+            os.makedirs(str_cpwd_full)
+            print("Dir: \n" , str_cpwd_full ,  " \nCreated \n") 
         else:
-            print("Dir: \n" , cpwd_full ,  " \nalready exists\n")
+            print("Dir: \n" , str_cpwd_full ,  " \nalready exists\n")
 
     def dl_Src_PCPP(self, vendor, modelData, allowedChipsets, allowedExtras):
-        mobo_count = pcpp.productLists.totalPages("motherboard")
-        print("Pages found: "+str(mobo_count))
+        int_mobo_page_count = pcpp.productLists.totalPages("motherboard")
+        print("Pages found: "+str(int_mobo_page_count))
 
-        for page in range(1, mobo_count+1):
+        for page in range(1, int_mobo_page_count+1):
             skuName = pcpp.productLists.getProductList("motherboard", page)
-            print("Collected page %d/%d" % (page,mobo_count))
+            print("Collected page %d/%d" % (page,int_mobo_page_count))
 
             for model in skuName:
-                fullsku = str(model["name"]).split(" ")
+                str_fullsku = str(model["name"]).split(" ")
+                str_modelsku = self.dl_Src_cleanStr(model["name"])
+                if re.search(r'WI.FI|WIFI|AC|AX', str_modelsku, flags=re.IGNORECASE):
+                    bool_wifi = True
+                else:
+                    bool_wifi = False
+                print(model["name"]+"|wifi: "+str(bool_wifi))
 
                 for x in range(len(allowedChipsets)):
                     regexString = (allowedChipsets[x]+allowedExtras)
                     #regexString = allowedChipsets[x]
-                    if re.search(regexString,model["name"],re.IGNORECASE):
-                        vendorpcpp = (fullsku[0]).upper()
-                        modelsku = self.dl_Src_cleanStr(model["name"])
-                        dataDict = {'name':modelsku,'productURL':'','downloadURL':'','status':0,'vendor':vendorpcpp,'chipset':allowedChipsets[x]}
-                        self.generic_Sort(modelsku, vendorpcpp, modelData, vendor, dataDict)
+                    if re.search(regexString,model["name"],flags=re.IGNORECASE):
+                        vendorpcpp = (str_fullsku[0]).upper()
+                        dict_dataDict = {'name':str_modelsku,'productURL':'','downloadURL':'','status':0,'vendor':vendorpcpp,'chipset':allowedChipsets[x],'wifi':bool_wifi}
+                        #print(dict_dataDict)
+                        self.generic_Sort(str_modelsku, vendorpcpp, modelData, vendor, dict_dataDict)
 
-    def dl_Src_cleanStr(self,fullsku):
-        model = fullsku.upper().replace(":","").replace(".", "-").replace(" ", "-").replace("(","").replace(")","").replace("-I-", "I-").replace("/","-")
+    def dl_Src_cleanStr(self,str_fullsku):
+        model = str_fullsku.upper().replace(":","").replace(".", "-").replace(" ", "-").replace("(","").replace(")","").replace("-I-", "I-").replace("/","-")
         return model
 
-    def generic_Sort(self,modelsku, vendor, modelData, vendorchq, dataDict):
+    def generic_Sort(self,str_modelsku, vendor, modelData, vendorchq, dict_dataDict):
         try:
-            moboKey = dataDict['name']
-           # print(dataDict['vendor']+":"+str(vendorchq))
-            if dataDict['vendor'] in vendorchq:
+            moboKey = dict_dataDict['name']
+           # print(dict_dataDict['vendor']+":"+str(vendorchq))
+            if dict_dataDict['vendor'] in vendorchq:
                 if not moboKey in modelData:   
-                    modelData[moboKey] = dataDict
-                    print('Added: '+dataDict['name'])
+                    modelData[moboKey] = dict_dataDict
+                    print('Added: '+dict_dataDict['name'])
                 else:
                     print(moboKey+" already in system...")
             else:
-                print('Invalid vendor: '+moboKey)
+                print('Unsupported vendor: '+moboKey)
 
         except Exception as e: 
             print(e)
-            print('Not Added: '+dataDict['name'])
+            print('Not Added: '+dict_dataDict['name'])
 
     def cleanup(self, cpath, index):
         try:
