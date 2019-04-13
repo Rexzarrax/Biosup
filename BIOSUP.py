@@ -87,28 +87,31 @@ def main(pipe_connection):
                 print(str_cpathDir+" Already Exists...")
             str_cpathZip = str_cpathDir+"/"+obj_myData.dict_modelData[str_model]['name'].replace("/","-")+".zip"
             str_vendor = obj_myData.dict_modelData[str_model]['vendor']
-            if str_vendor == "ASUS":
-                obj_getBIO.urlBuilderAsus(
-                        obj_myData.dict_modelData[str_model],
-                        obj_myConfig.allvendordata[str_vendor]['vendorSort'], 
-                        str_cpathZip, 
-                        browser_driver, 
-                        obj_myConfig.allvendordata[str_vendor]['vendorDownloadURLbase'],
-                        obj_linkSearching)
-            else:
-                obj_getBIO.GenericUrlBuilder(
-                        obj_myData.dict_modelData[str_model],
-                        obj_myConfig.allvendordata[str_vendor]['vendorSort'], 
-                        str_cpathZip, 
-                        browser_driver, 
-                        obj_myConfig.allvendordata[str_vendor]['vendorDownloadURLbase'],
-                        obj_myConfig.allvendordata[str_vendor]['vendorURLaddon'], 
-                        obj_linkSearching)
+            if (obj_myData.dict_modelData[str_model]['status'] == dict_state_key['no_action']) or (obj_myData.dict_modelData[str_model]['status'] == dict_state_key['update_bios']):
+                if str_vendor == "ASUS":
+                    obj_getBIO.urlBuilderAsus(
+                            obj_myData.dict_modelData[str_model],
+                            obj_myConfig.allvendordata[str_vendor]['vendorSort'], 
+                            str_cpathZip, 
+                            browser_driver, 
+                            obj_myConfig.allvendordata[str_vendor]['vendorDownloadURLbase'],
+                            obj_linkSearching)
+                else:
+                    obj_getBIO.GenericUrlBuilder(
+                            obj_myData.dict_modelData[str_model],
+                            obj_myConfig.allvendordata[str_vendor]['vendorSort'], 
+                            str_cpathZip, 
+                            browser_driver, 
+                            obj_myConfig.allvendordata[str_vendor]['vendorDownloadURLbase'],
+                            obj_myConfig.allvendordata[str_vendor]['vendorURLaddon'], 
+                            obj_linkSearching)
 
-            obj_dezip.deZip(str_cpathZip, str_cpathZip.strip(".zip"))
-            if (time.time() - int_timeModerator)<obj_myConfig.sleepTimer:
-                print("Sleeping...")
-                time.sleep(obj_myConfig.sleepwait) 
+                obj_dezip.deZip(str_cpathZip, str_cpathZip.strip(".zip"))
+                if (time.time() - int_timeModerator)<obj_myConfig.sleepTimer:
+                    print("Sleeping...")
+                    time.sleep(obj_myConfig.sleepwait)
+            else:
+                print("Skipping "+str_model) 
             print("Moving to next BIOS...\n")
             if obj_myConfig.clean:
                 print("Running Cleanup of "+str_cpathZip+"...")

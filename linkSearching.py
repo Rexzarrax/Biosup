@@ -11,14 +11,16 @@ from bs4 import BeautifulSoup
 class searchForLink:
     def __init__(self):
             pass
+    #convert this to use browser instead of get requests
     def searchforlinkDDG(self, str_mymodel, str_urlchq):
         print("Running DDG search...")
         int_numURL = 0
-        str_url = "https://duckduckgo.com/html/?q="+str_mymodel+" \+support"
-        print(str_url)
+        str_url = "https://duckduckgo.com/html/?q="+str_mymodel+" support"
+        headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'}    
+
         try:
-            r = requests.get(str_url).text
-            soup_html = BeautifulSoup(r, 'html5lib')
+            req = requests.get(str_url, headers = headers).text
+            soup_html = BeautifulSoup(req, 'html5lib')
             print(soup_html)
             #for str_chq_link in soup_html.find_all('a', attrs={'href': re.compile(str_urlchq, re.IGNORECASE)}):
             for str_chq_link in soup_html.find_all('a', attrs={'class': "result__url"}):
@@ -34,10 +36,11 @@ class searchForLink:
                 else:
                     break
             if str_link_to_return == "":
+                print("Switching to Google...")
                 googleAttempt = self.search_for_link_google(str_mymodel, str_urlchq)
                 return googleAttempt
         except:
-            print("Switching to Google...")
+            print("Failed, Switching to Google...")
             googleAttempt = self.search_for_link_google(str_mymodel, str_urlchq)
             return googleAttempt
 

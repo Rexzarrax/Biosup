@@ -66,6 +66,7 @@ class setUp:
                     print('Added: '+dict_dataDict['name'])
                 else:
                     print(moboKey+" already in system...")
+                    modelData[moboKey]['status'] = 1
             else:
                 print('Unsupported vendor: '+moboKey)
 
