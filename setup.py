@@ -24,8 +24,10 @@ class setUp:
 
     def dl_Src_PCPP(self, vendor, modelData, allowedChipsets, allowedExtras):
         int_mobo_page_count = pcpp.productLists.totalPages("motherboard")
-        print("Pages found: "+str(int_mobo_page_count))
+        str_wifi_regex = r'WI.FI|WIFI|AC|AX'
 
+        print("Pages found: "+str(int_mobo_page_count))
+        #IF IT IS ALREADY IN THE SYSTEM, CHANGE THE FLAG
         for page in range(1, int_mobo_page_count+1):
             skuName = pcpp.productLists.getProductList("motherboard", page)
             print("Collected page %d/%d" % (page,int_mobo_page_count))
@@ -33,11 +35,13 @@ class setUp:
             for model in skuName:
                 str_fullsku = str(model["name"]).split(" ")
                 str_modelsku = self.dl_Src_cleanStr(model["name"])
-                if re.search(r'WI.FI|WIFI|AC|AX', str_modelsku, flags=re.IGNORECASE):
+
+                #check model for wifi
+                if re.search(str_wifi_regex, str_modelsku, flags=re.IGNORECASE):
                     bool_wifi = True
                 else:
                     bool_wifi = False
-                print(model["name"]+"|wifi: "+str(bool_wifi))
+                #print(model["name"]+"|wifi: "+str(bool_wifi))
 
                 for x in range(len(allowedChipsets)):
                     regexString = (allowedChipsets[x]+allowedExtras)

@@ -99,16 +99,16 @@ class BIOSUP_CONFIG(wx.Frame):
             except Exception as e:
                 self.TEXT_CTRL_STATUS.AppendText("Unable to start BIOSUP thread...\n Error: "+str(e)+"\n")
             sleep(1)
-            try:
+            #try:
                 #self.Thr_checker = pool.Process(target=chq_status.meth_Checker,name='CHECKER_THREAD', args=(self.Thr_Biosup_run,self.TEXT_CTRL_STATUS,self.parent_conn))
-                self.Thr_checker = pool.Process(target=self.meth_Checker2,name='CHECKER_THREAD')
-                
-                self.Thr_checker.daemon = True
-                self.Thr_checker.start()
-                self.TEXT_CTRL_STATUS.AppendText("Checker subscript started successfully...\n")
+            #    self.Thr_checker = pool.Process(target=meth_Checker2,name='CHECKER_THREAD')
+            #    
+            #    self.Thr_checker.daemon = True
+            #    self.Thr_checker.start()
+            #    self.TEXT_CTRL_STATUS.AppendText("Checker subscript started successfully...\n")
             
-            except Exception as e: 
-                self.TEXT_CTRL_STATUS.AppendText("Unable to start CHECKER thread...\n Error: "+str(e)+"\n")
+            #except Exception as e: 
+            #    self.TEXT_CTRL_STATUS.AppendText("Unable to start CHECKER thread...\n Error: "+str(e)+"\n")
 
     def meth_Checker2(self):
             try:

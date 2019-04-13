@@ -51,23 +51,23 @@ class biosDownload:
     def getdlURL(self, driver, cpath, urlChq, mymodel):
         print("Motherboard URL: "+mymodel['productURL'])
         print("Finding Download URL...")
-        gotLink = refresh = False
-        retries = 1
-        while (gotLink == False) and (retries < 5):
-            soup_html = driver.getwebwithjs(mymodel['productURL'], refresh)
+        bool_gotLink = bool_refresh = False
+        int_retries = 1
+        while (bool_gotLink == False) and (int_retries < 5):
+            soup_html = driver.getwebwithjs(mymodel['productURL'], bool_refresh)
             for link in soup_html.find_all('a', attrs={'href': re.compile(urlChq)}):
                 print("Found the URL:", link['href'])
-                downloadLink = link['href']
+                str_download_Link = link['href']
                 if not link == "None":
-                    gotLink = True 
-                    self.dlBIOS(downloadLink,cpath, mymodel)
+                    bool_gotLink = True 
+                    self.dlBIOS(str_download_Link,cpath, mymodel)
                     break
-            if not gotLink:
-                print("Missed URL, retrying, waiting "+str(retries-1)+"s...")
-                sleep(retries)
-                if retries >= 5:
-                    refresh = True 
-                retries += 1                                
+            if not bool_gotLink:
+                print("Missed URL, retrying, waiting "+str(int_retries-1)+"s...")
+                sleep(int_retries)
+                if int_retries >= 5:
+                    bool_refresh = True 
+                int_retries += 1                                
 
     def dlBIOS(self,link ,cpath, mymodel):
         if not link == mymodel['downloadURL']:

@@ -11,39 +11,44 @@ from bs4 import BeautifulSoup
 class searchForLink:
     def __init__(self):
             pass
-    def searchforlinkDDG(self, mymodel, urlchq):
+    def searchforlinkDDG(self, str_mymodel, str_urlchq):
         print("Running DDG search...")
-        numURL = 0
-        url = "https://duckduckgo.com/html/?q="+mymodel+" +support"
+        int_numURL = 0
+        str_url = "https://duckduckgo.com/html/?q="+str_mymodel+" \+support"
+        print(str_url)
         try:
-            r = requests.get(url).text
+            r = requests.get(str_url).text
             soup_html = BeautifulSoup(r, 'html5lib')
-            #for link in soup_html.find_all('a', attrs={'href': re.compile(urlchq, re.IGNORECASE)}):
-            for link in soup_html.find_all('a', attrs={'class': "result__url"}):
-                unLinked = link['href']
-                unLinked = urllib.parse.unquote_plus(unLinked)
-                unLinked = unLinked.replace("/l/?kh=-1&uddg=","")
-                print("Found the URL:", unLinked)
-                if re.findall(urlchq, unLinked, re.IGNORECASE):
-                    return unLinked #make sure contains model in url
-                elif not numURL > 15:
-                    numURL += 1
-                    print("Tried link "+str(numURL)+":"+str(unLinked+"\n"+str(urlchq)))
+            print(soup_html)
+            #for str_chq_link in soup_html.find_all('a', attrs={'href': re.compile(str_urlchq, re.IGNORECASE)}):
+            for str_chq_link in soup_html.find_all('a', attrs={'class': "result__url"}):
+                str_link_to_return = str_chq_link['href']
+                str_link_to_return = urllib.parse.unquote_plus(str_link_to_return)
+                str_link_to_return = str_link_to_return.replace("/l/?kh=-1&uddg=","")
+                print("Found the URL:", str_link_to_return)
+                if re.findall(str_urlchq, str_link_to_return, re.IGNORECASE):
+                    return str_link_to_return #make sure contains model in url
+                elif not int_numURL > 15:
+                    int_numURL += 1
+                    print("Tried str_chq_link "+str(int_numURL)+":"+str(str_link_to_return+"\n"+str(str_urlchq)))
                 else:
                     break
+            if str_link_to_return == "":
+                googleAttempt = self.search_for_link_google(str_mymodel, str_urlchq)
+                return googleAttempt
         except:
             print("Switching to Google...")
-            googleAttempt = self.searchforlinkgoogle(mymodel, urlchq)
+            googleAttempt = self.search_for_link_google(str_mymodel, str_urlchq)
             return googleAttempt
 
-    def searchforlinkgoogle(self, mymodel, urlchq):
-        print("Google searching for "+mymodel+ " +support bios")
+    def search_for_link_google(self, str_mymodel, str_urlchq):
+        print("Google searching for "+str_mymodel+ " +support bios")
         try:
-            for j in search(mymodel+" bios", tld="com", num=5, start=0, stop=5, pause=4): 
-                print("Checking "+j)
-                if re.search(urlchq, j, re.IGNORECASE):
-                    if not j == "None":
-                        return j
+            for str_link in search(str_mymodel+" bios", tld="com", num=5, start=0, stop=5, pause=4): 
+                print("Checking "+str_link)
+                if re.search(str_urlchq, str_link, re.IGNORECASE):
+                    if not str_link == "None":
+                        return str_link
                     else:
                         print("Error in search")
         except:

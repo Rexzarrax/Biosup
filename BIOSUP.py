@@ -28,6 +28,7 @@ def main(pipe_connection):
     dict_ModelData = {}
     str_datapath = os.path.join(os.getcwd(), os.path.dirname(__file__),"BIOSHERE","urlData.txt")
     str_breaker = "-------------------START---------------------"
+    dict_state_key = {'no_action':0,'update_bios':1,'ignore_bios':2,'failed_dl':3,'success_dl':4}
     #set up directories and files
     try: 
         with open(str_datapath) as file_datafile:
