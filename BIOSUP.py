@@ -112,7 +112,7 @@ def main(pipe_connection):
             else:
                 print("Skipping "+str_model) 
             print("Moving to next BIOS...\n")
-            if obj_myConfig.clean:
+            if obj_myConfig.clean and obj_myData.dict_modelData[str_model]['status'] == dict_state_key['success_dl']:
                 print("Running Cleanup of "+str_cpathZip+"...")
                 obj_mysetup.cleanup(str_cpathZip, int_index)
             if (int_index%10==0):

@@ -65,7 +65,7 @@ class setUp:
             if dict_model_data['vendor'] in arr_vendorchq:
                 if not str_moboKey in dict_modelData:   
                     dict_modelData[str_moboKey] = dict_model_data
-                    dict_modelData[str_moboKey]['status'] = 1
+                    dict_modelData[str_moboKey]['status'] = 0
                     print('Added: '+dict_model_data['name'])
                 else:
                     dict_modelData[str_moboKey]['status'] = 1
