@@ -21,7 +21,7 @@ class searchForLink:
         try:
             req = requests.get(str_url, headers = headers).text
             soup_html = BeautifulSoup(req, 'html5lib')
-            print(soup_html)
+            #print(soup_html)
             #for str_chq_link in soup_html.find_all('a', attrs={'href': re.compile(str_urlchq, re.IGNORECASE)}):
             for str_chq_link in soup_html.find_all('a', attrs={'class': "result__url"}):
                 str_link_to_return = str_chq_link['href']

@@ -19,7 +19,6 @@ from loadConfig import loadConfig
 class moboData:
     def __init__(self, mysetup, myGetWeb, vendor, allowedChipsets, allowedExtras, dict_modelData):
         self.dict_modelData = dict_modelData
-        #status status'-> 0=nothing attempted, 1= BIOS bool_successfully downloaded, 2=Bios failed to downloaded, 4= already downloaded and upto date
         mysetup.dl_Src_PCPP(vendor, self.dict_modelData, allowedChipsets, allowedExtras)
 
 def main(pipe_connection):
@@ -28,7 +27,7 @@ def main(pipe_connection):
     dict_ModelData = {}
     str_datapath = os.path.join(os.getcwd(), os.path.dirname(__file__),"BIOSHERE","urlData.txt")
     str_breaker = "-------------------START---------------------"
-    dict_state_key = {'no_action':0,'update_bios':1,'ignore_bios':2,'failed_dl':3,'success_dl':4}
+    dict_state_key = {'no_action':0,'update_bios':1,'ignore_bios':2,'failed_dl':3,'success_dl':4, 'up-to-date':5}
     #set up directories and files
     try: 
         with open(str_datapath) as file_datafile:
@@ -105,8 +104,8 @@ def main(pipe_connection):
                             obj_myConfig.allvendordata[str_vendor]['vendorDownloadURLbase'],
                             obj_myConfig.allvendordata[str_vendor]['vendorURLaddon'], 
                             obj_linkSearching)
-
-                obj_dezip.deZip(str_cpathZip, str_cpathZip.strip(".zip"))
+                if not obj_myData.dict_modelData[str_model]['status'] == dict_state_key['up-to-date'] or obj_myData.dict_modelData[str_model]['status'] == dict_state_key['failed_dl']:
+                    obj_dezip.deZip(str_cpathZip, str_cpathZip.strip(".zip"))
                 if (time.time() - int_timeModerator)<obj_myConfig.sleepTimer:
                     print("Sleeping...")
                     time.sleep(obj_myConfig.sleepwait)

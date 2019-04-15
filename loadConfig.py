@@ -61,14 +61,14 @@ class loadConfig:
         print(" >Sleep Timer: "+ str(self.sleepTimer))
         print(" >Sleep Wait: "+ str(self.sleepwait))
         print(" >Vendor Array: "+str(self.vendor))
+        print(" >Allowed Chipsets: "+str(self.allowedChipsets))
+        print(" >Allowed Extras: "+str(self.allowedExtras))
         try:
             print(" >Vendor Web Selector: "+str(self.vendorSort))
             print(" >Additions for URL:"+str(self.vendorURLaddon))
             print(" >Download URL base: "+str(self.vendorDownloadURLbase))
         except:
             print(str(self.allvendordata))
-        print(" >Allowed Chipsets: "+str(self.allowedChipsets))
-        print(" >Allowed Extras: "+str(self.allowedExtras))
         print("Configuration Loaded...")
     def str_to_bool(self, s):
         if len(s)>0:
