@@ -48,11 +48,9 @@ class setUp:
                     #str_regexString = arr_allowedChipsets[x]
                     if re.search(str_regexString,model["name"],flags=re.IGNORECASE):
                         str_vendor_from_pcpp = (str_fullsku[0]).upper()
-                        dict_model_data = {'name':str_modelsku,'productURL':'','downloadURL':'','status':2,'vendor':str_vendor_from_pcpp,'chipset':arr_allowedChipsets[x],'wifi':bool_wifi}
+                        dict_model_data = {'name':str_modelsku,'productURL':'','downloadURL':'','status':0,'vendor':str_vendor_from_pcpp,'chipset':arr_allowedChipsets[x],'wifi':bool_wifi}
                         #print(dict_model_data)
                         self.generic_Sort(str_modelsku, dict_modelData, arr_vendorchq, dict_model_data)
-                    else:
-                        print("Ignoring "+str_modelsku)
                 
     def dl_Src_cleanStr(self,str_fullsku):
         model = str_fullsku.upper().replace(":","").replace(".", "-").replace(" ", "-").replace("(","").replace(")","").replace("-I-", "I-").replace("/","-")
@@ -62,14 +60,15 @@ class setUp:
         try:
             str_moboKey = dict_model_data['name']
            # print(dict_model_data['vendor']+":"+str(arr_vendorchq))
+           #put ignore state some how here
             if dict_model_data['vendor'] in arr_vendorchq:
                 if not str_moboKey in dict_modelData:   
                     dict_modelData[str_moboKey] = dict_model_data
-                    dict_modelData[str_moboKey]['status'] = 0
                     print('Added: '+dict_model_data['name'])
                 else:
                     dict_modelData[str_moboKey]['status'] = 1
                     print(str_moboKey+" already in system...")
+                
             else:
                 print('Unsupported vendor: '+str_moboKey)
 

@@ -1,7 +1,6 @@
-requests==2.21.0
-google==2.0.1
-html5lib==1.0.1
-wxPython==4.0.4
 clint==0.5.1
-PCPartPicker_API==0.0.9
+requests==2.21.0
+html5lib==1.0.1
+google==2.0.1
+PCPartPicker_API==0.1.2
 beautifulsoup4==4.7.1

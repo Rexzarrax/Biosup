@@ -21,9 +21,9 @@ class moboData:
         self.dict_modelData = dict_modelData
         mysetup.dl_Src_PCPP(vendor, self.dict_modelData, allowedChipsets, allowedExtras)
 
-def main(pipe_connection):
-    pipe_connection.send('----------BIOSUP----------')
-    pipe_connection.send("Initialising...")
+def main():
+    print('----------BIOSUP----------')
+    print("Initialising...")
     dict_ModelData = {}
     str_datapath = os.path.join(os.getcwd(), os.path.dirname(__file__),"BIOSHERE","urlData.txt")
     str_breaker = "-------------------START---------------------"
@@ -140,5 +140,5 @@ def main(pipe_connection):
     print("Script Finished...")
     input("Press Enter to continue/exit...")
 
-#if __name__ == "__main__":
-#    main()
+if __name__ == "__main__":
+    main()

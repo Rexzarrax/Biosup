@@ -5,13 +5,13 @@
 
 import wx
 import os
-from multiprocessing import Pool,Process,Pipe
-import subprocess
+#import multiprocessing
 import logging
 import time
-from datetime import datetime
+from datetime import datetime as dt
 import sys
-from BIOSUP import main as entry_BIOSUP
+import io
+#from BIOSUP import BIOSUP_MAIN as entry_BIOSUP
 from chq_status import chq_status
 
 from time import sleep
@@ -33,7 +33,7 @@ class BIOSUP_CONFIG(wx.Frame):
         self.selectall = self.running = True
         self.allchiparr = []
 
-        self.TEXT_CTRL_STATUS = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_LEFT | wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_WORDWRAP)
+        self.TEXT_CTRL_STATUS = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_LEFT | wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_WORDWRAP|wx.TE_RICH)
         self.TEXT_CTRL_STATUS.AppendText("Loading 'GUI_config.ini'...\n")
         
         try:
@@ -41,6 +41,7 @@ class BIOSUP_CONFIG(wx.Frame):
             self.TEXT_CTRL_STATUS.AppendText("'GUI_config.ini' successfully loaded...\n")
         except:
             self.TEXT_CTRL_STATUS.AppendText("'GUI_config.ini' failed to load...\n")
+            self.TEXT_CTRL_STATUS.SetForegroundColour(wx.RED)
 
         self.AMD_SIZER_ALL_CB = wx.CheckBox(self, wx.ID_ANY, "Select All")
         self.AMD_Chq_List = wx.CheckListBox(self, wx.ID_ANY, choices=self.config.AMDallowedchipsets)
@@ -52,8 +53,9 @@ class BIOSUP_CONFIG(wx.Frame):
         self.SH_BROWSER_CB = wx.CheckBox(self, wx.ID_ANY, "Show Browser")
         self.useLast_ChqBox = wx.CheckBox(self, wx.ID_ANY, "Last Config")
         self.Selectall_Btn = wx.Button(self, wx.ID_ANY, "SELECT ALL")
-        self.Run_Btn = wx.Button(self, wx.ID_ANY, "Generate\nConfig")
-        self.Run_n_Gen_Btn = wx.Button(self, wx.ID_ANY, "Generate\n and Run")
+        #self.Run_Btn = wx.Button(self, wx.ID_ANY, "Generate\nConfig")
+        #self.Run_n_Gen_Btn = wx.Button(self, wx.ID_ANY, "Generate\n and Run")
+        self.Run_n_Gen_Btn = wx.Button(self, wx.ID_ANY, "Generate\n Config")
 
         self.CLEANUP_CB.IsChecked()
 
@@ -61,13 +63,15 @@ class BIOSUP_CONFIG(wx.Frame):
         self.__do_layout()
         # end wxGlade
         #Bind events
-        self.Run_Btn.Bind(wx.EVT_BUTTON, self.Run_Event)
+        #self.Run_Btn.Bind(wx.EVT_BUTTON, self.Run_Event)
         self.Run_n_Gen_Btn.Bind(wx.EVT_BUTTON, self.Run_Gen_Event)
         self.Selectall_Btn.Bind(wx.EVT_BUTTON, self.Select_All_Chq_Box)
         self.useLast_ChqBox.Bind(wx.EVT_CHECKBOX, self.Select_Last_Run)
         self.AMD_SIZER_ALL_CB.Bind(wx.EVT_CHECKBOX, self.singular_Chq_AMD)
         self.INTEL_SIZER_ALL_CB.Bind(wx.EVT_CHECKBOX, self.singular_Chq_INTEL)
         self.VENDOR_SIZER_ALL_CB.Bind(wx.EVT_CHECKBOX, self.singular_Chq_Vendor)
+
+
         #self.useLast_ChqBox.SetValue(True)
     
     def singular_Chq_AMD(self, evt):
@@ -88,38 +92,9 @@ class BIOSUP_CONFIG(wx.Frame):
     
     def Run_Gen_Event(self, evt):
         self.Gen_Config()
-        with Pool(processes=4) as pool:
-            self.parent_conn, self.pipe_connection = Pipe()
-
-            try:
-                self.Thr_Biosup_run = pool.Process(target=entry_BIOSUP,name='BIOSUP_THREAD', args=(self.pipe_connection,))
-                self.Thr_Biosup_run.daemon = True
-                self.Thr_Biosup_run.start()
-                self.TEXT_CTRL_STATUS.AppendText("BIOSUP subscript started successfully...\n")
-            except Exception as e:
-                self.TEXT_CTRL_STATUS.AppendText("Unable to start BIOSUP thread...\n Error: "+str(e)+"\n")
-            sleep(1)
-            #try:
-                #self.Thr_checker = pool.Process(target=chq_status.meth_Checker,name='CHECKER_THREAD', args=(self.Thr_Biosup_run,self.TEXT_CTRL_STATUS,self.parent_conn))
-            #    self.Thr_checker = pool.Process(target=meth_Checker2,name='CHECKER_THREAD')
-            #    
-            #    self.Thr_checker.daemon = True
-            #    self.Thr_checker.start()
-            #    self.TEXT_CTRL_STATUS.AppendText("Checker subscript started successfully...\n")
-            
-            #except Exception as e: 
-            #    self.TEXT_CTRL_STATUS.AppendText("Unable to start CHECKER thread...\n Error: "+str(e)+"\n")
-
-    def meth_Checker2(self):
-            try:
-                while self.Thr_Biosup_run.is_alive: 
-                #TEXT_CTRL_STATUS.AppendText("Running as of "+str(dt.strftime('%H:%M:%S'))+"\n")
-                    #self.TEXT_CTRL_STATUS.AppendText(parent_conn.recv()+"\n")
-                    self.TEXT_CTRL_STATUS.AppendText("test"+"\n")
-                    sleep(1)
-                self.TEXT_CTRL_STATUS.AppendText("Biosup Exited...")
-            except Exception as e:
-                self.TEXT_CTRL_STATUS.AppendText("Unable to run CHECKER thread...\n Error: "+str(e)+"\n")                  
+        self.TEXT_CTRL_STATUS.AppendText("Now Close this GUI, and run 'BIOSUP.exe'")
+        self.TEXT_CTRL_STATUS.SetForegroundColour(wx.GREEN)
+               
 
     def Run_Event(self, evt):
         self.Gen_Config()
@@ -260,7 +235,8 @@ class BIOSUP_CONFIG(wx.Frame):
         FAT_CONTROLLER_GRID_SIZER.Add((0, 0), 0, 0, 0)
         FAT_CONTROLLER_GRID_SIZER.Add((0, 0), 0, 0, 0)
         FAT_CONTROLLER_GRID_SIZER.Add(self.Selectall_Btn, 0, wx.ALIGN_CENTER, 0)
-        FAT_CONTROLLER_GRID_SIZER.Add(self.Run_Btn, 0, wx.ALIGN_CENTER, 0)
+        FAT_CONTROLLER_GRID_SIZER.Add((0, 0), 0, 0, 0)
+        #FAT_CONTROLLER_GRID_SIZER.Add(self.Run_Btn, 0, wx.ALIGN_CENTER, 0)
         FAT_CONTROLLER_GRID_SIZER.Add(self.Run_n_Gen_Btn, 0, wx.ALIGN_RIGHT, 0)
 
         ALL_CTRLR.Add(FAT_CONTROLLER_GRID_SIZER, 0, 0, 0)
