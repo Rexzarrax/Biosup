@@ -12,11 +12,11 @@ from datetime import datetime as dt
 import sys
 import io
 #from BIOSUP import BIOSUP_MAIN as entry_BIOSUP
-from chq_status import chq_status
+from BIOSUP_THR_CHK_STATUS import chq_status
 
 from time import sleep
 
-from loadConfig import loadConfig 
+from BIOSUP_LOAD_CONFIG import loadConfig 
 
 # begin wxGlade: dependencies
 # end wxGlade
@@ -32,15 +32,16 @@ class BIOSUP_CONFIG(wx.Frame):
 
         self.selectall = self.running = True
         self.allchiparr = []
+        self.str_file_config = "CONFIGURATOR_CONFIG.ini"
 
         self.TEXT_CTRL_STATUS = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_LEFT | wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_WORDWRAP|wx.TE_RICH)
-        self.TEXT_CTRL_STATUS.AppendText("Loading 'GUI_config.ini'...\n")
+        self.TEXT_CTRL_STATUS.AppendText("Loading "+str(self.str_file_config)+"...\n")
         
         try:
-            self.config = loadConfig("GUI_config.ini")
-            self.TEXT_CTRL_STATUS.AppendText("'GUI_config.ini' successfully loaded...\n")
+            self.config = loadConfig(str(self.str_file_config))
+            self.TEXT_CTRL_STATUS.AppendText(str(self.str_file_config)+" successfully loaded...\n")
         except:
-            self.TEXT_CTRL_STATUS.AppendText("'GUI_config.ini' failed to load...\n")
+            self.TEXT_CTRL_STATUS.AppendText(str(self.str_file_config)+" failed to load...\n")
             self.TEXT_CTRL_STATUS.SetForegroundColour(wx.RED)
 
         self.AMD_SIZER_ALL_CB = wx.CheckBox(self, wx.ID_ANY, "Select All")
