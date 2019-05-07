@@ -6,14 +6,15 @@ import json
 import logging
 
 from csv import writer
-from Unzip import unzip
-from getHTML import gethtml
-from biosDL import biosDownload
-from setup import setUp
-from statistics import datastatistics
-from getwebwithjs import webwithjs
-from linkSearching import searchForLink       
-from loadConfig import loadConfig   
+
+from BIOSUP_UNZIP_ZIP import unzip
+from BIOSUP_GET_RAW_HTML import gethtml
+from BIOSUP_FIND_URL_AND_DL import biosDownload
+from BIOSUP_DICT_SETUP_DEL import setUp
+from BIOSUP_GET_STATISTICS import datastatistics
+from BIOSUP_LOAD_PG_IN_DRIVER import webwithjs
+from BIOSUP_SEARCH_PRODUCT_LINK import searchForLink       
+from BIOSUP_LOAD_CONFIG import loadConfig   
 
 #stores motherboard data
 class moboData:
