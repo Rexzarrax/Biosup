@@ -27,14 +27,10 @@ class webwithjs:
         self.sleepTimer = sleepTimer
         print("sleep timer: "+str(sleepTimer))
         try:
-            #if FireFox:
-                #FireFox headless
             options = webdriver.firefox.options.Options()
             if not openBrowser:
                 options.add_argument('-headless')
             self.driver = webdriver.Firefox(options=options)
-            #else:
-            #   self.runChromeDriver(openBrowser)
         except:
             self.runChromeDriver(openBrowser)
     def runChromeDriver(self, openBrowser):

@@ -2,7 +2,7 @@ import os
 import json
 import requests
 import re
-from PCPartPicker_API import pcpartpicker as pcpp
+from pcpartpickerapi import part_lists as pcpp
 try: 
     from bs4 import BeautifulSoup
 except ImportError:  
@@ -23,14 +23,14 @@ class setUp:
             print("Dir: \n" , str_cpwd_full ,  " \nalready exists\n")
 
     def dl_Src_PCPP(self, arr_vendorchq, dict_modelData, arr_allowedChipsets, str_allowedExtras):
-        int_mobo_page_count = pcpp.productLists.totalPages("motherboard")
+        int_mobo_page_count = pcpp.list_info("motherboard")["page_count"]
         str_wifi_regex = r'WI.FI|WIFI|AC|AX'
 
         print("Pages found: "+str(int_mobo_page_count))
         #IF IT IS ALREADY IN THE SYSTEM, CHANGE THE FLAG
-        for page in range(1, int_mobo_page_count+1):
-            list_skus = pcpp.productLists.getProductList("motherboard", page)
-            print("Collected page %d/%d" % (page,int_mobo_page_count))
+        for int_page in range(1, int_mobo_page_count+1):
+            list_skus = pcpp.get_list("motherboard", page_num=int_page)
+            print("Collected page %d/%d" % (int_page,int_mobo_page_count))
 
             for model in list_skus:
                 str_fullsku = str(model["name"]).split(" ")

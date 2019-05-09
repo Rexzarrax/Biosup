@@ -18,9 +18,9 @@ from BIOSUP_LOAD_CONFIG import loadConfig
 
 #stores motherboard data
 class moboData:
-    def __init__(self, mysetup, myGetWeb, vendor, allowedChipsets, allowedExtras, dict_modelData):
+    def __init__(self, obj_mysetup, vendor, allowedChipsets, allowedExtras, dict_modelData):
         self.dict_modelData = dict_modelData
-        mysetup.dl_Src_PCPP(vendor, self.dict_modelData, allowedChipsets, allowedExtras)
+        obj_mysetup.dl_Src_PCPP(vendor, self.dict_modelData, allowedChipsets, allowedExtras)
 
 def main():
     print('----------BIOSUP----------')
@@ -54,7 +54,7 @@ def main():
     obj_statisticsData = datastatistics(obj_myConfig.vendor)
     obj_mysetup = setUp()
     obj_myGetWeb = gethtml()
-    obj_myData = moboData(obj_mysetup, obj_myGetWeb, obj_myConfig.vendor, obj_myConfig.allowedChipsets, obj_myConfig.allowedExtras, dict_ModelData)  
+    obj_myData = moboData(obj_mysetup, obj_myConfig.vendor, obj_myConfig.allowedChipsets, obj_myConfig.allowedExtras, dict_ModelData)  
     obj_getBIO = biosDownload()
     obj_dezip = unzip()
     
