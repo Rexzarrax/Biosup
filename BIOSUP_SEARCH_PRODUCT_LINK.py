@@ -15,7 +15,8 @@ class searchForLink:
     def searchforlinkDDG(self, str_mymodel, str_urlchq):
         print("Running DDG search...")
         int_numURL = 0
-        str_url = "https://duckduckgo.com/html/?q="+str_mymodel+" support"
+        str_url = "https://duckduckgo.com/html/?q="+str_mymodel+" bios uefi"
+        print("DDG Gen link: "+str_url)
         headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'}    
 
         try:
