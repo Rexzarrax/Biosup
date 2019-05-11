@@ -71,70 +71,83 @@ def main():
     
     print("Finding and Downloading BIOS...")
 
+    int_used_total = 0
+
     int_modelLen = len(obj_myData.dict_modelData)
+    for int_x,str_model in enumerate(obj_myData.dict_modelData):
+        if not obj_myData.dict_modelData[str_model]['status'] == dict_state_key['update_bios']:
+            obj_myData.dict_modelData[str_model]['status'] = dict_state_key['ignore_bios']
+        else:
+            int_used_total += 1
 
     #loops through all entries in the myData.modelData dictionary
     for int_index,str_model in enumerate(obj_myData.dict_modelData):
         try:
-            int_timeModerator = time.time()
-            bool_success = False
-            print(str_breaker)
-            str_cpathDir = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/BIOSHERE/"+obj_myData.dict_modelData[str_model]['vendor']+"/"+str(obj_myData.dict_modelData[str_model]['chipset'])
-            print(str_model+"|Progress: "+str(int_index+1)+"/"+str(int_modelLen))
-            try:
-                os.makedirs(str_cpathDir)
-            except:
-                print(str_cpathDir+" Already Exists...")
-            str_cpathZip = str_cpathDir+"/"+obj_myData.dict_modelData[str_model]['name'].replace("/","-")+".zip"
-            str_vendor = obj_myData.dict_modelData[str_model]['vendor']
-            if (obj_myData.dict_modelData[str_model]['status'] == dict_state_key['no_action']) or (obj_myData.dict_modelData[str_model]['status'] == dict_state_key['update_bios']):
-                if str_vendor == "ASUS":
-                    obj_getBIO.urlBuilderAsus(
-                            obj_myData.dict_modelData[str_model],
-                            obj_myConfig.allvendordata[str_vendor]['vendorSort'], 
-                            str_cpathZip, 
-                            browser_driver, 
-                            obj_myConfig.allvendordata[str_vendor]['vendorDownloadURLbase'],
-                            obj_linkSearching)
+            if obj_myData.dict_modelData[str_model]['status'] == dict_state_key['update_bios']:
+                int_timeModerator = time.time()
+                bool_success = False
+                print(str_breaker)
+                str_cpathDir = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/BIOSHERE/"+obj_myData.dict_modelData[str_model]['vendor']+"/"+str(obj_myData.dict_modelData[str_model]['chipset'])
+                
+                print(str_model+"|Progress: "+str(int_index+1)+"/"+str(int_used_total))
+                try:
+                    os.makedirs(str_cpathDir)
+                except:
+                    print(str_cpathDir+" Already Exists...")
+                str_cpathZip = str_cpathDir+"/"+obj_myData.dict_modelData[str_model]['name'].replace("/","-")+".zip"
+                str_vendor = obj_myData.dict_modelData[str_model]['vendor']
+                if (obj_myData.dict_modelData[str_model]['status'] == dict_state_key['no_action']) or (obj_myData.dict_modelData[str_model]['status'] == dict_state_key['update_bios']):
+                    if str_vendor == "ASUS":
+                        obj_getBIO.urlBuilderAsus(
+                                obj_myData.dict_modelData[str_model],
+                                obj_myConfig.allvendordata[str_vendor]['vendorSort'], 
+                                str_cpathZip, 
+                                browser_driver, 
+                                obj_myConfig.allvendordata[str_vendor]['vendorDownloadURLbase'],
+                                obj_linkSearching)
+                    else:
+                        obj_getBIO.GenericUrlBuilder(
+                                obj_myData.dict_modelData[str_model],
+                                obj_myConfig.allvendordata[str_vendor]['vendorSort'], 
+                                str_cpathZip, 
+                                browser_driver, 
+                                obj_myConfig.allvendordata[str_vendor]['vendorDownloadURLbase'],
+                                obj_myConfig.allvendordata[str_vendor]['vendorURLaddon'], 
+                                obj_linkSearching)
+                    if not obj_myData.dict_modelData[str_model]['status'] == dict_state_key['up-to-date'] or obj_myData.dict_modelData[str_model]['status'] == dict_state_key['failed_dl']:
+                        obj_dezip.deZip(str_cpathZip, str_cpathZip.strip(".zip"))
+                    if (time.time() - int_timeModerator)<obj_myConfig.sleepTimer:
+                        print("Sleeping...")
+                        time.sleep(obj_myConfig.sleepwait)
                 else:
-                    obj_getBIO.GenericUrlBuilder(
-                            obj_myData.dict_modelData[str_model],
-                            obj_myConfig.allvendordata[str_vendor]['vendorSort'], 
-                            str_cpathZip, 
-                            browser_driver, 
-                            obj_myConfig.allvendordata[str_vendor]['vendorDownloadURLbase'],
-                            obj_myConfig.allvendordata[str_vendor]['vendorURLaddon'], 
-                            obj_linkSearching)
-                if not obj_myData.dict_modelData[str_model]['status'] == dict_state_key['up-to-date'] or obj_myData.dict_modelData[str_model]['status'] == dict_state_key['failed_dl']:
-                    obj_dezip.deZip(str_cpathZip, str_cpathZip.strip(".zip"))
-                if (time.time() - int_timeModerator)<obj_myConfig.sleepTimer:
-                    print("Sleeping...")
-                    time.sleep(obj_myConfig.sleepwait)
+                    print("Skipping "+str_model) 
+                print("Moving to next BIOS...\n")
+                if obj_myConfig.clean and obj_myData.dict_modelData[str_model]['status'] == dict_state_key['success_dl']:
+                    print("Running Cleanup of "+str_cpathZip+"...")
+                    obj_mysetup.cleanup(str_cpathZip, int_index)
+                if (int_index%10==0):
+                    print("Adding last "+str(10)+" URL's to file...")
+                    if obj_myConfig.saveState:
+                        with open (str_datapath,"w") as outfile:
+                            json.dump(obj_myData.dict_modelData,outfile)
             else:
-                print("Skipping "+str_model) 
-            print("Moving to next BIOS...\n")
-            if obj_myConfig.clean and obj_myData.dict_modelData[str_model]['status'] == dict_state_key['success_dl']:
-                print("Running Cleanup of "+str_cpathZip+"...")
-                obj_mysetup.cleanup(str_cpathZip, int_index)
-            if (int_index%10==0):
-                print("Adding last "+str(10)+" URL's to file...")
-                if obj_myConfig.saveState:
-                    with open (str_datapath,"w") as outfile:
-                        json.dump(obj_myData.dict_modelData,outfile)
+                print("Skipped: "+obj_myData.dict_modelData[str_model]['name'])
         except:
             print("Error Detected with ..."+str_model)
             wait = input("Press Enter to continue. \nPress any key and then Enter to exit:")
             if len(wait)>0:
                 print('Exiting...')
-                browser_driver.browser_driver.quit()
+                browser_driver.driver.quit()
                 quit()
 
     if obj_myConfig.saveState:
         with open (str_datapath,"w") as outfile:
             json.dump(obj_myData.dict_modelData,outfile)
 
-    browser_driver.browser_driver.quit()
+    browser_driver.driver.quit()
     print("All downloading and unzipping attempted...\n")
+
+    print("Total Models in urldata.txt"+str(int_modelLen)) 
 
     obj_statisticsData.printstat(obj_myConfig.vendor, obj_myData)
     
