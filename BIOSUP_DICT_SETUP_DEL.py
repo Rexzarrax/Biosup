@@ -65,6 +65,7 @@ class setUp:
                 if not str_moboKey in dict_modelData:   
                     dict_modelData[str_moboKey] = dict_model_data
                     print('Added: '+dict_model_data['name'])
+                    dict_modelData[str_moboKey]['status'] = 1
                 else:
                     dict_modelData[str_moboKey]['status'] = 1
                     print(str_moboKey+" already in system...")
