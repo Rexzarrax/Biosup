@@ -64,3 +64,6 @@ node_modules/
 urlData.txt
 BIOSUP/Scripts/
 BIOSUP/tcl/
+bin/
+include/
+.google-cookie
