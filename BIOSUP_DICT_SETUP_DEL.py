@@ -23,13 +23,14 @@ class setUp:
             print("Dir: \n" , str_cpwd_full ,  " \nalready exists\n")
 
     def dl_Src_PCPP(self, arr_vendorchq, dict_modelData, arr_allowedChipsets, str_allowedExtras):
-        int_mobo_page_count = pcpp.list_info("motherboard")["page_count"]
+        #int_mobo_page_count = pcpp.list_info("motherboard")["page_count"]
+        int_mobo_page_count = pcpp.list_page_count("motherboard")
         str_wifi_regex = r'WI.FI|WIFI|AC|AX'
 
         print("Pages found: "+str(int_mobo_page_count))
         #IF IT IS ALREADY IN THE SYSTEM, CHANGE THE FLAG
         for int_page in range(1, int_mobo_page_count+1):
-            list_skus = pcpp.get_list("motherboard", page_num=int_page)
+            list_skus = pcpp.get_list("motherboard", page=int_page)
             print("Collected page %d/%d" % (int_page,int_mobo_page_count))
 
             for model in list_skus:
