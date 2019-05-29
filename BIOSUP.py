@@ -13,14 +13,14 @@ from BIOSUP_FIND_URL_AND_DL import biosDownload
 from BIOSUP_DICT_SETUP_DEL import setUp
 from BIOSUP_GET_STATISTICS import datastatistics
 from BIOSUP_LOAD_PG_IN_DRIVER import webwithjs
-from BIOSUP_SEARCH_PRODUCT_LINK import searchForLink       
-from BIOSUP_LOAD_CONFIG import loadConfig   
+from BIOSUP_SEARCH_PRODUCT_LINK import searchForLink
+from BIOSUP_LOAD_CONFIG import loadConfig        
 
 #stores motherboard data
 class moboData:
     def __init__(self, obj_mysetup, vendor, allowedChipsets, allowedExtras, dict_modelData):
         self.dict_modelData = dict_modelData
-        obj_mysetup.dl_Src_PCPP(vendor, self.dict_modelData, allowedChipsets, allowedExtras)
+        obj_mysetup.dl_src_github(vendor, self.dict_modelData, allowedChipsets, allowedExtras)
 
 def main():
     print('----------BIOSUP----------')
