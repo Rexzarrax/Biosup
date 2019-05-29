@@ -15,7 +15,7 @@ class searchForLink:
     def searchforlinkDDG(self, str_mymodel, str_urlchq):
         print("Running DDG search...")
         int_numURL = 0
-        str_url = "https://duckduckgo.com/html/?q="+str_mymodel+" bios uefi"
+        str_url = "https://duckduckgo.com/html/?q="+str_mymodel+" uefi bios"
         print("DDG Gen link: "+str_url)
         headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'}    
 
@@ -31,15 +31,15 @@ class searchForLink:
                 print("Found the URL:", str_link_to_return)
                 if re.findall(str_urlchq, str_link_to_return, re.IGNORECASE):
                     return str_link_to_return #make sure contains model in url
-                elif not int_numURL > 15:
+                elif not int_numURL > 20:
                     int_numURL += 1
                     print("Tried str_chq_link "+str(int_numURL)+":"+str(str_link_to_return+"\n"+str(str_urlchq)))
                 else:
                     break
-            if str_link_to_return == "":
-                print("Switching to Google...")
-                googleAttempt = self.search_for_link_google(str_mymodel, str_urlchq)
-                return googleAttempt
+            #if str_link_to_return == "":
+            print("Switching to Google...")
+            googleAttempt = self.search_for_link_google(str_mymodel, str_urlchq)
+            return googleAttempt
         except:
             print("Failed, Switching to Google...")
             googleAttempt = self.search_for_link_google(str_mymodel, str_urlchq)
