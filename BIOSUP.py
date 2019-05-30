@@ -51,7 +51,7 @@ def main():
 
     #create required objects
     obj_myConfig = loadConfig("config.ini")
-    obj_statisticsData = datastatistics(obj_myConfig.vendor)
+    obj_statisticsData = datastatistics(obj_myConfig.vendor, dict_state_key)
     obj_mysetup = setUp()
     obj_myGetWeb = gethtml()
     obj_myData = moboData(obj_mysetup, obj_myConfig.vendor, obj_myConfig.allowedChipsets, obj_myConfig.allowedExtras, dict_ModelData)  
@@ -147,7 +147,7 @@ def main():
     browser_driver.driver.quit()
     print("All downloading and unzipping attempted...\n")
 
-    print("Total Models in urldata.txt"+str(int_modelLen)) 
+    print("Total Models in urldata.txt: "+str(int_modelLen)) 
 
     obj_statisticsData.printstat(obj_myConfig.vendor, obj_myData)
     
