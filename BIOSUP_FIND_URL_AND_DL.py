@@ -33,6 +33,7 @@ class biosDownload:
     def urlBuilderAsus(self, dict_mymodel, str_urlchq, str_cpath, driver,str_URLchq, searchForLink):
         print("Finding Motherboard URL...")
         if not os.path.exists(str_cpath):
+            #could add ability to use prod url if already in urltxt dict but need to implememnt checking system
             str_prodURL = str(searchForLink.searchforlinkDDG(dict_mymodel['name'], str_urlchq)).replace("/specifications","")
             str_prodURL = re.sub('_Download(.*)|_CPU(.*)|_QVL(.*)|_BIOS/','_BIOS', str_prodURL, flags=re.IGNORECASE)             
             if not str_prodURL == "None" :

@@ -43,7 +43,7 @@ class datastatistics:
             str_title = '{s:{c}^{n}}'.format(s=str_counter,n=20,c='=')
             print(str_title)
             print('Successful downloads: %s' %(self.vendorCounts[str_counter]['successCount']))
-            print('Already latest: %s' %(self.vendorCounts[str_counter]['updateCount']))
+            print('Bios already latest: %s' %(self.vendorCounts[str_counter]['updateCount']))
             print('Failed Downloads: %s' %(self.vendorCounts[str_counter]['failCount']))
 
         if not len(self.failedDownloadList) == 0:
