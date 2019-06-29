@@ -54,7 +54,7 @@ def main():
             obj_print.print_msg('File already exists...')
 
     #create required objects
-    obj_myConfig = loadConfig("config.ini", obj_print)
+    obj_myConfig = loadConfig("config.ini")
     obj_statisticsData = datastatistics(obj_myConfig.vendor, dict_state_key)
     obj_mysetup = setUp()
     obj_myGetWeb = gethtml()

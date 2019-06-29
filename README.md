@@ -6,24 +6,40 @@ Biosup is a program designed to automate the sourcing and downloading of BIOS/UE
 
 Furthermore, Biosup features progress saving and full automation, set and forget!
 
+Biosup DOES NOT install the bios for you.
+
 ![](header.PNG)
 
 ## Installation
 No installation needed :D
 
-to run Biosup on:
+To run Biosup on:
 Windows:
 
-1. Download the latest version from [here](https://bitbucket.org/Rexzarrax/biosup/downloads/).
+1. Download the latest version from [here](https://github.com/Rexzarrax/Biosup/releases).
 2. Unzip the downloaded file.
-3. Run BIOSUP.exe.
+3. Run CONFIGURATOR.exe.
+4. Selected the options you wish to run Biosup with.
+5. Click the "Generate Config" button
+6. exit the CONFIGURATOR.
+
+7. Run BIOSUP.exe
+8. Wait for the script to finish. 
+
 
 Linux:
+1. Download the source code through git
+2. Navigate to it through your favourite cli
+3. Install the required packages with pip(see requirements.txt) 
+4. Using the python interpreter, run the CONFIGURATOR.py script.
+5. Selected the options you wish to run Biosup with.
+6. Click the "Generate Config" button
+7. exit the CONFIGURATOR.
 
-    WINE: detailed steps coming
+8. Run BIOSUP.py
+9. Wait for the script to finish. 
 
-    Git: detailed steps coming
-
+**Note, it is reccomended to run this on USB flash storage generally for easy transfer to the PC needing a update.
 
 ## Requirements 
 Can be found in requirement.txt in main repo [here](https://bitbucket.org/Rexzarrax/biosup/src/master/requirements.txt)

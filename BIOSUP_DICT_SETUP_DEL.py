@@ -89,22 +89,22 @@ class setUp:
             if dict_model_data['vendor'] in arr_vendorchq:
                 if not str_moboKey in dict_modelData:   
                     dict_modelData[str_moboKey] = dict_model_data
-                    obj_print.print_msg('Added: '+dict_model_data['name'])
+                    print('Added: '+dict_model_data['name'])
                     dict_modelData[str_moboKey]['status'] = 1
                 else:
                     dict_modelData[str_moboKey]['status'] = 1
-                    obj_print.print_msg(str_moboKey+" already in system...")
+                    print(str_moboKey+" already in system...")
                 
             else:
-                obj_print.print_msg('Unsupported vendor: '+str_moboKey)
+                print('Unsupported vendor: '+str_moboKey)
 
         except Exception as e: 
-            obj_print.print_msg(e)
-            obj_print.print_msg('Not Added: '+dict_model_data['name'])
+            print(e)
+            print('Not Added: '+dict_model_data['name'])
 
     def cleanup(self, str_cpath, index):
         try:
-            obj_print.print_msg("Deleting "+str_cpath)
+            print("Deleting "+str_cpath)
             os.remove(str_cpath)
         except: 
-            obj_print.print_msg("Error in Deleting "+str_cpath)
+            print("Error in Deleting "+str_cpath)
