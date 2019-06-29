@@ -24,10 +24,10 @@ class moboData:
         obj_mysetup.dl_src_github(vendor, self.dict_modelData, allowedChipsets, allowedExtras)
 
 def main():
-    obj_print = printOutput()
+    #obj_print = printOutput()
 
-    obj_print.print_msg('----------BIOSUP----------')
-    obj_print.print_msg("Initialising...")
+    print('----------BIOSUP----------')
+    print("Initialising...")
     dict_ModelData = {}
     str_datapath = os.path.join(os.getcwd(), os.path.dirname(__file__),"BIOSHERE","urlData.txt")
     str_breaker = "-------------------START---------------------"
@@ -37,21 +37,21 @@ def main():
     try: 
         with open(str_datapath) as file_datafile:
             dict_ModelData = json.load(file_datafile)
-            obj_print.print_msg(str(dict_ModelData))
+            print(str(dict_ModelData))
             file_datafile.close()
     except Exception as e: 
-        obj_print.print_msg(e)
+        print(e)
         try:
-            obj_print.print_msg("Attempting to create BIOSHERE folder...")
+            print("Attempting to create BIOSHERE folder...")
             os.mkdir(os.path.join(os.getcwd(), os.path.dirname(__file__),"BIOSHERE"))
         except:
-            obj_print.print_msg("Dir already exists")
+            print("Dir already exists")
         try:
-            obj_print.print_msg("Creating "+str_datapath)
+            print("Creating "+str_datapath)
             file_datafile=open(str_datapath,"x")
             file_datafile.close()
         except:
-            obj_print.print_msg('File already exists...')
+            print('File already exists...')
 
     #create required objects
     obj_myConfig = loadConfig("config.ini")
@@ -63,17 +63,17 @@ def main():
     obj_dezip = unzip()
     
     #open headless web browser to access vendor websites
-    obj_print.print_msg("Opening browser...")
+    print("Opening browser...")
     browser_driver = webwithjs(obj_myConfig.openBrowser, obj_myConfig.sleepTimer)
     obj_linkSearching = searchForLink()
 
-    obj_print.print_msg("Sourcing models...")
+    print("Sourcing models...")
     for vendorName in range(len(obj_myConfig.vendor)):
         obj_mysetup.folderChq(obj_myConfig.vendor[vendorName])
 
-    obj_print.print_msg(str(obj_myData.dict_modelData))
+    print(str(obj_myData.dict_modelData))
     
-    obj_print.print_msg("Finding and Downloading BIOS...")
+    print("Finding and Downloading BIOS...")
 
     int_used_total = 0
 
@@ -90,14 +90,14 @@ def main():
             if obj_myData.dict_modelData[str_model]['status'] == dict_state_key['update_bios']:
                 int_timeModerator = time.time()
                 bool_success = False
-                obj_print.print_msg(str_breaker)
+                print(str_breaker)
                 str_cpathDir = os.path.join(os.getcwd(), os.path.dirname(__file__))+"/BIOSHERE/"+obj_myData.dict_modelData[str_model]['vendor']+"/"+str(obj_myData.dict_modelData[str_model]['chipset'])
                 
-                obj_print.print_msg(str_model+"|Progress: "+str(int_index+1)+"/"+str(int_used_total))
+                print(str_model+"|Progress: "+str(int_index+1)+"/"+str(int_used_total))
                 try:
                     os.makedirs(str_cpathDir)
                 except:
-                    obj_print.print_msg(str_cpathDir+" Already Exists...")
+                    print(str_cpathDir+" Already Exists...")
                 str_cpathZip = str_cpathDir+"/"+obj_myData.dict_modelData[str_model]['name'].replace("/","-")+".zip"
                 str_vendor = obj_myData.dict_modelData[str_model]['vendor']
                 if (obj_myData.dict_modelData[str_model]['status'] == dict_state_key['no_action']) or (obj_myData.dict_modelData[str_model]['status'] == dict_state_key['update_bios']):
@@ -121,26 +121,26 @@ def main():
                     if not obj_myData.dict_modelData[str_model]['status'] == dict_state_key['up-to-date'] or obj_myData.dict_modelData[str_model]['status'] == dict_state_key['failed_dl']:
                         obj_dezip.deZip(str_cpathZip, str_cpathZip.strip(".zip"))
                     if (time.time() - int_timeModerator)<obj_myConfig.sleepTimer:
-                        obj_print.print_msg("Sleeping...")
+                        print("Sleeping...")
                         time.sleep(obj_myConfig.sleepwait)
                 else:
-                    obj_print.print_msg("Skipping "+str_model) 
-                obj_print.print_msg("Moving to next BIOS...\n")
+                    print("Skipping "+str_model) 
+                print("Moving to next BIOS...\n")
                 if obj_myConfig.clean and obj_myData.dict_modelData[str_model]['status'] == dict_state_key['success_dl']:
-                    obj_print.print_msg("Running Cleanup of "+str_cpathZip+"...")
+                    print("Running Cleanup of "+str_cpathZip+"...")
                     obj_mysetup.cleanup(str_cpathZip, int_index)
                 if (int_index%10==0):
-                    obj_print.print_msg("Adding last "+str(10)+" URL's to file...")
+                    print("Adding last "+str(10)+" URL's to file...")
                     if obj_myConfig.saveState:
                         with open (str_datapath,"w") as outfile:
                             json.dump(obj_myData.dict_modelData,outfile)
             else:
-                obj_print.print_msg("Skipped: "+obj_myData.dict_modelData[str_model]['name'])
+                print("Skipped: "+obj_myData.dict_modelData[str_model]['name'])
         except:
-            obj_print.print_msg("Error Detected with ..."+str_model)
+            print("Error Detected with ..."+str_model)
             wait = input("Press Enter to continue. \nPress any key and then Enter to exit:")
             if len(wait)>0:
-                obj_print.print_msg('Exiting...')
+                print('Exiting...')
                 browser_driver.driver.quit()
                 quit()
 
@@ -149,13 +149,13 @@ def main():
             json.dump(obj_myData.dict_modelData,outfile)
 
     browser_driver.driver.quit()
-    obj_print.print_msg("All downloading and unzipping attempted...\n")
+    print("All downloading and unzipping attempted...\n")
 
-    obj_print.print_msg("Total Models in urldata.txt: "+str(int_modelLen)) 
+    print("Total Models in urldata.txt: "+str(int_modelLen)) 
 
     obj_statisticsData.printstat(obj_myConfig.vendor, obj_myData)
     
-    obj_print.print_msg("Script Finished...")
+    print("Script Finished...")
     input("Press Enter to continue/exit...")
 
 if __name__ == "__main__":
