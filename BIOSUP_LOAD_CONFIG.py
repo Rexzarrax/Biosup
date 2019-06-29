@@ -3,7 +3,7 @@ import os
 from json import load
 
 class loadConfig:
-    def __init__(self, configfile):
+    def __init__(self, configfile, obj_print):
         try:
             config_object = ConfigParser()
             config_object.read(configfile)
@@ -45,31 +45,31 @@ class loadConfig:
                     self.allvendordata = load(infile)
                     infile.close()
             except Exception as e: 
-                print("Failure in loading vendors (in)"+str(e))
+                obj_print.print_msg("Failure in loading vendors (in)"+str(e))
                 exit()
-            print(str(self.allvendordata))
+            obj_print.print_msg(str(self.allvendordata))
         except Exception as e: 
-            print("Failure in loading vendors (out)"+str(e))
+            obj_print.print_msg("Failure in loading vendors (out)"+str(e))
             input("Critical Error: Missing or Invalid configuration file(config.ini or GUI_config.ini)")
             exit()
         #print all loaded config data to console
-        print("Loading config... ")
-        print(" >Clean up: "+str(self.clean))
+        obj_print.print_msg("Loading config... ")
+        obj_print.print_msg(" >Clean up: "+str(self.clean))
         #print(" >FireFox installed: "+str(self.FireFox))
-        print(" >Open browser window: "+str(self.openBrowser))
-        print(" >Save BIOS already Downloaded: "+str(self.saveState))
-        print(" >Sleep Timer: "+ str(self.sleepTimer))
-        print(" >Sleep Wait: "+ str(self.sleepwait))
-        print(" >Vendor Array: "+str(self.vendor))
-        print(" >Allowed Chipsets: "+str(self.allowedChipsets))
-        print(" >Allowed Extras: "+str(self.allowedExtras))
+        obj_print.print_msg(" >Open browser window: "+str(self.openBrowser))
+        obj_print.print_msg(" >Save BIOS already Downloaded: "+str(self.saveState))
+        obj_print.print_msg(" >Sleep Timer: "+ str(self.sleepTimer))
+        obj_print.print_msg(" >Sleep Wait: "+ str(self.sleepwait))
+        obj_print.print_msg(" >Vendor Array: "+str(self.vendor))
+        obj_print.print_msg(" >Allowed Chipsets: "+str(self.allowedChipsets))
+        obj_print.print_msg(" >Allowed Extras: "+str(self.allowedExtras))
         try:
-            print(" >Vendor Web Selector: "+str(self.vendorSort))
-            print(" >Additions for URL:"+str(self.vendorURLaddon))
-            print(" >Download URL base: "+str(self.vendorDownloadURLbase))
+            obj_print.print_msg(" >Vendor Web Selector: "+str(self.vendorSort))
+            obj_print.print_msg(" >Additions for URL:"+str(self.vendorURLaddon))
+            obj_print.print_msg(" >Download URL base: "+str(self.vendorDownloadURLbase))
         except:
-            print(str(self.allvendordata))
-        print("Configuration Loaded...")
+            obj_print.print_msg(str(self.allvendordata))
+        obj_print.print_msg("Configuration Loaded...")
     def str_to_bool(self, s):
         if len(s)>0:
             return True
