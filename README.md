@@ -39,7 +39,7 @@ Linux:
 8. Run BIOSUP.py
 9. Wait for the script to finish. 
 
-**Note, it is recomended to run this on USB flash storage generally for easy transfer to the PC needing a update.
+**Note, it is recommended to run this on USB flash storage generally for easy transfer to the PC needing a update.
 
 Use ctrl-c to exit while in linux (or any other process manager)
 
