@@ -27,7 +27,10 @@ class loadConfig:
                 self.allowedChipsets = (config_object["SETTINGS"]["allowedChipsets"].split(","))
                 print('allowed chipsets')
             self.allowedChipsets.sort()
-
+            try:
+                self.allowedChipsets.remove('')
+            except:
+                print("No blank entries :)")
             try:
                 self.datapath = os.path.join(os.getcwd(), os.path.dirname(__file__),"vendorInfo.txt")
                 with open (self.datapath) as infile:
@@ -39,7 +42,7 @@ class loadConfig:
             print(str(self.allvendordata))
         except Exception as e: 
             print("Failure in loading vendors (out)"+str(e))
-            input("Critical Error: Missing or Invalid configuration file(config.ini or GUI_config.ini)")
+            input("Critical Error: Missing or Invalid configuration file: "+configfile)
             exit()
         #print all loaded config data to console
         print("Loading config... ")

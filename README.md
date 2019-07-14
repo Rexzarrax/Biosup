@@ -44,7 +44,13 @@ Linux:
 Use ctrl-c to exit while in linux (or any other process manager)
 
 ## Requirements 
-Can be found in requirement.txt in main repo [here](https://bitbucket.org/Rexzarrax/biosup/src/master/requirements.txt)
+Software:
+-The latest python version
+-Used packages can be found in requirement.txt, in main repo [here](https://bitbucket.org/Rexzarrax/biosup/src/master/requirements.txt)
+
+Hardware:
+-System with internet connection
+-USB flash drive with at least 8GB of storage(16GB recommended)
 
 ## Credits
 Icon made by [Smashicons](https://www.flaticon.com/authors/smashicons) from [Flaticon](https://www.flaticon.com)

@@ -14,8 +14,7 @@ from BIOSUP_DICT_SETUP_DEL import setUp
 from BIOSUP_GET_STATISTICS import datastatistics
 from BIOSUP_LOAD_PG_IN_DRIVER import webwithjs
 from BIOSUP_SEARCH_PRODUCT_LINK import searchForLink
-from BIOSUP_LOAD_CONFIG import loadConfig       
-from BIOSUP_PRINT_OUTPUT import printOutput 
+from BIOSUP_LOAD_CONFIG import loadConfig
 
 #stores motherboard data
 class moboData:
@@ -101,23 +100,13 @@ def main():
                 str_cpathZip = str_cpathDir+"/"+obj_myData.dict_modelData[str_model]['name'].replace("/","-")+".zip"
                 str_vendor = obj_myData.dict_modelData[str_model]['vendor']
                 if (obj_myData.dict_modelData[str_model]['status'] == dict_state_key['no_action']) or (obj_myData.dict_modelData[str_model]['status'] == dict_state_key['update_bios']):
-                    if str_vendor == "ASUS":
-                        obj_getBIO.urlBuilderAsus(
-                                obj_myData.dict_modelData[str_model],
-                                obj_myConfig.allvendordata[str_vendor]['vendorSort'], 
-                                str_cpathZip, 
-                                browser_driver, 
-                                obj_myConfig.allvendordata[str_vendor]['vendorDownloadURLbase'],
-                                obj_linkSearching)
-                    else:
-                        obj_getBIO.GenericUrlBuilder(
-                                obj_myData.dict_modelData[str_model],
-                                obj_myConfig.allvendordata[str_vendor]['vendorSort'], 
-                                str_cpathZip, 
-                                browser_driver, 
-                                obj_myConfig.allvendordata[str_vendor]['vendorDownloadURLbase'],
-                                obj_myConfig.allvendordata[str_vendor]['vendorURLaddon'], 
-                                obj_linkSearching)
+                    obj_getBIO.GenericUrlBuilder(
+                            obj_myData.dict_modelData[str_model],
+                            obj_myConfig.allvendordata[str_vendor],
+                            str_cpathZip, 
+                            browser_driver,
+                            obj_linkSearching)
+
                     if not obj_myData.dict_modelData[str_model]['status'] == dict_state_key['up-to-date'] or obj_myData.dict_modelData[str_model]['status'] == dict_state_key['failed_dl']:
                         obj_dezip.deZip(str_cpathZip, str_cpathZip.strip(".zip"))
                     if (time.time() - int_timeModerator)<obj_myConfig.sleepTimer:
@@ -125,10 +114,13 @@ def main():
                         time.sleep(obj_myConfig.sleepwait)
                 else:
                     print("Skipping "+str_model) 
+
                 print("Moving to next BIOS...\n")
+                
                 if obj_myConfig.clean and obj_myData.dict_modelData[str_model]['status'] == dict_state_key['success_dl']:
                     print("Running Cleanup of "+str_cpathZip+"...")
                     obj_mysetup.cleanup(str_cpathZip, int_index)
+                
                 if (int_index%10==0):
                     print("Adding last "+str(10)+" URL's to file...")
                     if obj_myConfig.saveState:
@@ -136,8 +128,9 @@ def main():
                             json.dump(obj_myData.dict_modelData,outfile)
             else:
                 print("Skipped: "+obj_myData.dict_modelData[str_model]['name'])
-        except:
-            print("Error Detected with ..."+str_model)
+
+        except Exception as e:
+            print("Error Detected with model: "+str_model+" "+str(e))
             wait = input("Press Enter to continue. \nPress any key and then Enter to exit:")
             if len(wait)>0:
                 print('Exiting...')

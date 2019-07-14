@@ -17,51 +17,42 @@ class biosDownload:
     def __Init__(self):
         #self.status = {'DLSuccess':False,'DLUpdate':False}
         pass
-    def GenericUrlBuilder(self,dict_mymodel, str_urlchq, str_cpath, driver, str_URLchq, URLaddON, searchForLink):
+    def GenericUrlBuilder(self,dict_mymodel,uniqVendorData, str_cpath, driver, searchForLink):
+        str_urlchq = uniqVendorData['vendorSort']
+        URLaddON = uniqVendorData['vendorURLaddon']
+        list_URLDLchq = uniqVendorData['vendorDownloadURLbase']
+
         print("Finding "+dict_mymodel['name']+ " URL...")
         if not os.path.exists(str_cpath):
             #could add ability to use prod url is already in system but need to imp checking system
             dict_mymodel['productURL'] = str(searchForLink.searchforlinkDDG(dict_mymodel['name'], str_urlchq))
+            dict_mymodel['productURL'] = re.sub(uniqVendorData['vendorSUBInput'],uniqVendorData['vendorSUBOutput'], dict_mymodel['productURL'], flags=re.IGNORECASE)
+            print(dict_mymodel['productURL'])
             if not dict_mymodel['productURL'] == "None":
                 dict_mymodel['productURL'] += URLaddON
-                self.getdlURL(driver, str_cpath, str_URLchq, dict_mymodel)
+                self.getdlURL(driver, str_cpath, list_URLDLchq, dict_mymodel)
             else:
                 print("Error in getting Src URL")
         else:
             print("Zip file already downloaded...")
-    #Download bios from Asus
-    def urlBuilderAsus(self, dict_mymodel, str_urlchq, str_cpath, driver,str_URLchq, searchForLink):
-        print("Finding Motherboard URL...")
-        if not os.path.exists(str_cpath):
-            #could add ability to use prod url if already in urltxt dict but need to implememnt checking system
-            str_prodURL = str(searchForLink.searchforlinkDDG(dict_mymodel['name'], str_urlchq)).replace("/specifications","")
-            str_prodURL = re.sub('_Download(.*)|_CPU(.*)|_QVL(.*)|_BIOS/','_BIOS', str_prodURL, flags=re.IGNORECASE)             
-            if not str_prodURL == "None" :
-                if not str_prodURL.endswith('_BIOS'):
-                    print("Adding 'HelpDesk_BIOS/' to URL")
-                    str_prodURL += '/HelpDesk_BIOS/'
-                dict_mymodel['productURL'] = str_prodURL
-                self.getdlURL(driver, str_cpath, str_URLchq, dict_mymodel)
-            else:
-                print("Error in getting Motherboard URL")      
-        else:
-             print("Zip file already downloaded...")
 
     #setup in future to try and use the url gathered from in dict_mymodel[productURL]
     #instead of using linksearching all the time
-    def getdlURL(self, driver, str_cpath, str_urlChq, dict_mymodel):
+    def getdlURL(self, driver, str_cpath, list_urlChq, dict_mymodel):
         print("Motherboard URL: "+dict_mymodel['productURL'])
         print("Finding Download URL...")
         bool_gotLink = bool_refresh = False
         int_retries = 1
         while (bool_gotLink == False) and (int_retries < 5):
             soup_html = driver.getwebwithjs(dict_mymodel['productURL'], bool_refresh)
-            for link in soup_html.find_all('a', attrs={'href': re.compile(str_urlChq)}):
-                print("Found the URL:", link['href'])
-                str_download_Link = link['href']
-                if not link == "None":
-                    bool_gotLink = True 
-                    self.dlBIOS(str_download_Link,str_cpath, dict_mymodel)
+            for str_urlchq in list_urlChq:
+                for link in soup_html.find_all('a', attrs={'href': re.compile(str_urlchq)}):
+                    print("Found the URL:", link['href'])
+                    str_download_Link = link['href']
+                    if not link == "None":
+                        bool_gotLink = True 
+                        self.dlBIOS(str_download_Link,str_cpath, dict_mymodel)
+                        break
                     break
             if not bool_gotLink:
                 print("Missed URL, retrying, waiting "+str(int_retries-1)+"s...")

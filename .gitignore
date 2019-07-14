@@ -67,3 +67,5 @@ BIOSUP/tcl/
 bin/
 include/
 .google-cookie
+
+*.ps1

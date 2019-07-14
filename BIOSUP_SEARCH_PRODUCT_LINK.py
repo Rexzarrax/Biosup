@@ -2,6 +2,7 @@ import re
 import requests
 import html5lib
 import urllib.parse
+from difflib import SequenceMatcher
 try: 
     from googlesearch import search 
 except ImportError:  
@@ -12,9 +13,11 @@ class searchForLink:
     def __init__(self):
             pass
     #convert this to use browser instead of get requests
+    #if searchforlinkDDG fails, uses google instead
     def searchforlinkDDG(self, str_mymodel, str_urlchq):
         print("Running DDG search...")
         list_search_extras = [""," uefi", " bios", " support"]
+        int_search_threshold = 0.6
         for int_x in range(0,len(list_search_extras)):
             int_numURL = 0
             print("Query addon: "+list_search_extras[int_x])
@@ -31,12 +34,21 @@ class searchForLink:
                     str_link_to_return = str_chq_link['href']
                     str_link_to_return = urllib.parse.unquote_plus(str_link_to_return)
                     str_link_to_return = str_link_to_return.replace("/l/?kh=-1&uddg=","")
+                   
                     print("Found the URL:", str_link_to_return)
+                    print(str_urlchq+str_mymodel+" vs. "+str_link_to_return)
+                    
+                    #will need to fix this up a bit to accuratly find the correct url
                     if re.findall(str_urlchq, str_link_to_return, re.IGNORECASE):
-                        return str_link_to_return #make sure contains model in url
+                        int_match = SequenceMatcher("",str_link_to_return,str_urlchq+str_mymodel).ratio()
+                        print(str(int_match))
+                        if int_match > int_search_threshold:
+                            return str_link_to_return
+
                     elif not int_numURL > 20:
                         int_numURL += 1
                         print("Tried str_chq_link "+str(int_numURL)+":"+str(str_link_to_return+"\n"+str(str_urlchq)))
+                    
                     else:
                         break
                 #if str_link_to_return == "":
