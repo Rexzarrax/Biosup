@@ -15,7 +15,6 @@ from clint.textui import progress
 #class holds methods for downloading the BIOS from a vendor
 class biosDownload:
     def __Init__(self):
-        #self.status = {'DLSuccess':False,'DLUpdate':False}
         pass
     def GenericUrlBuilder(self,dict_mymodel,uniqVendorData, str_cpath, driver, searchForLink):
         str_urlchq = uniqVendorData['vendorSort']
@@ -25,9 +24,13 @@ class biosDownload:
         print("Finding "+dict_mymodel['name']+ " URL...")
         if not os.path.exists(str_cpath):
             #could add ability to use prod url is already in system but need to imp checking system
-            dict_mymodel['productURL'] = str(searchForLink.searchforlinkDDG(dict_mymodel['name'], str_urlchq))
-            dict_mymodel['productURL'] = re.sub(uniqVendorData['vendorSUBInput'],uniqVendorData['vendorSUBOutput'], dict_mymodel['productURL'], flags=re.IGNORECASE)
-            print(dict_mymodel['productURL'])
+            if dict_mymodel['productURL']=="":
+                print("Finding DL from URL: "+dict_mymodel['productURL'])
+                dict_mymodel['productURL'] = str(searchForLink.searchforlinkDDG(dict_mymodel['name'], str_urlchq))
+                dict_mymodel['productURL'] = re.sub(uniqVendorData['vendorSUBInput'],uniqVendorData['vendorSUBOutput'], dict_mymodel['productURL'], flags=re.IGNORECASE)
+            else:
+                print("Using Prev found URL: "+dict_mymodel['productURL'])
+                
             if not dict_mymodel['productURL'] == "None":
                 dict_mymodel['productURL'] += URLaddON
                 self.getdlURL(driver, str_cpath, list_URLDLchq, dict_mymodel)
