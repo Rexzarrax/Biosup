@@ -29,6 +29,8 @@ def main():
     print("Initialising...")
     dict_ModelData = {}
     str_datapath = os.path.join(os.getcwd(), os.path.dirname(__file__),"BIOSHERE","urlData.txt")
+    str_running_config = os.path.join(os.getcwd(), os.path.dirname(__file__),"config.ini")
+    str_datapathvendor = os.path.join(os.getcwd(), os.path.dirname(__file__),"vendorInfo.txt")
     str_breaker = "-------------------START---------------------"
     dict_state_key = {'no_action':0,'update_bios':1,'ignore_bios':2,'failed_dl':3,'success_dl':4, 'up-to-date':5}
 
@@ -53,7 +55,7 @@ def main():
             print('File already exists...')
 
     #create required objects
-    obj_myConfig = loadConfig("config.ini")
+    obj_myConfig = loadConfig(str_running_config, str_datapathvendor)
     obj_statisticsData = datastatistics(obj_myConfig.vendor, dict_state_key)
     obj_mysetup = setUp()
     obj_myGetWeb = gethtml()

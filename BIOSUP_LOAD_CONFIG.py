@@ -3,7 +3,8 @@ import os
 from json import load
 
 class loadConfig:
-    def __init__(self, configfile):
+    def __init__(self, configfile, str_datapath):
+        self.str_datapath = str_datapath
         try:
             config_object = ConfigParser()
             config_object.read(configfile)
@@ -32,8 +33,7 @@ class loadConfig:
             except:
                 print("No blank entries :)")
             try:
-                self.datapath = os.path.join(os.getcwd(), os.path.dirname(__file__),"vendorInfo.txt")
-                with open (self.datapath) as infile:
+                with open (self.str_datapath) as infile:
                     self.allvendordata = load(infile)
                     infile.close()
             except Exception as e: 

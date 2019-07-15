@@ -5,6 +5,21 @@ try:
 except ImportError:  
     print("No module named 'BeautifulSoup' found") 
 class webwithjs:
+    def __init__(self, openBrowser, sleepTimer):
+        self.str_tempURL = ""
+        self.sleepTimer = sleepTimer
+        print("sleep timer: "+str(sleepTimer))
+        try:
+            try:
+                options = webdriver.firefox.options.Options()
+                if not openBrowser:
+                    options.add_argument('-headless')
+                self.driver = webdriver.Firefox(options=options)
+            except:
+                self.runChromeDriver(openBrowser)
+        except Exception as e:
+            input("Error in loading web driver: "+str(e))
+            quit()
     def getwebwithjs(self, str_link, bool_refresh):           
             if (not str_link == "None") and (not str_link == self.str_tempURL):
                 print("First Load of "+str_link+"...")
@@ -21,18 +36,7 @@ class webwithjs:
             time.sleep(self.sleepTimer)
             soup_temp = BeautifulSoup(self.driver.page_source, "html5lib") #page_source fetches page after rendering is complete
             return soup_temp
-            
-    def __init__(self, openBrowser, sleepTimer):
-        self.str_tempURL = ""
-        self.sleepTimer = sleepTimer
-        print("sleep timer: "+str(sleepTimer))
-        try:
-            options = webdriver.firefox.options.Options()
-            if not openBrowser:
-                options.add_argument('-headless')
-            self.driver = webdriver.Firefox(options=options)
-        except:
-            self.runChromeDriver(openBrowser)
+
     def runChromeDriver(self, openBrowser):
          #Chrome Headless
             options = webdriver.ChromeOptions()

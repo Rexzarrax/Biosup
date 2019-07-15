@@ -1,7 +1,5 @@
 import requests
 
-
-
 class web_scraper:
     def __init__(self, *args, **kwargs):
         #return super().__init__(*args, **kwargs)

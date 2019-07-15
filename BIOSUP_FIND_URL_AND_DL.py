@@ -20,22 +20,28 @@ class biosDownload:
         str_urlchq = uniqVendorData['vendorSort']
         URLaddON = uniqVendorData['vendorURLaddon']
         list_URLDLchq = uniqVendorData['vendorDownloadURLbase']
+        bool_link_tester = True
 
         print("Finding "+dict_mymodel['name']+ " URL...")
         if not os.path.exists(str_cpath):
             #could add ability to use prod url is already in system but need to imp checking system
-            if dict_mymodel['productURL']=="":
-                print("Finding DL from URL: "+dict_mymodel['productURL'])
-                dict_mymodel['productURL'] = str(searchForLink.searchforlinkDDG(dict_mymodel['name'], str_urlchq))
-                dict_mymodel['productURL'] = re.sub(uniqVendorData['vendorSUBInput'],uniqVendorData['vendorSUBOutput'], dict_mymodel['productURL'], flags=re.IGNORECASE)
-            else:
-                print("Using Prev found URL: "+dict_mymodel['productURL'])
-                
-            if not dict_mymodel['productURL'] == "None":
-                dict_mymodel['productURL'] += URLaddON
-                self.getdlURL(driver, str_cpath, list_URLDLchq, dict_mymodel)
-            else:
-                print("Error in getting Src URL")
+            while bool_link_tester:
+                if dict_mymodel['productURL']=="":
+                    print("Finding DL from URL: "+dict_mymodel['productURL'])
+                    dict_mymodel['productURL'] = str(searchForLink.searchforlinkDDG(dict_mymodel['name'], str_urlchq))
+                    dict_mymodel['productURL'] = re.sub(uniqVendorData['vendorSUBInput'],uniqVendorData['vendorSUBOutput'], dict_mymodel['productURL'], flags=re.IGNORECASE)
+                    bool_link_tester = False
+                else:
+                    print("Using Prev found URL: "+dict_mymodel['productURL'])
+                    bool_link_tester = True
+
+                if not dict_mymodel['productURL'] == "None":
+                    dict_mymodel['productURL'] += URLaddON
+                    if self.getdlURL(driver, str_cpath, list_URLDLchq, dict_mymodel):
+                        bool_link_tester = False
+                else:
+                    print("Error in getting Src URL")
+                    bool_link_tester = False
         else:
             print("Zip file already downloaded...")
 
@@ -62,7 +68,11 @@ class biosDownload:
                 sleep(int_retries)
                 if int_retries >= 5:
                     bool_refresh = True 
-                int_retries += 1                                
+                int_retries += 1
+        if bool_gotLink:
+            return True
+        else:
+            return False                                
 
     def dlBIOS(self,link,str_cpath, dict_mymodel):
         if not link == dict_mymodel['downloadURL']:
