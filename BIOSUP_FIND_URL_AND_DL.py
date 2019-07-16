@@ -36,7 +36,9 @@ class biosDownload:
                     bool_link_tester = True
 
                 if not dict_mymodel['productURL'] == "None":
-                    dict_mymodel['productURL'] += URLaddON
+                    if re.search(dict_mymodel['productURL'], URLaddON) == "None":
+                        print("Adding: "+URLaddON)
+                        dict_mymodel['productURL'] += URLaddON
                     if self.getdlURL(driver, str_cpath, list_URLDLchq, dict_mymodel):
                         bool_link_tester = False
                 else:
