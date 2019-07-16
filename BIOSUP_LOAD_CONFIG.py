@@ -37,13 +37,13 @@ class loadConfig:
                     self.allvendordata = load(infile)
                     infile.close()
             except Exception as e: 
-                print("Failure in loading vendors (in)"+str(e))
-                exit()
+                input("Failure in loading vendors (in)"+str(e))
+                quit()
             print(str(self.allvendordata))
         except Exception as e: 
             print("Failure in loading vendors (out)"+str(e))
             input("Critical Error: Missing or Invalid configuration file: "+configfile)
-            exit()
+            quit()
         #print all loaded config data to console
         print("Loading config... ")
         print(" >Clean up: "+str(self.clean))

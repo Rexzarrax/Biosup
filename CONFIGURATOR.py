@@ -32,18 +32,20 @@ class BIOSUP_CONFIG(wx.Frame):
 
         self.selectall = self.running = True
         self.allchiparr = []
-        self.str_file_config = "CONFIGURATOR_CONFIG.ini"
+        self.str_file_config = os.path.join(os.getcwd(), os.path.dirname(__file__),"CONFIGURATOR_CONFIG.ini")
+        self.str_datapathvendor = os.path.join(os.getcwd(), os.path.dirname(__file__),"vendorInfo.txt")
 
         self.TEXT_CTRL_STATUS = wx.TextCtrl(self, wx.ID_ANY, "", style=wx.TE_LEFT | wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_WORDWRAP|wx.TE_RICH)
         self.TEXT_CTRL_STATUS.AppendText("Loading "+str(self.str_file_config)+"...\n")
         
         try:
-            self.config = loadConfig(str(self.str_file_config))
+            self.config = loadConfig(self.str_file_config, self.str_datapathvendor)
             self.TEXT_CTRL_STATUS.AppendText(str(self.str_file_config)+" successfully loaded...\n")
-        except:
+        except Exception as e:
+            print("failed to load config: "+str(e))
             self.TEXT_CTRL_STATUS.AppendText(str(self.str_file_config)+" failed to load...\n")
             self.TEXT_CTRL_STATUS.SetForegroundColour(wx.RED)
-
+        
         self.AMD_SIZER_ALL_CB = wx.CheckBox(self, wx.ID_ANY, "Select All")
         self.AMD_Chq_List = wx.CheckListBox(self, wx.ID_ANY, choices=self.config.AMDallowedchipsets)
         self.INTEL_SIZER_ALL_CB = wx.CheckBox(self, wx.ID_ANY, "Select All")
@@ -57,7 +59,7 @@ class BIOSUP_CONFIG(wx.Frame):
         #self.Run_Btn = wx.Button(self, wx.ID_ANY, "Generate\nConfig")
         #self.Run_n_Gen_Btn = wx.Button(self, wx.ID_ANY, "Generate\n and Run")
         self.Run_n_Gen_Btn = wx.Button(self, wx.ID_ANY, "Generate\n Config")
-
+        
         self.CLEANUP_CB.IsChecked()
 
         self.__set_properties()
@@ -192,7 +194,7 @@ class BIOSUP_CONFIG(wx.Frame):
             self.deselect_Check_Lists(self.AMD_Chq_List)
             self.deselect_Check_Lists(self.Intel_Chq_List)
             self.deselect_Check_Lists(self.Vendor_Chq_List)
-            self.lastconfig = loadConfig("config.ini")
+            self.lastconfig = loadConfig(os.path.join(os.getcwd(), os.path.dirname(__file__),"config.ini"), self.str_datapathvendor)
             self.Set_Check_Lists(self.lastconfig)
             self.CLEANUP_CB.SetValue(bool(self.lastconfig.saveState))
         else:
