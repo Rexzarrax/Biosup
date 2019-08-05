@@ -2,5 +2,5 @@
  "ASROCK": {"vendorSort": "^https:\\/\\/(www\\.)?asrock\\.com\\/mb\\/", "vendorDownloadURLbase": ["^http://asrock.pc.cdn.bitgravity.com/BIOS/"], "vendorURLaddon": "#BIOS","vendorSUBInput":"","vendorSUBOutput":""},
  "ASUS": {"vendorSort": "^https:\\/\\/www\\.asus\\.com\\/(au\\/|us\\/)?Motherboards\\/", "vendorDownloadURLbase": ["^https://dlcdnets.asus.com/pub"], "vendorURLaddon": "/HelpDesk_BIOS/","vendorSUBInput":"_Download(.*)|_CPU(.*)|_QVL(.*)|_BIOS/","vendorSUBOutput":"_BIOS"}, 
  "GIGABYTE": {"vendorSort": "^https:\\/\\/www\\.gigabyte\\.com\\/(us\\/)?Motherboard\\/", "vendorDownloadURLbase": ["^http://download.gigabyte.asia/FileList/BIOS"], "vendorURLaddon": "/support#support-dl-bios","vendorSUBInput":"","vendorSUBOutput":""}, 
- "MSI": {"vendorSort": "^https:\\/\\/(www|us)?\\.msi\\.com\\/Motherboard\\/support\\/", "vendorDownloadURLbase": ["^http://download.msi.com/bos"], "vendorURLaddon": "#down-bios","vendorSUBInput":"","vendorSUBOutput":""}
+ "MSI": {"vendorSort": "^https:\\/\\/(www|us)?\\.msi\\.com\\/Motherboard\\/support\\/", "vendorDownloadURLbase": ["^(http://)?download.msi.com/bos"], "vendorURLaddon": "#down-bios","vendorSUBInput":"","vendorSUBOutput":""}
 }
