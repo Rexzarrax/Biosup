@@ -28,7 +28,7 @@ class biosDownload:
             while bool_link_tester:
                 if dict_mymodel['productURL']=="":
                     print("Finding DL from URL: "+dict_mymodel['productURL'])
-                    dict_mymodel['productURL'] = str(searchForLink.searchforlinkDDG(dict_mymodel['name'], str_urlchq))
+                    dict_mymodel['productURL'] = str(searchForLink.searchforlinkDDG(dict_mymodel['name'], str_urlchq, dict_mymodel['chipset']))
                     dict_mymodel['productURL'] = re.sub(uniqVendorData['vendorSUBInput'],uniqVendorData['vendorSUBOutput'], dict_mymodel['productURL'], flags=re.IGNORECASE)
                     bool_link_tester = False
                 else:

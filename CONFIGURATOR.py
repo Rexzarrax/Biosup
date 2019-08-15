@@ -5,7 +5,7 @@
 
 import wx
 import os
-#import multiprocessing
+from multiprocessing import Process, Pipe
 import logging
 import time
 from datetime import datetime as dt
@@ -13,6 +13,7 @@ import sys
 import io
 #from BIOSUP import BIOSUP_MAIN as entry_BIOSUP
 from BIOSUP_THR_CHK_STATUS import chq_status
+from BIOSUP import main
 
 from time import sleep
 
@@ -30,6 +31,7 @@ class BIOSUP_CONFIG(wx.Frame):
         kwds["style"] = kwds.get("style", 0) | wx.DEFAULT_FRAME_STYLE
         wx.Frame.__init__(self, *args, **kwds)
 
+        self.BIOSUP_APP = main
         self.selectall = self.running = True
         self.allchiparr = []
         self.str_file_config = os.path.join(os.getcwd(), os.path.dirname(__file__),"CONFIGURATOR_CONFIG.ini")
@@ -55,9 +57,9 @@ class BIOSUP_CONFIG(wx.Frame):
         self.CLEANUP_CB = wx.CheckBox(self, wx.ID_ANY, "Remove Zips")
         self.SH_BROWSER_CB = wx.CheckBox(self, wx.ID_ANY, "Show Browser")
         self.useLast_ChqBox = wx.CheckBox(self, wx.ID_ANY, "Last Config")
-        self.Selectall_Btn = wx.Button(self, wx.ID_ANY, "Select All")
+        self.Selectall_Btn = wx.Button(self, wx.ID_ANY, "Select\n All")
         #self.Run_Btn = wx.Button(self, wx.ID_ANY, "Generate\nConfig")
-        #self.Run_n_Gen_Btn = wx.Button(self, wx.ID_ANY, "Generate\n and Run")
+        self.Run_Btn = wx.Button(self, wx.ID_ANY, "Generate\n and Run")
         self.Run_n_Gen_Btn = wx.Button(self, wx.ID_ANY, "Generate\n Config")
         
         self.CLEANUP_CB.IsChecked()
@@ -66,13 +68,14 @@ class BIOSUP_CONFIG(wx.Frame):
         self.__do_layout()
         # end wxGlade
         #Bind events
-        #self.Run_Btn.Bind(wx.EVT_BUTTON, self.Run_Event)
+        self.Run_Btn.Bind(wx.EVT_BUTTON, self.Run_Event)
         self.Run_n_Gen_Btn.Bind(wx.EVT_BUTTON, self.Run_Gen_Event)
         self.Selectall_Btn.Bind(wx.EVT_BUTTON, self.Select_All_Chq_Box)
         self.useLast_ChqBox.Bind(wx.EVT_CHECKBOX, self.Select_Last_Run)
         self.AMD_SIZER_ALL_CB.Bind(wx.EVT_CHECKBOX, self.singular_Chq_AMD)
         self.INTEL_SIZER_ALL_CB.Bind(wx.EVT_CHECKBOX, self.singular_Chq_INTEL)
         self.VENDOR_SIZER_ALL_CB.Bind(wx.EVT_CHECKBOX, self.singular_Chq_Vendor)
+        self.Bind(wx.EVT_CLOSE, self.OnClose)
 
 
         #self.useLast_ChqBox.SetValue(True)
@@ -93,6 +96,19 @@ class BIOSUP_CONFIG(wx.Frame):
         else:
             self.deselect_Check_Lists(self.Vendor_Chq_List)
     
+    def OnClose(self, evt):
+        try:
+            if self.biosup_process.is_alive():
+                self.TEXT_CTRL_STATUS.AppendText("Exiting...\n")
+                self.biosup_process.terminate()
+            else:
+                self.TEXT_CTRL_STATUS.AppendText("BIOSUP subscript already killed\n")
+        except:
+            self.TEXT_CTRL_STATUS.AppendText("No Process to kill\n")
+        quit()
+        wx.Exit()
+
+
     def Run_Gen_Event(self, evt):
         self.Gen_Config()
         self.TEXT_CTRL_STATUS.AppendText("Now Close this GUI, and run 'BIOSUP.exe'")
@@ -101,6 +117,13 @@ class BIOSUP_CONFIG(wx.Frame):
 
     def Run_Event(self, evt):
         self.Gen_Config()
+        parent_conn, child_conn = Pipe()
+        self.biosup_process = Process(target=self.BIOSUP_APP)
+        self.biosup_process.daemon = True
+        self.biosup_process.start()
+
+        #self.TEXT_CTRL_STATUS.AppendText(thread.)
+
 
     def True_False_checker(self, Bool_State):
         if Bool_State:
@@ -163,7 +186,7 @@ class BIOSUP_CONFIG(wx.Frame):
             self.Set_Check_Lists(self.config)
             self.useLast_ChqBox.SetValue(False)
             self.selectall = False
-            self.Selectall_Btn.SetLabel("De-select All")
+            self.Selectall_Btn.SetLabel("De-select\n All")
             self.AMD_SIZER_ALL_CB.SetValue(True)
             self.INTEL_SIZER_ALL_CB.SetValue(True)
             self.VENDOR_SIZER_ALL_CB.SetValue(True)
@@ -174,7 +197,7 @@ class BIOSUP_CONFIG(wx.Frame):
             self.deselect_Check_Lists(self.Intel_Chq_List)
             self.deselect_Check_Lists(self.Vendor_Chq_List)
             self.selectall = True
-            self.Selectall_Btn.SetLabel("Select All")
+            self.Selectall_Btn.SetLabel("Select\n All")
             self.AMD_SIZER_ALL_CB.SetValue(False)
             self.INTEL_SIZER_ALL_CB.SetValue(False)
             self.VENDOR_SIZER_ALL_CB.SetValue(False)
@@ -238,9 +261,8 @@ class BIOSUP_CONFIG(wx.Frame):
         FAT_CONTROLLER_GRID_SIZER.Add((0, 0), 0, 0, 0)
         FAT_CONTROLLER_GRID_SIZER.Add((0, 0), 0, 0, 0)
         FAT_CONTROLLER_GRID_SIZER.Add(self.Selectall_Btn, 0, wx.ALIGN_LEFT, 0)
-        FAT_CONTROLLER_GRID_SIZER.Add((0, 0), 0, 0, 0)
-        #FAT_CONTROLLER_GRID_SIZER.Add(self.Run_Btn, 0, wx.ALIGN_CENTER, 0)
-        FAT_CONTROLLER_GRID_SIZER.Add(self.Run_n_Gen_Btn, 0, wx.ALIGN_RIGHT, 0)
+        FAT_CONTROLLER_GRID_SIZER.Add(self.Run_n_Gen_Btn, 0, wx.ALIGN_CENTER, 0)
+        FAT_CONTROLLER_GRID_SIZER.Add(self.Run_Btn, 0, wx.ALIGN_RIGHT, 0)
 
         ALL_CTRLR.Add(FAT_CONTROLLER_GRID_SIZER, 0, 0, 0)
         ALL_CTRLR.Add(self.TEXT_CTRL_STATUS, 0, wx.EXPAND, 0)

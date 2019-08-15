@@ -12,9 +12,9 @@ from bs4 import BeautifulSoup
 class searchForLink:
     def __init__(self):
             pass
-    #convert this to use browser instead of get requests
+    #convert this to use browser instead of get requests?
     #if searchforlinkDDG fails, uses google instead
-    def searchforlinkDDG(self, str_mymodel, str_urlchq):
+    def searchforlinkDDG(self, str_mymodel, str_urlchq, str_chipset):
         print("Running DDG search...")
         list_search_extras = [""," uefi", " bios", " support"]
         int_search_threshold = 0.6
@@ -37,18 +37,23 @@ class searchForLink:
                    
                     print("Found the URL:", str_link_to_return)
                     print(str_urlchq+str_mymodel+" vs. "+str_link_to_return)
+                    print("Tried str_chq_link "+str(int_numURL)+":"+str(str_link_to_return+"\n"+str(str_urlchq)))
                     
                     #will need to fix this up a bit to accuratly find the correct url
-                    if re.findall(str_urlchq, str_link_to_return, re.IGNORECASE):
+                    if re.search(str_urlchq, str_link_to_return, re.IGNORECASE):
                         int_match = SequenceMatcher("",str_link_to_return,str_urlchq+str_mymodel).ratio()
                         print(str(int_match))
-                        if int_match > int_search_threshold:
-                            return str_link_to_return
-
+                        if re.search(str_chipset,str_link_to_return):
+                            print("Chipset match "+str_chipset+" vs. "+str_link_to_return)    
+                            if int_match > int_search_threshold:                         
+                                print("Full match")
+                                return str_link_to_return
+                        else:
+                            print("No match")
                     elif not int_numURL > 20:
+                        print("No match")
                         int_numURL += 1
-                        print("Tried str_chq_link "+str(int_numURL)+":"+str(str_link_to_return+"\n"+str(str_urlchq)))
-                    
+                              
                     else:
                         break
                 #if str_link_to_return == "":
