@@ -1,5 +1,5 @@
 google==2.0.1
-requests==2.21.0
+requests==2.31.0
 pcpartpickerapi==0.1.7
 html5lib==1.0.1
 clint==0.5.1
